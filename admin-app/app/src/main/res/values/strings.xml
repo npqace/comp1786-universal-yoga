@@ -1,0 +1,150 @@
+<resources>
+    <!-- App basic information -->
+    <string name="app_name">Universal Yoga</string>
+    <string name="app_version">Version 1.0</string>
+    <string name="app_header_title">Universal Yoga Admin</string>
+    <string name="app_header_subtitle">Manage your yoga courses and classes</string>
+
+    <!-- General action labels -->
+    <string name="action_edit">Edit</string>
+    <string name="action_delete">Delete</string>
+    <string name="action_cancel">Cancel</string>
+    <string name="action_confirm">Confirm</string>
+    <string name="action_save">SAVE</string>
+    <string name="action_clear_all">Clear All</string>
+
+    <!-- Common form labels and indicators -->
+    <string name="label_description">Description</string>
+    <string name="label_loading">Loading…</string>
+    <string name="indicator_required">*</string>
+    <string name="indicator_optional">✓</string>
+
+    <!-- Splash screen texts -->
+    <string name="splash_logo_description">Universal Yoga Logo</string>
+    <string name="splash_subtitle">Admin Dashboard</string>
+    <string name="splash_tagline">Manage Your Yoga Classes</string>
+
+    <!-- Form headers and labels -->
+    <string name="form_header_required">Required Information</string>
+    <string name="form_header_optional">Optional Information</string>
+    <string name="form_label_day_of_week">Day of Week</string>
+    <string name="form_label_time">Time</string>
+    <string name="form_label_capacity">Capacity</string>
+    <string name="form_label_duration">Duration</string>
+    <string name="form_label_price">Price per class</string>
+    <string name="form_label_class_type">Type of Class</string>
+    <string name="form_label_instructor">Instructor Name</string>
+    <string name="form_label_room">Room/Studio Number</string>
+    <string name="form_label_difficulty">Difficulty Level</string>
+    <string name="form_label_equipment">Equipment Needed</string>
+    <string name="form_label_age_group">Target Age Group</string>
+
+    <!-- Form hints -->
+    <string name="form_hint_time">Tap to select time</string>
+    <string name="form_hint_capacity">Number of persons</string>
+    <string name="form_hint_duration">Minutes (e.g. 60)</string>
+    <string name="form_hint_price">Price per class (e.g. 25.00)</string>
+    <string name="form_hint_description">Tell us about this class…</string>
+    <string name="form_hint_instructor">e.g. Sarah Johnson</string>
+    <string name="form_hint_room">e.g. Studio A, Room 201</string>
+    <string name="form_hint_equipment">e.g. Yoga mats, blocks, straps</string>
+
+    <!-- Form buttons -->
+    <string name="button_clear_form">CLEAR FORM</string>
+    <string name="button_create_course">CREATE COURSE</string>
+
+    <!-- Course section -->
+    <string name="btn_add_course_description">Add new course</string>
+    <string name="desc_course_logo">Yoga course logo</string>
+    <string name="course_title">Hatha Yoga</string>
+    <string name="course_price">£25.00</string>
+    <string name="desc_calendar_icon">Calendar icon</string>
+    <string name="course_time">Monday at 18:00</string>
+    <string name="desc_capacity">Capacity icon</string>
+    <string name="course_capacity">20 people • 60 minutes</string>
+    <string name="course_instructor">Default: Sarah Johnson</string>
+    <string name="course_location">Studio A</string>
+    <string name="course_difficulty">Beginner</string>
+    <string name="course_description">A gentle yoga practice focusing on basic postures and breathing techniques.</string>
+    <string name="course_created_date">Created: 15/12/2024 14:30</string>
+
+    <!-- Create Course Activity -->
+    <string name="desc_back_btn">Back</string>
+    <string name="create_course_title">Create New Course</string>
+
+
+    <!-- Class section -->
+    <string name="title_class_list">Classes</string>
+    <string name="message_no_classes_found">No classes found</string>
+    <string name="button_create_class">Create Class</string>
+
+    <!-- Search functionality -->
+    <string name="title_search">Search Classes</string>
+    <string name="search_hint_main">Search by class type, instructor, or day…</string>
+    <string name="search_hint_date">Select date to search</string>
+    <string name="button_search_teacher">Search by Teacher</string>
+    <string name="button_advanced_search">Advanced Search</string>
+    <string name="search_results_title">Search Results</string>
+    <string name="search_empty_title">No Results Found</string>
+    <string name="search_empty_subtitle">No classes match your search criteria. Try adjusting your search terms.</string>
+    <string name="search_ready_title">Ready to Search</string>
+    <string name="search_ready_subtitle">Enter a teacher name or use advanced search to find classes</string>
+
+    <!-- Time picker dialog -->
+    <string name="dialog_title_time_picker">Time of Course</string>
+    <string name="dialog_select_time">Select time</string>
+    <string name="dialog_hour">Hour</string>
+    <string name="dialog_minutes">Minutes</string>
+    <string name="dialog_am">AM</string>
+    <string name="dialog_pm">PM</string>
+
+    <!-- Course confirmation dialog -->
+    <string name="dialog_title_confirm_course">Course Details Confirmation</string>
+    <string name="dialog_subtitle_confirm_course">Please review the course template details below</string>
+    <string name="dialog_details_title_confirm_course">Yoga Course Template Details</string>
+    <string name="dialog_description_confirm_course">Course details will appear here…</string>
+    <string name="dialog_info_confirm_course">Once saved, this course template will be available for creating specific classes.</string>
+
+    <!-- Delete confirmation dialogs -->
+    <string name="dialog_title_delete_course">Delete Course?</string>
+    <string name="dialog_message_delete_course">Are you sure you want to delete this course template? This will also delete all associated classes.</string>
+
+    <string name="dialog_title_delete_class">Delete Class?</string>
+    <string name="dialog_message_delete_class">Are you sure you want to delete this class?</string>
+
+    <!-- Database reset confirmation -->
+    <string name="dialog_title_reset_database">Reset Database?</string>
+    <string name="dialog_message_reset_database">Are you sure you want to delete all course templates and classes? This action cannot be undone.</string>
+    <string name="button_reset_database">Reset Database</string>
+
+    <!-- Toast messages / notifications -->
+    <string name="toast_form_cleared">Form cleared</string>
+
+    <!-- Database operation success messages -->
+    <string name="db_success_course_saved">Yoga course saved successfully!</string>
+    <string name="db_success_course_updated">Yoga course updated successfully!</string>
+    <string name="db_success_course_deleted">Yoga course deleted successfully!</string>
+    <string name="db_success_class_saved">Class saved successfully!</string>
+    <string name="db_success_class_updated">Class updated successfully!</string>
+    <string name="db_success_class_deleted">Class deleted successfully!</string>
+    <string name="db_success_database_reset">Database reset successfully!</string>
+
+    <!-- Error messages -->
+    <string name="toast_error_validation">Please fill all the required fields</string>
+    <string name="toast_error_creating_course">Error creating course: %s</string>
+    <string name="db_error_course_save">Failed to save yoga course</string>
+    <string name="db_error_course_update">Failed to update yoga course</string>
+    <string name="db_error_course_delete">Failed to delete yoga course</string>
+    <string name="db_error_class_save">Failed to save class</string>
+    <string name="db_error_class_update">Failed to update class</string>
+    <string name="db_error_class_delete">Failed to delete class</string>
+
+    <!-- Empty state   -->
+    <string name="empty_courses">No yoga courses yet</string>
+    <string name="empty_create_course">Create your first yoga course using the + button</string>
+    <string name="empty_classes"></string>
+
+
+    <!-- Format strings -->
+    <string name="format_price_input">£ %s</string>
+</resources>

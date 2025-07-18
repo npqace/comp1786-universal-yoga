@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+
+    <!-- Blue Theme Colors (5 colors max) -->
+    <color name="primary_blue">#2196F3</color>        <!-- Main blue -->
+    <color name="dark_blue">#1976D2</color>           <!-- Dark blue for accents -->
+    <color name="light_blue">#E3F2FD</color>          <!-- Light blue for backgrounds -->
+    <color name="accent_orange">#FF9800</color>        <!-- Orange accent for buttons -->
+    <color name="text_dark">#263238</color>           <!-- Dark text -->
+
+    <!-- App color mappings -->
+    <color name="primary_text">@color/text_dark</color>
+    <color name="secondary_text">#757575</color>
+    <color name="background_light">@color/light_blue</color>
+    <color name="background_white">@color/white</color>
+    <color name="error_color">#F44336</color>
+    <color name="success_color">#4CAF50</color>
+    <color name="light_gray">#E0E0E0</color>
+
+    <!-- Status colors for improved functionality -->
+    <!-- Removed unused red and green color aliases -->
+</resources>
