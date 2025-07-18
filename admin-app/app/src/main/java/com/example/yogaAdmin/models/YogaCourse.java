@@ -105,4 +105,3 @@ public class YogaCourse implements Serializable {
         return "Created: " + sdf.format(new Date(createdDate));
     }
 }
-

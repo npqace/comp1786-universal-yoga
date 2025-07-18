@@ -55,6 +55,7 @@
     <string name="button_update_course">UPDATE COURSE</string>
 
     <!-- Course section -->
+    <string name="desc_menu">Menu</string>
     <string name="btn_add_course_description">Add new course</string>
     <string name="desc_course_logo">Yoga course logo</string>
     <string name="course_title">Hatha Yoga</string>
@@ -124,7 +125,7 @@
     <!-- Database reset confirmation -->
     <string name="dialog_title_reset_database">Reset Database?</string>
     <string name="dialog_message_reset_database">Are you sure you want to delete all course templates and classes? This action cannot be undone.</string>
-    <string name="button_reset_database">Reset Database</string>
+    <string name="btn_reset_database">Reset Database</string>
 
     <!-- Toast messages / notifications -->
     <string name="toast_form_cleared">Form cleared</string>
@@ -156,4 +157,8 @@
 
     <!-- Format strings -->
     <string name="format_price_input">£ %s</string>
+
+    <!-- Menu items -->
+    <string name="menu_reset_database">Reset Database</string>
+    <string name="menu_about">About</string>
 </resources>

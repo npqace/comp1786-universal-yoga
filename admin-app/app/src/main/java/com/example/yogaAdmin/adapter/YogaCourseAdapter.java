@@ -145,4 +145,3 @@ public class YogaCourseAdapter extends ListAdapter<YogaCourse, YogaCourseAdapter
         this.listener = listener;
     }
 }
-

@@ -36,4 +36,8 @@ public class YogaCourseViewModel extends AndroidViewModel {
     public void delete(YogaCourse yogaCourse) {
         mRepository.delete(yogaCourse);
     }
+
+    public void deleteAllCourses() {
+        mRepository.deleteAllCourses();
+    }
 }

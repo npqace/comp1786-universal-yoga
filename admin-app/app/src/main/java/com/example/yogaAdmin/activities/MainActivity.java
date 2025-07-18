@@ -3,11 +3,16 @@ package com.example.yogaAdmin.activities;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.PopupMenu;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -23,14 +28,20 @@ public class MainActivity extends AppCompatActivity {
     public static final int ADD_COURSE_REQUEST = 1;
     public static final int EDIT_COURSE_REQUEST = 2;
 
+
     private YogaCourseViewModel yogaCourseViewModel;
     private RecyclerView recyclerView;
     private LinearLayout emptyStateLayout;
+    private ImageView btnMenu;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        btnMenu = findViewById(R.id.btn_menu);
+        btnMenu.setOnClickListener(this::showPopupMenu);
+
 
         FloatingActionButton buttonAddCourse = findViewById(R.id.fab_add_course);
         buttonAddCourse.setOnClickListener(v -> {
@@ -91,7 +102,51 @@ public class MainActivity extends AppCompatActivity {
             }
         } else {
             // Optional: Handle the case where the user cancels the create/edit activity
-            // Toast.makeText(this, "Course not saved", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Course not saved", Toast.LENGTH_SHORT).show();
         }
+    }
+
+    private void showPopupMenu(View view) {
+        PopupMenu popupMenu = new PopupMenu(this, view);
+        popupMenu.getMenuInflater().inflate(R.menu.main_menu, popupMenu.getMenu());
+        popupMenu.setOnMenuItemClickListener(item -> {
+            if (item.getItemId() == R.id.action_reset_database) {
+                showResetConfirmationDialog();
+                return true;
+            } else if (item.getItemId() == R.id.action_about) {
+                showAboutDialog();
+                return true;
+            }
+            return false;
+        });
+        popupMenu.show();
+    }
+
+    private void showResetConfirmationDialog() {
+        AlertDialog dialog = new AlertDialog.Builder(this)
+                .setTitle("Reset Database")
+                .setMessage("Are you sure you want to delete all courses? This action cannot be undone.")
+                .setPositiveButton("Reset", (dialogInterface, which) -> {
+                    yogaCourseViewModel.deleteAllCourses();
+                    Toast.makeText(MainActivity.this, "All courses deleted", Toast.LENGTH_SHORT).show();
+                })
+                .setNegativeButton("Cancel", null)
+                .create();
+
+        dialog.show();
+
+        Button positiveButton = dialog.getButton(AlertDialog.BUTTON_POSITIVE);
+        if (positiveButton != null) {
+            // You can use a standard Android red or a custom color from your res/values/colors.xml
+            positiveButton.setTextColor(ContextCompat.getColor(this, R.color.error_color));
+        }
+    }
+
+    private void showAboutDialog() {
+        new AlertDialog.Builder(this)
+                .setTitle("About Universal Yoga")
+                .setMessage("This is an admin application for managing yoga courses.\n\nVersion: 1.0")
+                .setPositiveButton("OK", null)
+                .show();
     }
 }

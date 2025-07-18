@@ -42,4 +42,10 @@ public class YogaCourseRepository {
             mYogaCourseDao.delete(yogaCourse);
         });
     }
+
+    public void deleteAllCourses() {
+        AppDatabase.databaseWriteExecutor.execute(() -> {
+            mYogaCourseDao.deleteAllCourses();
+        });
+    }
 }
