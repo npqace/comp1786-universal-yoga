@@ -108,14 +108,16 @@
 
         <!-- Default Instructor (optional) -->
         <TextView
-            android:id="@+id/tv_default_instructor"
+            android:id="@+id/tv_instructor"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/course_instructor"
             android:textSize="14sp"
             android:textColor="@color/secondary_text"
-            android:layout_marginBottom="4dp"
+            android:layout_marginBottom="8dp"
             android:visibility="gone"
+            android:gravity="center_vertical"
+            android:drawablePadding="8dp"
             app:drawableStartCompat="@drawable/ic_instructor" />
 
         <!-- Room (optional) -->
@@ -126,8 +128,10 @@
             android:text="@string/course_location"
             android:textSize="14sp"
             android:textColor="@color/secondary_text"
-            android:layout_marginBottom="4dp"
+            android:layout_marginBottom="8dp"
             android:visibility="gone"
+            android:gravity="center_vertical"
+            android:drawablePadding="8dp"
             app:drawableStartCompat="@drawable/ic_location"/>
 
         <!-- Difficulty (optional) -->
@@ -138,9 +142,39 @@
             android:text="@string/course_difficulty"
             android:textSize="14sp"
             android:textColor="@color/secondary_text"
+            android:layout_marginBottom="8dp"
+            android:visibility="gone"
+            android:gravity="center_vertical"
+            android:drawablePadding="8dp"
+            app:drawableStartCompat="@drawable/ic_level"/>
+
+        <!-- Equipment (optional) -->
+        <TextView
+            android:id="@+id/tv_equipment"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/course_equipment"
+            android:textSize="14sp"
+            android:textColor="@color/secondary_text"
+            android:layout_marginBottom="8dp"
+            android:visibility="gone"
+            android:gravity="center_vertical"
+            android:drawablePadding="8dp"
+            app:drawableStartCompat="@drawable/ic_equipment"/>
+
+        <!-- Age Group (optional) -->
+        <TextView
+            android:id="@+id/tv_age_group"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/course_age_group"
+            android:textSize="14sp"
+            android:textColor="@color/secondary_text"
             android:layout_marginBottom="4dp"
             android:visibility="gone"
-            app:drawableStartCompat="@drawable/ic_level"/>
+            android:gravity="center_vertical"
+            android:drawablePadding="8dp"
+            app:drawableStartCompat="@drawable/ic_people"/>
 
         <!-- Description (optional) -->
         <TextView
@@ -154,6 +188,8 @@
             android:background="@drawable/details_card_background"
             android:padding="12dp"
             android:visibility="gone"
+            android:gravity="center_vertical"
+            android:drawablePadding="8dp"
             app:drawableStartCompat="@drawable/ic_description"/>
 
         <!-- Created date -->

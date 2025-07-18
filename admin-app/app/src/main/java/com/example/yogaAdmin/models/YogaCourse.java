@@ -1,6 +1,19 @@
 package com.example.yogaAdmin.models;
 
-public class YogaCourse {
+import androidx.room.Entity;
+import androidx.room.Ignore;
+import androidx.room.PrimaryKey;
+
+import java.io.Serializable;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
+
+@Entity(tableName = "yoga_courses")
+public class YogaCourse implements Serializable {
+    @PrimaryKey(autoGenerate = true)
+    private int id;
+
     // Required fields
     private String dayOfWeek;
     private String time;
@@ -16,22 +29,28 @@ public class YogaCourse {
     private String difficultyLevel;
     private String equipmentNeeded;
     private String ageGroup;
+    private long createdDate;
 
     // Default constructor
     public YogaCourse() {}
 
-    // Constructor with required fields
+    // Constructor with required fields (ID is not included as it's auto-generated)
+    @Ignore
     public YogaCourse(String dayOfWeek, String time, int capacity, int duration,
-                     double price, String classType) {
+                      double price, String classType) {
         this.dayOfWeek = dayOfWeek;
         this.time = time;
         this.capacity = capacity;
         this.duration = duration;
         this.price = price;
         this.classType = classType;
+        this.createdDate = System.currentTimeMillis();
     }
 
     // Getters and Setters
+    public int getId() { return id; }
+    public void setId(int id) { this.id = id; }
+
     public String getDayOfWeek() { return dayOfWeek; }
     public void setDayOfWeek(String dayOfWeek) { this.dayOfWeek = dayOfWeek; }
 
@@ -68,12 +87,11 @@ public class YogaCourse {
     public String getAgeGroup() { return ageGroup; }
     public void setAgeGroup(String ageGroup) { this.ageGroup = ageGroup; }
 
-
+    public long getCreatedDate() { return createdDate; }
+    public void setCreatedDate(long createdDate) { this.createdDate = createdDate; }
 
     // Get formatted price string
     public String getFormattedPrice() {
-        // Use Locale.UK to ensure the currency symbol and decimal format are correct for GBP
-        // This resolves potential locale-dependent formatting issues.
         return String.format(java.util.Locale.UK, "£%.2f", price);
     }
 
@@ -81,4 +99,10 @@ public class YogaCourse {
     public String getFormattedDuration() {
         return duration + " minutes";
     }
+
+    public String getFormattedCreatedDate() {
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault());
+        return "Created: " + sdf.format(new Date(createdDate));
+    }
 }
+

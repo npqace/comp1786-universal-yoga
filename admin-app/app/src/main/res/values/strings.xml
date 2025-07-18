@@ -52,6 +52,7 @@
     <!-- Form buttons -->
     <string name="button_clear_form">CLEAR FORM</string>
     <string name="button_create_course">CREATE COURSE</string>
+    <string name="button_update_course">UPDATE COURSE</string>
 
     <!-- Course section -->
     <string name="btn_add_course_description">Add new course</string>
@@ -65,8 +66,16 @@
     <string name="course_instructor">Default: Sarah Johnson</string>
     <string name="course_location">Studio A</string>
     <string name="course_difficulty">Beginner</string>
+    <string name="course_equipment">Yoga mats, blocks, straps</string>
+    <string name="course_age_group">Adults</string>
     <string name="course_description">A gentle yoga practice focusing on basic postures and breathing techniques.</string>
     <string name="course_created_date">Created: 15/12/2024 14:30</string>
+
+    <string name="desc_instructor">Instructor icon</string>
+    <string name="desc_location">Location icon</string>
+    <string name="desc_level">Level icon</string>
+    <string name="desc_description">Description icon</string>
+
 
     <!-- Create Course Activity -->
     <string name="desc_back_btn">Back</string>
@@ -142,7 +151,7 @@
     <!-- Empty state   -->
     <string name="empty_courses">No yoga courses yet</string>
     <string name="empty_create_course">Create your first yoga course using the + button</string>
-    <string name="empty_classes"></string>
+    <string name="empty_classes">No classes</string>
 
 
     <!-- Format strings -->

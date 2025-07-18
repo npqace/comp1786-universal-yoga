@@ -32,7 +32,6 @@
             <ImageView
                 android:layout_width="48dp"
                 android:layout_height="48dp"
-                android:contentDescription="@string/splash_logo_description"
                 android:src="@drawable/yoga_logo"
                 android:layout_marginEnd="16dp" />
 
@@ -77,7 +76,6 @@
                 android:layout_width="0dp"
                 android:layout_height="48dp"
                 android:layout_weight="1"
-                android:autofillHints=""
                 android:hint="@string/search_hint_main"
                 android:inputType="text"
                 android:textSize="16sp"
@@ -134,7 +132,6 @@
                 <ImageView
                     android:layout_width="80dp"
                     android:layout_height="80dp"
-                    android:contentDescription="@string/splash_logo_description"
                     android:src="@drawable/yoga_logo"
                     android:layout_marginBottom="16dp"
                     android:alpha="0.5"
@@ -175,5 +172,7 @@
         android:layout_gravity="bottom|end"
         app:backgroundTint="@color/primary_blue"
         app:tint="@color/white" />
+
+
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
