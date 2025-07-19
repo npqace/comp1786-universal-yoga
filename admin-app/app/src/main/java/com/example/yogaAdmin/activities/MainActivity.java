@@ -27,7 +27,7 @@ public class MainActivity extends AppCompatActivity {
 
     public static final int ADD_COURSE_REQUEST = 1;
     public static final int EDIT_COURSE_REQUEST = 2;
-
+    public static final String EXTRA_COURSE = "com.example.yogaAdmin.EXTRA_COURSE";
 
     private YogaCourseViewModel yogaCourseViewModel;
     private RecyclerView recyclerView;
@@ -71,6 +71,14 @@ public class MainActivity extends AppCompatActivity {
 
         adapter.setOnItemClickListener(new YogaCourseAdapter.OnItemClickListener() {
             @Override
+            public void onItemClick(YogaCourse course) {
+                Intent intent = new Intent(MainActivity.this, YogaClassListActivity.class);
+                intent.putExtra(YogaClassListActivity.EXTRA_COURSE_ID, course.getId());
+                intent.putExtra(YogaClassListActivity.EXTRA_COURSE_NAME, course.getClassType());
+                startActivity(intent);
+            }
+
+            @Override
             public void onEditClick(YogaCourse course) {
                 Intent intent = new Intent(MainActivity.this, CreateCourseActivity.class);
                 intent.putExtra(CreateCourseActivity.EXTRA_COURSE, course);
@@ -79,8 +87,17 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onDeleteClick(YogaCourse course) {
-                yogaCourseViewModel.delete(course);
-                Toast.makeText(MainActivity.this, "Course deleted", Toast.LENGTH_SHORT).show();
+                AlertDialog dialog = new AlertDialog.Builder(MainActivity.this)
+                        .setTitle("Delete Course")
+                        .setMessage("Are you sure you want to delete this course? This will also delete all associated classes.")
+                        .setPositiveButton("Delete", (dialogInterface, which) -> {
+                            yogaCourseViewModel.delete(course);
+                            Toast.makeText(MainActivity.this, "Course deleted", Toast.LENGTH_SHORT).show();
+                        })
+                        .setNegativeButton("Cancel", null)
+                        .create();
+                dialog.show();
+                dialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(ContextCompat.getColor(MainActivity.this, R.color.error_color));
             }
         });
     }
@@ -137,16 +154,17 @@ public class MainActivity extends AppCompatActivity {
 
         Button positiveButton = dialog.getButton(AlertDialog.BUTTON_POSITIVE);
         if (positiveButton != null) {
-            // You can use a standard Android red or a custom color from your res/values/colors.xml
             positiveButton.setTextColor(ContextCompat.getColor(this, R.color.error_color));
         }
     }
 
     private void showAboutDialog() {
-        new AlertDialog.Builder(this)
+        AlertDialog dialog = new AlertDialog.Builder(this)
                 .setTitle("About Universal Yoga")
                 .setMessage("This is an admin application for managing yoga courses.\n\nVersion: 1.0")
                 .setPositiveButton("OK", null)
-                .show();
+                .create();
+        dialog.show();
+        dialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(ContextCompat.getColor(this, R.color.primary_blue));
     }
 }

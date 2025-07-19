@@ -59,10 +59,10 @@ public class YogaCourseAdapter extends ListAdapter<YogaCourse, YogaCourseAdapter
     @Override
     public void onBindViewHolder(@NonNull CourseViewHolder holder, int position) {
         YogaCourse currentCourse = getItem(position);
-        holder.tvCourseType.setText(currentCourse.getClassType());
+        holder.tvCourseType.setText(String.format("%s (%s)", currentCourse.getClassType(), currentCourse.getDayOfWeek()));
         holder.tvPrice.setText(currentCourse.getFormattedPrice());
-        holder.tvDayTime.setText(currentCourse.getDayOfWeek() + " at " + currentCourse.getTime());
-        holder.tvCapacityDuration.setText(currentCourse.getCapacity() + " people • " + currentCourse.getFormattedDuration());
+        holder.tvDayTime.setText(String.format("%s at %s", currentCourse.getDayOfWeek(), currentCourse.getTime()));
+        holder.tvCapacityDuration.setText(String.format("%d people • %s", currentCourse.getCapacity(), currentCourse.getFormattedDuration()));
         holder.tvCreatedDate.setText(currentCourse.getFormattedCreatedDate());
 
         // Optional fields with conditional visibility
@@ -120,6 +120,13 @@ public class YogaCourseAdapter extends ListAdapter<YogaCourse, YogaCourseAdapter
             btnEdit = itemView.findViewById(R.id.btn_edit);
             btnDelete = itemView.findViewById(R.id.btn_delete);
 
+            itemView.setOnClickListener(v -> {
+                int position = getAdapterPosition();
+                if (listener != null && position != RecyclerView.NO_POSITION) {
+                    listener.onItemClick(getItem(position));
+                }
+            });
+
             btnEdit.setOnClickListener(v -> {
                 int position = getAdapterPosition();
                 if (listener != null && position != RecyclerView.NO_POSITION) {
@@ -137,6 +144,7 @@ public class YogaCourseAdapter extends ListAdapter<YogaCourse, YogaCourseAdapter
     }
 
     public interface OnItemClickListener {
+        void onItemClick(YogaCourse course);
         void onEditClick(YogaCourse course);
         void onDeleteClick(YogaCourse course);
     }

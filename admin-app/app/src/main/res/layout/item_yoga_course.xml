@@ -29,7 +29,7 @@
                 android:layout_width="24dp"
                 android:layout_height="24dp"
                 android:contentDescription="@string/desc_course_logo"
-                android:src="@drawable/yoga_logo"
+                android:src="@drawable/ic_yoga"
                 android:layout_marginEnd="8dp"
                 app:tint="@color/primary_blue" />
 
@@ -197,7 +197,7 @@
             android:id="@+id/tv_created_date"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/course_created_date"
+            android:text="@string/created_date"
             android:textSize="12sp"
             android:textColor="@color/secondary_text"
             android:textStyle="italic"

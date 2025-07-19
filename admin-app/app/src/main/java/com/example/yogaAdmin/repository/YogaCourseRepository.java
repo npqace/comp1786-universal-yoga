@@ -25,6 +25,10 @@ public class YogaCourseRepository {
         return mAllCourses;
     }
 
+    public LiveData<YogaCourse> getCourseById(long courseId) {
+        return mYogaCourseDao.getCourseById(courseId);
+    }
+
     public void insert(YogaCourse yogaCourse) {
         AppDatabase.databaseWriteExecutor.execute(() -> {
             mYogaCourseDao.insert(yogaCourse);

@@ -41,7 +41,7 @@ public class CreateCourseActivity extends AppCompatActivity {
     // Error icons for required fields
     private ImageView ivErrorDayOfWeek, ivErrorTime, ivErrorCapacity, ivErrorDuration, ivErrorPrice, ivErrorClassType;
 
-    private int courseId = -1;
+    private long courseId = -1;
     private long existingCourseCreatedDate = 0;
 
     @Override
@@ -357,3 +357,4 @@ public class CreateCourseActivity extends AppCompatActivity {
         });
     }
 }
+

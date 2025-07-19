@@ -25,6 +25,10 @@ public class YogaCourseViewModel extends AndroidViewModel {
         return mAllCourses;
     }
 
+    public LiveData<YogaCourse> getCourseById(long courseId) {
+        return mRepository.getCourseById(courseId);
+    }
+
     public void insert(YogaCourse yogaCourse) {
         mRepository.insert(yogaCourse);
     }

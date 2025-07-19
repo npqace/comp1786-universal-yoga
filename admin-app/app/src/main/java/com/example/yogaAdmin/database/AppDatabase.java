@@ -6,16 +6,19 @@ import androidx.room.Database;
 import androidx.room.Room;
 import androidx.room.RoomDatabase;
 
+import com.example.yogaAdmin.dao.YogaClassDao;
 import com.example.yogaAdmin.dao.YogaCourseDao;
+import com.example.yogaAdmin.models.YogaClass;
 import com.example.yogaAdmin.models.YogaCourse;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-@Database(entities = {YogaCourse.class}, version = 1, exportSchema = false)
+@Database(entities = {YogaCourse.class, YogaClass.class}, version = 4, exportSchema = false)
 public abstract class AppDatabase extends RoomDatabase {
 
     public abstract YogaCourseDao yogaCourseDao();
+    public abstract YogaClassDao yogaClassDao();
 
     private static volatile AppDatabase INSTANCE;
     private static final int NUMBER_OF_THREADS = 4;
@@ -28,6 +31,7 @@ public abstract class AppDatabase extends RoomDatabase {
                 if (INSTANCE == null) {
                     INSTANCE = Room.databaseBuilder(context.getApplicationContext(),
                                     AppDatabase.class, "yoga_database")
+                            .fallbackToDestructiveMigration()
                             .build();
                 }
             }

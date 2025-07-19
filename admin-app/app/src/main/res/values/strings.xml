@@ -38,6 +38,7 @@
     <string name="form_label_difficulty">Difficulty Level</string>
     <string name="form_label_equipment">Equipment Needed</string>
     <string name="form_label_age_group">Target Age Group</string>
+    <string name="form_label_class_name">Class Name</string>
 
     <!-- Form hints -->
     <string name="form_hint_time">Tap to select time</string>
@@ -48,6 +49,7 @@
     <string name="form_hint_instructor">e.g. Sarah Johnson</string>
     <string name="form_hint_room">e.g. Studio A, Room 201</string>
     <string name="form_hint_equipment">e.g. Yoga mats, blocks, straps</string>
+    <string name="form_hint_class_name">e.g. Morning Flow</string>
 
     <!-- Form buttons -->
     <string name="button_clear_form">CLEAR FORM</string>
@@ -70,7 +72,7 @@
     <string name="course_equipment">Yoga mats, blocks, straps</string>
     <string name="course_age_group">Adults</string>
     <string name="course_description">A gentle yoga practice focusing on basic postures and breathing techniques.</string>
-    <string name="course_created_date">Created: 15/12/2024 14:30</string>
+    <string name="created_date">Created: 15/12/2024 14:30</string>
 
     <string name="desc_instructor">Instructor icon</string>
     <string name="desc_location">Location icon</string>
@@ -86,7 +88,37 @@
     <!-- Class section -->
     <string name="title_class_list">Classes</string>
     <string name="message_no_classes_found">No classes found</string>
-    <string name="button_create_class">Create Class</string>
+    <string name="message_create_class">Create specific class from this course</string>
+    <string name="btn_create_class">Create Class</string>
+    <string name="btn_search">Search</string>
+    <string name="btn_class_create">+ Create</string>
+    <string name="btn_reset_classes">Reset Classes</string>
+
+    <string name="subtitle_create_class">For: Hatha Yoga - Monday at 18:00</string>
+
+    <!-- Class Item placeholder -->
+    <string name="placeholder_class_date">15/01/2025</string>
+    <string name="placeholder_class_day">Wednesday</string>
+    <string name="class_status">Status</string>
+    <string name="placeholder_class_instructor">Sarah Johnson</string>
+    <string name="placeholder_course_info">Hatha Yoga • 18:00 • £25.00</string>
+    <string name="placeholder_class_capacity">20 people (default capacity)</string>
+    <string name="placeholder_class_comment">Special notes for this session</string>
+
+    <!-- Create Class Activity -->
+    <string name="callout_info">📋 Course Template Details</string>
+    <string name="message_course_details">Course details will be populated here…</string>
+    <string name="title_class_date">Class Date</string>
+    <string name="hint_class_date">Tap to select date</string>
+    <string name="title_class_instructor">Assigned Instructor</string>
+    <string name="title_repeat">Repeat for Weeks</string>
+    <string name="repeat_default">Default: 1</string>
+    <string name="hint_repeat">1</string>
+    <string name="message_repeat">Classes will be created for consecutive weeks starting from the selected date</string>
+    <string name="title_custom_capacity">Custom Capacity</string>
+    <string name="hint_capacity">Leave empty to use default capacity</string>
+    <string name="title_class_comment">Additional Comments</string>
+    <string name="hint_class_comment">Any special notes for this specific class…</string>
 
     <!-- Search functionality -->
     <string name="title_search">Search Classes</string>
@@ -152,7 +184,6 @@
     <!-- Empty state   -->
     <string name="empty_courses">No yoga courses yet</string>
     <string name="empty_create_course">Create your first yoga course using the + button</string>
-    <string name="empty_classes">No classes</string>
 
 
     <!-- Format strings -->

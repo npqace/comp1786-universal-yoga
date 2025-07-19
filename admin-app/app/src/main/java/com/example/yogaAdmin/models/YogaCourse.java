@@ -12,7 +12,7 @@ import java.util.Locale;
 @Entity(tableName = "yoga_courses")
 public class YogaCourse implements Serializable {
     @PrimaryKey(autoGenerate = true)
-    private int id;
+    private long id;
 
     // Required fields
     private String dayOfWeek;
@@ -48,8 +48,8 @@ public class YogaCourse implements Serializable {
     }
 
     // Getters and Setters
-    public int getId() { return id; }
-    public void setId(int id) { this.id = id; }
+    public long getId() { return id; }
+    public void setId(long id) { this.id = id; }
 
     public String getDayOfWeek() { return dayOfWeek; }
     public void setDayOfWeek(String dayOfWeek) { this.dayOfWeek = dayOfWeek; }

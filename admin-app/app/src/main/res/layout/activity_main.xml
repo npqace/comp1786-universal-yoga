@@ -32,7 +32,7 @@
             <ImageView
                 android:layout_width="48dp"
                 android:layout_height="48dp"
-                android:src="@drawable/yoga_logo"
+                android:src="@drawable/ic_yoga"
                 android:layout_marginEnd="16dp" />
 
             <!-- Text Container -->
@@ -142,7 +142,7 @@
                 <ImageView
                     android:layout_width="80dp"
                     android:layout_height="80dp"
-                    android:src="@drawable/yoga_logo"
+                    android:src="@drawable/ic_yoga"
                     android:layout_marginBottom="16dp"
                     android:alpha="0.5"
                     app:tint="@color/secondary_text" />

@@ -28,4 +28,7 @@ public interface YogaCourseDao {
 
     @Query("SELECT * FROM yoga_courses ORDER BY dayOfWeek, time ASC")
     LiveData<List<YogaCourse>> getAllCourses();
+
+    @Query("SELECT * FROM yoga_courses WHERE id = :courseId")
+    LiveData<YogaCourse> getCourseById(long courseId);
 }

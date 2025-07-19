@@ -457,7 +457,7 @@
                 <ImageView
                     android:layout_width="20dp"
                     android:layout_height="20dp"
-                    android:src="@drawable/yoga_logo"
+                    android:src="@drawable/ic_yoga"
                     android:layout_marginEnd="8dp"
                     app:tint="@color/primary_blue" />
 
