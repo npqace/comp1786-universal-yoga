@@ -2,13 +2,10 @@ package com.example.yogaAdmin.activities;
 
 import android.app.DatePickerDialog;
 import android.content.Intent;
-import android.os.Build;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
-import android.view.Window;
-import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
@@ -24,7 +21,6 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.yogaAdmin.R;
 import com.example.yogaAdmin.adapter.ClassWithCourseInfoAdapter;
-import com.example.yogaAdmin.models.ClassWithCourseInfo;
 import com.example.yogaAdmin.viewmodel.YogaClassViewModel;
 
 import java.util.Calendar;
@@ -38,8 +34,10 @@ public class SearchActivity extends AppCompatActivity {
     private YogaClassViewModel yogaClassViewModel;
     private LinearLayout emptyStateLayout;
     private TextView tvResultsCount;
-    private ImageView btnClearDate, btnClearDay;
-    private Button btnClearAll, btnAdvancedSearch;
+    private ImageView btnClearDate;
+    private Button btnClearAll;
+    private ImageView btnAdvancedSearch;
+    private LinearLayout advancedSearchContainer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,6 +49,9 @@ public class SearchActivity extends AppCompatActivity {
         initViews();
         setupRecyclerView();
         setupListeners();
+
+        // Perform initial search to show all classes
+        performSearch();
     }
 
     private void initViews() {
@@ -61,9 +62,9 @@ public class SearchActivity extends AppCompatActivity {
         emptyStateLayout = findViewById(R.id.layout_empty_state);
         tvResultsCount = findViewById(R.id.tv_results_count);
         btnClearDate = findViewById(R.id.btn_clear_date);
-        btnClearDay = findViewById(R.id.btn_clear_day);
         btnClearAll = findViewById(R.id.btn_clear_all);
         btnAdvancedSearch = findViewById(R.id.btn_advanced_search);
+        advancedSearchContainer = findViewById(R.id.advanced_search_container);
 
         ImageView btnBack = findViewById(R.id.btn_back);
         btnBack.setOnClickListener(v -> finish());
@@ -83,17 +84,21 @@ public class SearchActivity extends AppCompatActivity {
     }
 
     private void setupListeners() {
+        btnAdvancedSearch.setOnClickListener(v -> {
+            if (advancedSearchContainer.getVisibility() == View.VISIBLE) {
+                advancedSearchContainer.setVisibility(View.GONE);
+            } else {
+                advancedSearchContainer.setVisibility(View.VISIBLE);
+            }
+        });
+
         editTeacherSearch.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                if (s.length() > 0) {
-                    searchByTeacher(s.toString());
-                } else {
-                    clearResults();
-                }
+                performSearch();
             }
 
             @Override
@@ -102,33 +107,40 @@ public class SearchActivity extends AppCompatActivity {
 
         editDateSearch.setOnClickListener(v -> showDatePickerDialog());
 
-        btnAdvancedSearch.setOnClickListener(v -> performAdvancedSearch());
+        editDateSearch.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                btnClearDate.setVisibility(s.length() > 0 ? View.VISIBLE : View.GONE);
+                performSearch();
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {}
+        });
+
 
         btnClearDate.setOnClickListener(v -> {
             editDateSearch.setText("");
-            btnClearDate.setVisibility(View.GONE);
         });
 
         spinnerDaySearch.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                btnClearDay.setVisibility(position > 0 ? View.VISIBLE : View.GONE);
+                performSearch();
             }
 
             @Override
             public void onNothingSelected(AdapterView<?> parent) {}
         });
 
-        btnClearDay.setOnClickListener(v -> {
-            spinnerDaySearch.setSelection(0);
-            btnClearDay.setVisibility(View.GONE);
-        });
-
         btnClearAll.setOnClickListener(v -> {
             editTeacherSearch.setText("");
             editDateSearch.setText("");
             spinnerDaySearch.setSelection(0);
-            clearResults();
+            performSearch();
         });
     }
 
@@ -142,41 +154,27 @@ public class SearchActivity extends AppCompatActivity {
                 (view, year1, monthOfYear, dayOfMonth) -> {
                     String selectedDate = String.format("%02d/%02d/%d", dayOfMonth, (monthOfYear + 1), year1);
                     editDateSearch.setText(selectedDate);
-                    btnClearDate.setVisibility(View.VISIBLE);
                 }, year, month, day);
         datePickerDialog.show();
     }
 
-    private void searchByTeacher(String teacherName) {
-        yogaClassViewModel.searchByTeacher(teacherName).observe(this, results -> {
+    private void performSearch() {
+        String teacherName = editTeacherSearch.getText().toString().trim();
+        String date = editDateSearch.getText().toString().trim();
+        String dayOfWeek = spinnerDaySearch.getSelectedItem().toString();
+
+        yogaClassViewModel.search(teacherName, date, dayOfWeek).observe(this, results -> {
+            if (results == null) return;
             adapter.submitList(results);
             updateUIWithResults(results.size());
         });
     }
 
-    private void performAdvancedSearch() {
-        String date = editDateSearch.getText().toString();
-        String dayOfWeek = spinnerDaySearch.getSelectedItem().toString();
-
-        if (!date.isEmpty()) {
-            yogaClassViewModel.searchByDate(date).observe(this, results -> {
-                adapter.submitList(results);
-                updateUIWithResults(results.size());
-            });
-        } else if (!dayOfWeek.equals("All")) {
-            yogaClassViewModel.searchByDayOfWeek(dayOfWeek).observe(this, results -> {
-                adapter.submitList(results);
-                updateUIWithResults(results.size());
-            });
-        }
-    }
-
-    private void clearResults() {
-        adapter.submitList(null);
-        updateUIWithResults(0);
-    }
-
     private void updateUIWithResults(int count) {
+        boolean hasSearchQuery = !editTeacherSearch.getText().toString().trim().isEmpty() ||
+                !editDateSearch.getText().toString().trim().isEmpty() ||
+                (spinnerDaySearch.getSelectedItemPosition() > 0 && !spinnerDaySearch.getSelectedItem().toString().equals("All Days"));
+
         if (count > 0) {
             recyclerViewResults.setVisibility(View.VISIBLE);
             emptyStateLayout.setVisibility(View.GONE);
@@ -186,6 +184,17 @@ public class SearchActivity extends AppCompatActivity {
             recyclerViewResults.setVisibility(View.GONE);
             emptyStateLayout.setVisibility(View.VISIBLE);
             tvResultsCount.setVisibility(View.GONE);
+
+            // Customize empty state message
+            TextView emptyTitle = findViewById(R.id.tv_empty_title);
+            TextView emptySubtitle = findViewById(R.id.tv_empty_subtitle);
+            if (hasSearchQuery) {
+                emptyTitle.setText(R.string.empty_search_no_results_header);
+                emptySubtitle.setText(R.string.empty_search_no_results_subheader);
+            } else {
+                emptyTitle.setText(R.string.empty_search_header);
+                emptySubtitle.setText(R.string.empty_search_subheader);
+            }
         }
     }
 }

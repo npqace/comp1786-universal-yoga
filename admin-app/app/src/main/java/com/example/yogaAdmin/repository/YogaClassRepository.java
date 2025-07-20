@@ -100,4 +100,11 @@ public class YogaClassRepository {
     public LiveData<List<ClassWithCourseInfo>> searchByDayOfWeek(String dayOfWeek) {
         return yogaClassDao.searchByDayOfWeek(dayOfWeek);
     }
+
+    public LiveData<List<ClassWithCourseInfo>> search(String teacherName, String date, String dayOfWeek) {
+        String teacherQuery = (teacherName == null || teacherName.isEmpty()) ? null : "%" + teacherName + "%";
+        String dateQuery = (date == null || date.isEmpty()) ? null : date;
+        String dayOfWeekQuery = (dayOfWeek == null || dayOfWeek.isEmpty() || dayOfWeek.equals("All Days")) ? null : dayOfWeek;
+        return yogaClassDao.search(teacherQuery, dateQuery, dayOfWeekQuery);
+    }
 }

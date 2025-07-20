@@ -141,6 +141,8 @@
 
     <string name="empty_search_header">Ready to Search</string>
     <string name="empty_search_subheader">Enter a teacher name or use advanced search to find classes</string>
+    <string name="empty_search_no_results_header">No Results Found</string>
+    <string name="empty_search_no_results_subheader">No classes match your search criteria. Try adjusting your search terms.</string>
 
     <!-- Time picker dialog -->
     <string name="dialog_title_time_picker">Time of Course</string>
