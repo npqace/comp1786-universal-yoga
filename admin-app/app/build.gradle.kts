@@ -1,5 +1,6 @@
 plugins {
     alias(libs.plugins.android.application)
+    alias(libs.plugins.google.gms.google.services)
 }
 
 android {
@@ -40,6 +41,7 @@ dependencies {
     implementation("androidx.room:room-runtime:2.7.1")
     implementation("androidx.lifecycle:lifecycle-viewmodel:2.8.1")
     implementation("androidx.lifecycle:lifecycle-livedata:2.8.1")
+    implementation(libs.firebase.database)
     annotationProcessor("androidx.room:room-compiler:2.7.1")
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)

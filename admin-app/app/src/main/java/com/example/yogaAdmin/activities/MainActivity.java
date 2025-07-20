@@ -24,6 +24,7 @@ import com.example.yogaAdmin.R;
 import com.example.yogaAdmin.adapter.YogaCourseAdapter;
 import com.example.yogaAdmin.models.YogaCourse;
 import com.example.yogaAdmin.viewmodel.YogaCourseViewModel;
+import com.example.yogaAdmin.services.FirebaseSyncManager;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.ArrayList;
@@ -77,7 +78,8 @@ public class MainActivity extends AppCompatActivity {
             allCourses.clear();
             if (courses != null) {
                 allCourses.addAll(courses);
-            }            filterCourses(editSearch.getText().toString());
+            }
+            filterCourses(editSearch.getText().toString());
         });
 
         adapter.setOnItemClickListener(new YogaCourseAdapter.OnItemClickListener() {
@@ -182,16 +184,26 @@ public class MainActivity extends AppCompatActivity {
         PopupMenu popupMenu = new PopupMenu(this, view);
         popupMenu.getMenuInflater().inflate(R.menu.main_menu, popupMenu.getMenu());
         popupMenu.setOnMenuItemClickListener(item -> {
-            if (item.getItemId() == R.id.action_reset_database) {
+            int itemId = item.getItemId();
+            if (itemId == R.id.action_reset_database) {
                 showResetConfirmationDialog();
                 return true;
-            } else if (item.getItemId() == R.id.action_about) {
+            } else if (itemId == R.id.action_about) {
                 showAboutDialog();
+                return true;
+            } else if (itemId == R.id.action_sync) {
+                syncDataToFirebase();
                 return true;
             }
             return false;
         });
         popupMenu.show();
+    }
+
+    private void syncDataToFirebase() {
+        Toast.makeText(this, "Syncing data to Firebase...", Toast.LENGTH_SHORT).show();
+        yogaCourseViewModel.syncAllData();
+        Toast.makeText(MainActivity.this, "Data synced successfully!", Toast.LENGTH_SHORT).show();
     }
 
     private void showResetConfirmationDialog() {

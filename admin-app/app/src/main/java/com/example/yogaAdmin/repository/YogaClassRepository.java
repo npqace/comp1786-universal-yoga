@@ -1,7 +1,6 @@
 package com.example.yogaAdmin.repository;
 
 import android.app.Application;
-import android.os.AsyncTask;
 
 import androidx.lifecycle.LiveData;
 
@@ -11,19 +10,25 @@ import com.example.yogaAdmin.database.AppDatabase;
 import com.example.yogaAdmin.models.ClassWithCourseInfo;
 import com.example.yogaAdmin.models.YogaClass;
 import com.example.yogaAdmin.models.YogaCourse;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.List;
+import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 
 public class YogaClassRepository {
     private YogaClassDao yogaClassDao;
     private YogaCourseDao yogaCourseDao;
     private LiveData<List<YogaClass>> allClasses;
+    private DatabaseReference firebaseDatabase;
 
     public YogaClassRepository(Application application, long courseId) {
         AppDatabase db = AppDatabase.getDatabase(application);
         yogaClassDao = db.yogaClassDao();
         yogaCourseDao = db.yogaCourseDao();
+        firebaseDatabase = FirebaseDatabase.getInstance().getReference();
         if (courseId != -1) {
             allClasses = yogaClassDao.getClassesForCourse(courseId);
         }
@@ -32,6 +37,7 @@ public class YogaClassRepository {
         AppDatabase db = AppDatabase.getDatabase(application);
         yogaClassDao = db.yogaClassDao();
         yogaCourseDao = db.yogaCourseDao();
+        firebaseDatabase = FirebaseDatabase.getInstance().getReference();
     }
 
     public LiveData<List<YogaClass>> getAllClasses() {
@@ -48,45 +54,51 @@ public class YogaClassRepository {
 
     public void insert(YogaClass yogaClass) {
         AppDatabase.databaseWriteExecutor.execute(() -> {
-            yogaClassDao.insert(yogaClass);
+            long id = yogaClassDao.insert(yogaClass);
+            yogaClass.setId(id);
+
+            String firebaseKey = firebaseDatabase.child("classes").push().getKey();
+            yogaClass.setFirebaseKey(firebaseKey);
+            yogaClassDao.update(yogaClass); // Update with the new key
+
+            firebaseDatabase.child("classes").child(firebaseKey).setValue(yogaClass);
         });
     }
 
     public void update(YogaClass yogaClass) {
         AppDatabase.databaseWriteExecutor.execute(() -> {
             yogaClassDao.update(yogaClass);
+            if (yogaClass.getFirebaseKey() != null) {
+                firebaseDatabase.child("classes").child(yogaClass.getFirebaseKey()).setValue(yogaClass);
+            }
         });
     }
 
     public void delete(YogaClass yogaClass) {
         AppDatabase.databaseWriteExecutor.execute(() -> {
             yogaClassDao.delete(yogaClass);
+            if (yogaClass.getFirebaseKey() != null) {
+                firebaseDatabase.child("classes").child(yogaClass.getFirebaseKey()).removeValue();
+            }
         });
     }
 
     public void deleteClassesByCourseId(long courseId) {
         AppDatabase.databaseWriteExecutor.execute(() -> {
+            List<YogaClass> classes = yogaClassDao.getClassesForCourseSync(courseId);
+            for(YogaClass yogaClass : classes) {
+                if (yogaClass.getFirebaseKey() != null) {
+                    firebaseDatabase.child("classes").child(yogaClass.getFirebaseKey()).removeValue();
+                }
+            }
             yogaClassDao.deleteClassesByCourseId(courseId);
         });
     }
 
     public boolean classExists(long courseId, String date) throws ExecutionException, InterruptedException {
-        return new ClassExistsAsyncTask(yogaClassDao).execute(courseId, date).get();
-    }
-
-    private static class ClassExistsAsyncTask extends AsyncTask<Object, Void, Boolean> {
-        private YogaClassDao asyncTaskDao;
-
-        ClassExistsAsyncTask(YogaClassDao dao) {
-            asyncTaskDao = dao;
-        }
-
-        @Override
-        protected Boolean doInBackground(Object... params) {
-            long courseId = (long) params[0];
-            String date = (String) params[1];
-            return asyncTaskDao.classExists(courseId, date) > 0;
-        }
+        Callable<Integer> callable = () -> yogaClassDao.classExists(courseId, date);
+        Future<Integer> future = AppDatabase.databaseWriteExecutor.submit(callable);
+        return future.get() > 0;
     }
 
     public LiveData<List<ClassWithCourseInfo>> searchByTeacher(String teacherName) {

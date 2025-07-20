@@ -15,7 +15,7 @@ import java.util.List;
 @Dao
 public interface YogaCourseDao {
     @Insert(onConflict = OnConflictStrategy.IGNORE)
-    void insert(YogaCourse yogaCourse);
+    long insert(YogaCourse yogaCourse);
 
     @Update
     void update(YogaCourse yogaCourse);
@@ -28,6 +28,9 @@ public interface YogaCourseDao {
 
     @Query("SELECT * FROM yoga_courses ORDER BY dayOfWeek, time ASC")
     LiveData<List<YogaCourse>> getAllCourses();
+
+    @Query("SELECT * FROM yoga_courses")
+    List<YogaCourse> getCourseList();
 
     @Query("SELECT * FROM yoga_courses WHERE id = :courseId")
     LiveData<YogaCourse> getCourseById(long courseId);

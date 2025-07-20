@@ -53,6 +53,7 @@ public class CreateClassActivity extends AppCompatActivity {
 
     private String selectedDate = null;
     private boolean isEditMode = false;
+    private String firebaseKey = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -157,6 +158,7 @@ public class CreateClassActivity extends AppCompatActivity {
         editTeacher.setText(existingClass.getAssignedTeacher());
         editCapacity.setText(String.valueOf(existingClass.getActualCapacity()));
         editComments.setText(existingClass.getAdditionalComments());
+        firebaseKey = existingClass.getFirebaseKey();
     }
 
     private void setupDatePicker() {
@@ -317,6 +319,7 @@ public class CreateClassActivity extends AppCompatActivity {
         existingClass.setAdditionalComments(comments);
         existingClass.setActualCapacity(capacity > 0 ? capacity : course.getCapacity());
         existingClass.setDate(selectedDate);
+        existingClass.setFirebaseKey(firebaseKey);
         yogaClassViewModel.update(existingClass);
         Toast.makeText(this, "Class updated successfully!", Toast.LENGTH_SHORT).show();
         finish();

@@ -20,6 +20,7 @@ import java.util.Locale;
 public class YogaClass implements Serializable {
     @PrimaryKey(autoGenerate = true)
     private long id;
+    private String firebaseKey;
     private long courseId;
 
     // Instance specific
@@ -48,6 +49,13 @@ public class YogaClass implements Serializable {
     // Getters and Setters
     public long getId() { return id; }
     public void setId(long id) { this.id = id; }
+
+    public String getFirebaseKey() {
+        return firebaseKey;
+    }
+    public void setFirebaseKey(String firebaseKey) {
+        this.firebaseKey = firebaseKey;
+    }
 
     public long getCourseId() { return courseId; }
     public void setCourseId(long courseId) { this.courseId = courseId; }

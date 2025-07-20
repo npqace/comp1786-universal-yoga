@@ -13,6 +13,7 @@ import java.util.Locale;
 public class YogaCourse implements Serializable {
     @PrimaryKey(autoGenerate = true)
     private long id;
+    private String firebaseKey;
 
     // Required fields
     private String dayOfWeek;
@@ -50,6 +51,9 @@ public class YogaCourse implements Serializable {
     // Getters and Setters
     public long getId() { return id; }
     public void setId(long id) { this.id = id; }
+
+    public String getFirebaseKey() { return firebaseKey; }
+    public void setFirebaseKey(String firebaseKey) { this.firebaseKey = firebaseKey; }
 
     public String getDayOfWeek() { return dayOfWeek; }
     public void setDayOfWeek(String dayOfWeek) { this.dayOfWeek = dayOfWeek; }

@@ -207,6 +207,7 @@
     <string name="format_price_input">£ %s</string>
 
     <!-- Menu items -->
+    <string name="menu_sync">Sync with Cloud</string>
     <string name="menu_reset_database">Reset Database</string>
     <string name="menu_about">About</string>
 

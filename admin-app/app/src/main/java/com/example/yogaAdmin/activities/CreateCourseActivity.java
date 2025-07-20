@@ -42,6 +42,7 @@ public class CreateCourseActivity extends AppCompatActivity {
 
     private long courseId = -1;
     private long existingCourseCreatedDate = 0;
+    private String firebaseKey = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,6 +68,7 @@ public class CreateCourseActivity extends AppCompatActivity {
             if (course != null) {
                 courseId = course.getId();
                 existingCourseCreatedDate = course.getCreatedDate();
+                firebaseKey = course.getFirebaseKey();
                 populateFields(course);
             }
         } else {
@@ -235,6 +237,7 @@ public class CreateCourseActivity extends AppCompatActivity {
         if (courseId != -1) {
             course.setId(courseId);
             course.setCreatedDate(existingCourseCreatedDate);
+            course.setFirebaseKey(firebaseKey);
         }
 
         Intent data = new Intent();

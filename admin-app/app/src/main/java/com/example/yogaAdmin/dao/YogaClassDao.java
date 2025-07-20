@@ -31,6 +31,9 @@ public interface YogaClassDao {
     @Query("SELECT * FROM yoga_classes WHERE courseId = :courseId ORDER BY SUBSTR(date, 7, 4) ASC, SUBSTR(date, 4, 2) ASC, SUBSTR(date, 1, 2) ASC")
     LiveData<List<YogaClass>> getClassesForCourse(long courseId);
 
+    @Query("SELECT * FROM yoga_classes WHERE courseId = :courseId")
+    List<YogaClass> getClassesForCourseSync(long courseId);
+
     @Query("SELECT * FROM yoga_classes WHERE id = :classId")
     LiveData<YogaClass> getYogaClassById(long classId);
 
@@ -39,6 +42,12 @@ public interface YogaClassDao {
 
     @Query("DELETE FROM yoga_classes WHERE courseId = :courseId")
     void deleteClassesByCourseId(long courseId);
+
+    @Query("SELECT * FROM yoga_classes ORDER BY date DESC")
+    LiveData<List<YogaClass>> getAllClasses();
+
+    @Query("SELECT * FROM yoga_classes")
+    List<YogaClass> getClassList();
 
     @Query("SELECT * FROM yoga_classes ORDER BY date DESC")
     LiveData<List<YogaClass>> getAllClassesWithCourseInfo();
