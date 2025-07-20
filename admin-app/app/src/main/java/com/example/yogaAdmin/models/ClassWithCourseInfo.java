@@ -14,4 +14,9 @@ public class ClassWithCourseInfo implements Serializable {
             entityColumn = "id"
     )
     public YogaCourse yogaCourse;
+
+    public ClassWithCourseInfo(YogaClass yogaClass, YogaCourse yogaCourse) {
+        this.yogaClass = yogaClass;
+        this.yogaCourse = yogaCourse;
+    }
 }

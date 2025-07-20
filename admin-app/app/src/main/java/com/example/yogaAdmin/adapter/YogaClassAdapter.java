@@ -27,6 +27,7 @@ import java.util.Locale;
 public class YogaClassAdapter extends ListAdapter<YogaClass, YogaClassAdapter.YogaClassHolder> {
 
     private final OnClassActionListener actionListener;
+    private OnItemClickListener listener;
     private YogaCourse yogaCourse;
 
     public YogaClassAdapter(OnClassActionListener actionListener) {
@@ -72,7 +73,7 @@ public class YogaClassAdapter extends ListAdapter<YogaClass, YogaClassAdapter.Yo
         return getItem(position);
     }
 
-    static class YogaClassHolder extends RecyclerView.ViewHolder {
+     class YogaClassHolder extends RecyclerView.ViewHolder {
         private final TextView tvClassDate, tvClassDayOfWeek, tvAssignedTeacher, tvCourseInfo, tvCapacity, tvComments, tvCreatedDate;
         private final Spinner spinnerStatus;
         private final View btnEdit, btnDelete;
@@ -91,6 +92,16 @@ public class YogaClassAdapter extends ListAdapter<YogaClass, YogaClassAdapter.Yo
             spinnerStatus = itemView.findViewById(R.id.spinner_status);
             btnEdit = itemView.findViewById(R.id.btn_edit);
             btnDelete = itemView.findViewById(R.id.btn_delete);
+
+            itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    int position = getAdapterPosition();
+                    if (listener != null && position != RecyclerView.NO_POSITION) {
+                        listener.onItemClick(getItem(position));
+                    }
+                }
+            });
         }
 
         public void bind(YogaClass yogaClass, YogaCourse yogaCourse, OnClassActionListener actionListener) {
@@ -179,6 +190,14 @@ public class YogaClassAdapter extends ListAdapter<YogaClass, YogaClassAdapter.Yo
         void onEditClass(YogaClass yogaClass);
         void onDeleteClass(YogaClass yogaClass);
         void onUpdateStatus(YogaClass yogaClass, String newStatus);
+    }
+
+    public interface OnItemClickListener {
+        void onItemClick(YogaClass yogaClass);
+    }
+
+    public void setOnItemClickListener(OnItemClickListener listener) {
+        this.listener = listener;
     }
 }
 

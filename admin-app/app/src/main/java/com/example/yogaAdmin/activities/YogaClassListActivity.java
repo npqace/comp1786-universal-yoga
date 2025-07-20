@@ -24,6 +24,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.yogaAdmin.R;
 import com.example.yogaAdmin.adapter.YogaClassAdapter;
+import com.example.yogaAdmin.models.ClassWithCourseInfo;
 import com.example.yogaAdmin.models.YogaClass;
 import com.example.yogaAdmin.models.YogaCourse;
 import com.example.yogaAdmin.utils.NetworkStatusLiveData;
@@ -46,6 +47,7 @@ public class YogaClassListActivity extends AppCompatActivity {
 
     private long courseId;
     private String courseName;
+    private YogaCourse yogaCourse;
     private NetworkStatusLiveData networkStatusLiveData;
     private TextView tvOffline;
 
@@ -68,7 +70,7 @@ public class YogaClassListActivity extends AppCompatActivity {
             }
         });
 
-        
+
 
         courseId = getIntent().getLongExtra(EXTRA_COURSE_ID, -1);
         courseName = getIntent().getStringExtra(EXTRA_COURSE_NAME);
@@ -107,9 +109,10 @@ public class YogaClassListActivity extends AppCompatActivity {
         });
 
         yogaCourseViewModel = new ViewModelProvider(this).get(YogaCourseViewModel.class);
-        yogaCourseViewModel.getCourseById(courseId).observe(this, yogaCourse -> {
-            if (yogaCourse != null) {
-                adapter.setYogaCourse(yogaCourse);
+        yogaCourseViewModel.getCourseById(courseId).observe(this, course -> {
+            if (course != null) {
+                this.yogaCourse = course;
+                adapter.setYogaCourse(course);
             }
         });
     }
@@ -133,6 +136,20 @@ public class YogaClassListActivity extends AppCompatActivity {
             }
         });
         recyclerView.setAdapter(adapter);
+
+        adapter.setOnItemClickListener(new YogaClassAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(YogaClass yogaClass) {
+                if (yogaCourse != null) {
+                    Intent intent = new Intent(YogaClassListActivity.this, ClassDetailsActivity.class);
+                    ClassWithCourseInfo classWithCourseInfo = new ClassWithCourseInfo(yogaClass, yogaCourse);
+                    intent.putExtra(ClassDetailsActivity.EXTRA_CLASS_INFO, classWithCourseInfo);
+                    startActivity(intent);
+                } else {
+                    Toast.makeText(YogaClassListActivity.this, "Course details not available yet.", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
     }
 
     private void setupClickListeners() {
@@ -204,3 +221,4 @@ public class YogaClassListActivity extends AppCompatActivity {
         dialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(ContextCompat.getColor(this, R.color.error_color));
     }
 }
+
