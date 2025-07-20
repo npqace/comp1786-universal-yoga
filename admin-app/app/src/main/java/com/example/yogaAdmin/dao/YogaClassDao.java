@@ -6,8 +6,10 @@ import androidx.room.Delete;
 import androidx.room.Insert;
 import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
+import androidx.room.Transaction;
 import androidx.room.Update;
 
+import com.example.yogaAdmin.models.ClassWithCourseInfo;
 import com.example.yogaAdmin.models.YogaClass;
 
 import java.util.List;
@@ -40,4 +42,18 @@ public interface YogaClassDao {
 
     @Query("SELECT * FROM yoga_classes ORDER BY date DESC")
     LiveData<List<YogaClass>> getAllClassesWithCourseInfo();
+
+    @Transaction
+    @Query("SELECT * FROM yoga_classes WHERE assignedTeacher LIKE :teacherName")
+    LiveData<List<ClassWithCourseInfo>> searchByTeacher(String teacherName);
+
+    @Transaction
+    @Query("SELECT * FROM yoga_classes WHERE date = :date")
+    LiveData<List<ClassWithCourseInfo>> searchByDate(String date);
+
+    @Transaction
+    @Query("SELECT yoga_classes.* FROM yoga_classes " +
+            "JOIN yoga_courses ON yoga_classes.courseId = yoga_courses.id " +
+            "WHERE yoga_courses.dayOfWeek = :dayOfWeek")
+    LiveData<List<ClassWithCourseInfo>> searchByDayOfWeek(String dayOfWeek);
 }

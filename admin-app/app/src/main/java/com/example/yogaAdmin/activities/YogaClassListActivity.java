@@ -49,18 +49,13 @@ public class YogaClassListActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        configureStatusBar();
         setContentView(R.layout.activity_yoga_class_list);
 
         if (getSupportActionBar() != null) {
             getSupportActionBar().hide();
         }
 
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main_container), (v, insets) -> {
-            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
-            return insets;
-        });
+        
 
         courseId = getIntent().getLongExtra(EXTRA_COURSE_ID, -1);
         courseName = getIntent().getStringExtra(EXTRA_COURSE_NAME);
@@ -139,6 +134,12 @@ public class YogaClassListActivity extends AppCompatActivity {
 
         ImageView btnResetClasses = findViewById(R.id.btn_reset_classes);
         btnResetClasses.setOnClickListener(v -> showResetClassesDialog());
+
+        Button btnSearch = findViewById(R.id.btn_search);
+        btnSearch.setOnClickListener(v -> {
+            Intent intent = new Intent(this, SearchActivity.class);
+            startActivity(intent);
+        });
     }
 
     private void createNewClass() {
@@ -188,20 +189,5 @@ public class YogaClassListActivity extends AppCompatActivity {
                 .create();
         dialog.show();
         dialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(ContextCompat.getColor(this, R.color.error_color));
-    }
-
-    private void configureStatusBar() {
-        Window window = getWindow();
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-            window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-            window.setStatusBarColor(getResources().getColor(R.color.dark_blue, getTheme()));
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                View decorView = window.getDecorView();
-                int flags = decorView.getSystemUiVisibility();
-                flags &= ~View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR;
-                decorView.setSystemUiVisibility(flags);
-            }
-        }
     }
 }

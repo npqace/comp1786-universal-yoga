@@ -131,6 +131,16 @@
     <string name="search_empty_subtitle">No classes match your search criteria. Try adjusting your search terms.</string>
     <string name="search_ready_title">Ready to Search</string>
     <string name="search_ready_subtitle">Enter a teacher name or use advanced search to find classes</string>
+    <string name="header_basic_search">🔍 Basic Search</string>
+    <string name="subheader_search_teacher">Teacher Name</string>
+    <string name="hint_search_teacher">Enter teacher name (e.g. Sarah, Johnson)</string>
+    <string name="header_advanced_search">⚙️ Advanced Search</string>
+    <string name="subheader_specific_date">Specific Date</string>
+    <string name="btn_apply_advanced">Apply Advanced Search</string>
+    <string name="header_search_results">📋 Search Results</string>
+
+    <string name="empty_search_header">Ready to Search</string>
+    <string name="empty_search_subheader">Enter a teacher name or use advanced search to find classes</string>
 
     <!-- Time picker dialog -->
     <string name="dialog_title_time_picker">Time of Course</string>
@@ -185,6 +195,11 @@
     <string name="empty_courses">No yoga courses yet</string>
     <string name="empty_create_course">Create your first yoga course using the + button</string>
 
+    <!-- Status -->
+    <string name="status_scheduled">Scheduled</string>
+    <string name="status_completed">Completed</string>
+    <string name="status_cancelled">Cancelled</string>
+
 
     <!-- Format strings -->
     <string name="format_price_input">£ %s</string>
@@ -192,4 +207,21 @@
     <!-- Menu items -->
     <string name="menu_reset_database">Reset Database</string>
     <string name="menu_about">About</string>
+
+    <!-- Class Details -->
+    <string name="title_class_details">Class Details</string>
+    <string name="header_class_details">Class Details</string>
+    <string name="header_course_details">Course Details</string>
+    <string name="label_class_date">Date</string>
+    <string name="label_assigned_teacher">Assigned Teacher</string>
+    <string name="label_capacity_details">Capacity</string>
+    <string name="label_status">Status</string>
+    <string name="label_comments">Additional Comments</string>
+    <string name="label_class_type_details">Class Type</string>
+    <string name="label_day_of_week_details">Day of Week</string>
+    <string name="label_time_details">Time</string>
+    <string name="label_duration_details">Duration</string>
+    <string name="label_price_details">Price</string>
+    <string name="label_description_details">Description</string>
+    <string name="results_found">%d results found</string>
 </resources>

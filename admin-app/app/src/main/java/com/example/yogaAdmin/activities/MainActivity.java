@@ -2,8 +2,11 @@ package com.example.yogaAdmin.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.PopupMenu;
@@ -23,6 +26,9 @@ import com.example.yogaAdmin.models.YogaCourse;
 import com.example.yogaAdmin.viewmodel.YogaCourseViewModel;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class MainActivity extends AppCompatActivity {
 
     public static final int ADD_COURSE_REQUEST = 1;
@@ -33,6 +39,9 @@ public class MainActivity extends AppCompatActivity {
     private RecyclerView recyclerView;
     private LinearLayout emptyStateLayout;
     private ImageView btnMenu;
+    private EditText editSearch;
+    private YogaCourseAdapter adapter;
+    private List<YogaCourse> allCourses = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,6 +51,11 @@ public class MainActivity extends AppCompatActivity {
         btnMenu = findViewById(R.id.btn_menu);
         btnMenu.setOnClickListener(this::showPopupMenu);
 
+        ImageView btnAdvancedSearch = findViewById(R.id.btn_advanced_search);
+        btnAdvancedSearch.setOnClickListener(v -> {
+            Intent intent = new Intent(MainActivity.this, SearchActivity.class);
+            startActivity(intent);
+        });
 
         FloatingActionButton buttonAddCourse = findViewById(R.id.fab_add_course);
         buttonAddCourse.setOnClickListener(v -> {
@@ -51,22 +65,19 @@ public class MainActivity extends AppCompatActivity {
 
         recyclerView = findViewById(R.id.recycler_view_courses);
         emptyStateLayout = findViewById(R.id.layout_empty_state);
+        editSearch = findViewById(R.id.edit_search);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setHasFixedSize(true);
 
-        final YogaCourseAdapter adapter = new YogaCourseAdapter();
+        adapter = new YogaCourseAdapter();
         recyclerView.setAdapter(adapter);
 
         yogaCourseViewModel = new ViewModelProvider(this).get(YogaCourseViewModel.class);
         yogaCourseViewModel.getAllCourses().observe(this, courses -> {
-            adapter.submitList(courses);
-            if (courses == null || courses.isEmpty()) {
-                recyclerView.setVisibility(View.GONE);
-                emptyStateLayout.setVisibility(View.VISIBLE);
-            } else {
-                recyclerView.setVisibility(View.VISIBLE);
-                emptyStateLayout.setVisibility(View.GONE);
-            }
+            allCourses.clear();
+            if (courses != null) {
+                allCourses.addAll(courses);
+            }            filterCourses(editSearch.getText().toString());
         });
 
         adapter.setOnItemClickListener(new YogaCourseAdapter.OnItemClickListener() {
@@ -100,7 +111,51 @@ public class MainActivity extends AppCompatActivity {
                 dialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(ContextCompat.getColor(MainActivity.this, R.color.error_color));
             }
         });
+
+        editSearch.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                filterCourses(s.toString());
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+            }
+        });
     }
+
+    private void filterCourses(String query) {
+        List<YogaCourse> filteredList = new ArrayList<>();
+        if (query.isEmpty()) {
+            filteredList.addAll(allCourses);
+        } else {
+            String lowerCaseQuery = query.toLowerCase().trim();
+            for (YogaCourse course : allCourses) {
+                if ((course.getClassType() != null && course.getClassType().toLowerCase().contains(lowerCaseQuery)) ||
+                        (course.getInstructorName() != null && course.getInstructorName().toLowerCase().contains(lowerCaseQuery)) ||
+                        (course.getDayOfWeek() != null && course.getDayOfWeek().toLowerCase().contains(lowerCaseQuery))) {
+                    filteredList.add(course);
+                }
+            }
+        }
+        adapter.submitList(filteredList);
+        updateEmptyState(filteredList.size());
+    }
+
+    private void updateEmptyState(int itemCount) {
+        if (itemCount == 0) {
+            recyclerView.setVisibility(View.GONE);
+            emptyStateLayout.setVisibility(View.VISIBLE);
+        } else {
+            recyclerView.setVisibility(View.VISIBLE);
+            emptyStateLayout.setVisibility(View.GONE);
+        }
+    }
+
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {

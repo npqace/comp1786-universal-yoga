@@ -22,7 +22,6 @@ import androidx.core.view.WindowInsetsCompat;
 import com.example.yogaAdmin.R;
 import com.example.yogaAdmin.dialogs.TimePickerDialog;
 import com.example.yogaAdmin.models.YogaCourse;
-import com.example.yogaAdmin.utils.UIUtils;
 
 public class CreateCourseActivity extends AppCompatActivity {
     public static final String EXTRA_COURSE = "com.example.yogaAdmin.EXTRA_COURSE";
@@ -47,17 +46,13 @@ public class CreateCourseActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        UIUtils.configureStatusBar(this);
         setContentView(R.layout.activity_create_course);
 
         if (getSupportActionBar() != null) {
             getSupportActionBar().hide();
         }
 
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
-            insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            return insets;
-        });
+        
 
         initializeViews();
         setupInputFormatters();

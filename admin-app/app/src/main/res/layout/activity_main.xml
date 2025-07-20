@@ -79,6 +79,7 @@
             android:orientation="horizontal"
             android:layout_marginStart="16dp"
             android:layout_marginEnd="16dp"
+            android:layout_marginBottom="16dp"
             android:gravity="center_vertical">
 
             <EditText
@@ -100,13 +101,15 @@
             <!-- Advanced Search Icon -->
             <ImageView
                 android:id="@+id/btn_advanced_search"
-                android:layout_width="45dp"
-                android:layout_height="45dp"
-                android:src="@drawable/ic_advanced_search"
-                android:background="?android:attr/selectableItemBackgroundBorderless"
-                android:padding="8dp"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
                 android:layout_marginStart="12dp"
+                android:background="?android:attr/selectableItemBackgroundBorderless"
+                android:clickable="true"
                 android:contentDescription="@string/button_advanced_search"
+                android:focusable="true"
+                android:padding="8dp"
+                android:src="@drawable/ic_advanced_search"
                 app:tint="@color/primary_blue" />
 
         </LinearLayout>
@@ -122,9 +125,11 @@
                 android:id="@+id/recycler_view_courses"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:padding="16dp"
+                android:paddingTop="0dp"
+                android:paddingBottom="16dp"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
                 android:clipToPadding="false"
-                android:paddingBottom="80dp"
                 tools:listitem="@layout/item_yoga_course" />
 
             <!-- Empty state message -->
