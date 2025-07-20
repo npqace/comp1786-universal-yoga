@@ -1,13 +1,10 @@
 package com.example.yogaAdmin.activities;
 
 import android.app.DatePickerDialog;
-import android.os.Build;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
-import android.view.Window;
-import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -15,9 +12,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.example.yogaAdmin.R;
@@ -25,11 +19,18 @@ import com.example.yogaAdmin.models.YogaClass;
 import com.example.yogaAdmin.models.YogaCourse;
 import com.example.yogaAdmin.viewmodel.YogaClassViewModel;
 
+import com.google.android.material.datepicker.CalendarConstraints;
+import com.google.android.material.datepicker.DateValidatorPointForward;
+import com.google.android.material.datepicker.MaterialDatePicker;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
+import java.util.TimeZone;
 import java.util.concurrent.ExecutionException;
 
 public class CreateClassActivity extends AppCompatActivity {
@@ -44,7 +45,6 @@ public class CreateClassActivity extends AppCompatActivity {
 
     private long courseId;
     private long classId = -1;
-    private String courseName;
 
     private EditText editDate, editTeacher, editCapacity, editComments, editRepeatWeeks;
     private TextView tvCourseName, tvCourseDetails, tvDefaultCapacity;
@@ -63,10 +63,7 @@ public class CreateClassActivity extends AppCompatActivity {
             getSupportActionBar().hide();
         }
 
-        
-
         courseId = getIntent().getLongExtra(EXTRA_COURSE_ID, -1);
-        courseName = getIntent().getStringExtra(EXTRA_COURSE_NAME);
         classId = getIntent().getLongExtra(EXTRA_CLASS_ID, -1);
         isEditMode = classId != -1;
 
@@ -104,7 +101,7 @@ public class CreateClassActivity extends AppCompatActivity {
             TextView tvTitle = findViewById(R.id.tv_title);
             tvTitle.setText("Edit Class");
             btnCreateClass.setText("Update Class");
-            editRepeatWeeks.setVisibility(View.GONE);
+            findViewById(R.id.repeat_weeks_container).setVisibility(View.GONE);
         }
     }
 
@@ -167,30 +164,68 @@ public class CreateClassActivity extends AppCompatActivity {
     }
 
     private void showDatePicker() {
-        Calendar calendar = Calendar.getInstance();
+        if (course == null) {
+            Toast.makeText(this, "Course details not loaded yet.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        long initialSelection = MaterialDatePicker.todayInUtcMilliseconds();
         if (selectedDate != null) {
             try {
                 SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.UK);
                 Date date = sdf.parse(selectedDate);
                 if (date != null) {
-                    calendar.setTime(date);
+                    initialSelection = date.getTime();
                 }
             } catch (ParseException e) {
-                // Ignore
+                // Ignore and use today's date
             }
         }
 
-        DatePickerDialog datePickerDialog = new DatePickerDialog(this, R.style.Theme_YogaAdmin_DatePicker, (view, year, month, dayOfMonth) -> {
-            Calendar selectedCalendar = Calendar.getInstance();
-            selectedCalendar.set(year, month, dayOfMonth);
+        int courseDayOfWeek = getCalendarDayOfWeek(course.getDayOfWeek());
+
+        CalendarConstraints.Builder constraintsBuilder = new CalendarConstraints.Builder();
+        constraintsBuilder.setValidator(new DayOfWeekValidator(courseDayOfWeek));
+        constraintsBuilder.setStart(MaterialDatePicker.todayInUtcMilliseconds());
+
+
+        MaterialDatePicker<Long> datePicker = MaterialDatePicker.Builder.datePicker()
+                .setTitleText("Select a " + course.getDayOfWeek())
+                .setSelection(initialSelection)
+                .setCalendarConstraints(constraintsBuilder.build())
+                .build();
+
+        datePicker.addOnPositiveButtonClickListener(selection -> {
+            // The selection is in UTC milliseconds. Convert it to the local time zone.
+            Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
+            calendar.setTimeInMillis(selection);
+            // The above calendar is in UTC. To format it correctly in the local timezone,
+            // we create a new calendar instance with the default (local) timezone
+            // and set its fields from the UTC calendar.
+            Calendar localCalendar = Calendar.getInstance();
+            localCalendar.set(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH));
+
             SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.UK);
-            selectedDate = sdf.format(selectedCalendar.getTime());
+            selectedDate = sdf.format(localCalendar.getTime());
             editDate.setText(selectedDate);
             hideFieldError(editDate, ivErrorDate);
-        }, calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH));
+        });
 
-        datePickerDialog.getDatePicker().setMinDate(System.currentTimeMillis() - 1000);
-        datePickerDialog.show();
+        datePicker.show(getSupportFragmentManager(), "MATERIAL_DATE_PICKER");
+    }
+
+
+    private int getCalendarDayOfWeek(String dayOfWeek) {
+        switch (dayOfWeek.toLowerCase()) {
+            case "sunday": return Calendar.SUNDAY;
+            case "monday": return Calendar.MONDAY;
+            case "tuesday": return Calendar.TUESDAY;
+            case "wednesday": return Calendar.WEDNESDAY;
+            case "thursday": return Calendar.THURSDAY;
+            case "friday": return Calendar.FRIDAY;
+            case "saturday": return Calendar.SATURDAY;
+            default: return -1; // Invalid day
+        }
     }
 
     private void setupFormValidation() {
@@ -211,7 +246,7 @@ public class CreateClassActivity extends AppCompatActivity {
 
     private void setupClickListeners() {
         btnClear.setOnClickListener(v -> clearForm());
-        btnCreateClass.setOnClickListener(v -> validateAndCreateClass());
+        btnCreateClass.setOnClickListener(v -> validateAndSaveClass());
     }
 
     private void clearForm() {
@@ -226,7 +261,7 @@ public class CreateClassActivity extends AppCompatActivity {
         Toast.makeText(this, "Form cleared", Toast.LENGTH_SHORT).show();
     }
 
-    private void validateAndCreateClass() {
+    private void validateAndSaveClass() {
         if (!validateForm()) return;
 
         String teacher = editTeacher.getText().toString().trim();
