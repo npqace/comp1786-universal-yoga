@@ -7,6 +7,17 @@
     android:background="@drawable/splash_background"
     android:padding="32dp">
 
+    <TextView
+        android:id="@+id/tv_offline"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/error_color"
+        android:text="@string/you_are_currently_offline"
+        android:textColor="@android:color/white"
+        android:padding="8dp"
+        android:gravity="center"
+        android:visibility="gone" />
+
     <!-- Logo Container -->
     <LinearLayout
         android:layout_width="wrap_content"

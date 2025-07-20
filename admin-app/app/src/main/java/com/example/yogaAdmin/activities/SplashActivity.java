@@ -1,10 +1,12 @@
 package com.example.yogaAdmin.activities;
 
 import com.example.yogaAdmin.R;
+import com.example.yogaAdmin.utils.NetworkStatusLiveData;
 
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
+import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
@@ -15,6 +17,8 @@ import androidx.appcompat.app.AppCompatActivity;
 public class SplashActivity extends AppCompatActivity {
 
     private static final int SPLASH_DURATION = 3000; // 3 seconds
+    private NetworkStatusLiveData networkStatusLiveData;
+    private TextView tvOffline;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -25,6 +29,16 @@ public class SplashActivity extends AppCompatActivity {
         if (getSupportActionBar() != null) {
             getSupportActionBar().hide();
         }
+
+        tvOffline = findViewById(R.id.tv_offline);
+        networkStatusLiveData = new NetworkStatusLiveData(getApplicationContext());
+        networkStatusLiveData.observe(this, isOnline -> {
+            if (isOnline) {
+                tvOffline.setVisibility(View.GONE);
+            } else {
+                tvOffline.setVisibility(View.VISIBLE);
+            }
+        });
 
         initializeAnimations();
 

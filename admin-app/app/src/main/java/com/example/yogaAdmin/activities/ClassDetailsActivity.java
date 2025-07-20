@@ -14,6 +14,7 @@ import com.example.yogaAdmin.R;
 import com.example.yogaAdmin.models.ClassWithCourseInfo;
 import com.example.yogaAdmin.models.YogaClass;
 import com.example.yogaAdmin.models.YogaCourse;
+import com.example.yogaAdmin.utils.NetworkStatusLiveData;
 
 public class ClassDetailsActivity extends AppCompatActivity {
 
@@ -21,11 +22,23 @@ public class ClassDetailsActivity extends AppCompatActivity {
 
     private TextView tvClassDate, tvAssignedTeacher, tvCapacity, tvStatus, tvComments;
     private TextView tvClassType, tvDayOfWeek, tvTime, tvDuration, tvPrice, tvDescription;
+    private NetworkStatusLiveData networkStatusLiveData;
+    private TextView tvOffline;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_class_details);
+
+        tvOffline = findViewById(R.id.tv_offline);
+        networkStatusLiveData = new NetworkStatusLiveData(getApplicationContext());
+        networkStatusLiveData.observe(this, isOnline -> {
+            if (isOnline) {
+                tvOffline.setVisibility(View.GONE);
+            } else {
+                tvOffline.setVisibility(View.VISIBLE);
+            }
+        });
 
         initViews();
 

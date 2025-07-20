@@ -10,6 +10,7 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.PopupMenu;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
@@ -23,6 +24,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.yogaAdmin.R;
 import com.example.yogaAdmin.adapter.YogaCourseAdapter;
 import com.example.yogaAdmin.models.YogaCourse;
+import com.example.yogaAdmin.utils.NetworkStatusLiveData;
 import com.example.yogaAdmin.viewmodel.YogaCourseViewModel;
 import com.example.yogaAdmin.services.FirebaseSyncManager;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -43,11 +45,23 @@ public class MainActivity extends AppCompatActivity {
     private EditText editSearch;
     private YogaCourseAdapter adapter;
     private List<YogaCourse> allCourses = new ArrayList<>();
+    private NetworkStatusLiveData networkStatusLiveData;
+    private TextView tvOffline;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        tvOffline = findViewById(R.id.tv_offline);
+        networkStatusLiveData = new NetworkStatusLiveData(getApplicationContext());
+        networkStatusLiveData.observe(this, isOnline -> {
+            if (isOnline) {
+                tvOffline.setVisibility(View.GONE);
+            } else {
+                tvOffline.setVisibility(View.VISIBLE);
+            }
+        });
 
         btnMenu = findViewById(R.id.btn_menu);
         btnMenu.setOnClickListener(this::showPopupMenu);

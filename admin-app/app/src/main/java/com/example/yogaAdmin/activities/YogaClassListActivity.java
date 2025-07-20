@@ -26,6 +26,7 @@ import com.example.yogaAdmin.R;
 import com.example.yogaAdmin.adapter.YogaClassAdapter;
 import com.example.yogaAdmin.models.YogaClass;
 import com.example.yogaAdmin.models.YogaCourse;
+import com.example.yogaAdmin.utils.NetworkStatusLiveData;
 import com.example.yogaAdmin.viewmodel.YogaClassViewModel;
 import com.example.yogaAdmin.viewmodel.YogaCourseViewModel;
 
@@ -45,6 +46,8 @@ public class YogaClassListActivity extends AppCompatActivity {
 
     private long courseId;
     private String courseName;
+    private NetworkStatusLiveData networkStatusLiveData;
+    private TextView tvOffline;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,6 +57,16 @@ public class YogaClassListActivity extends AppCompatActivity {
         if (getSupportActionBar() != null) {
             getSupportActionBar().hide();
         }
+
+        tvOffline = findViewById(R.id.tv_offline);
+        networkStatusLiveData = new NetworkStatusLiveData(getApplicationContext());
+        networkStatusLiveData.observe(this, isOnline -> {
+            if (isOnline) {
+                tvOffline.setVisibility(View.GONE);
+            } else {
+                tvOffline.setVisibility(View.VISIBLE);
+            }
+        });
 
         
 

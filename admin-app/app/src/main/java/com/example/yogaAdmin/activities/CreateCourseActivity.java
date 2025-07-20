@@ -12,6 +12,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -22,6 +23,7 @@ import androidx.core.view.WindowInsetsCompat;
 import com.example.yogaAdmin.R;
 import com.example.yogaAdmin.dialogs.TimePickerDialog;
 import com.example.yogaAdmin.models.YogaCourse;
+import com.example.yogaAdmin.utils.NetworkStatusLiveData;
 
 public class CreateCourseActivity extends AppCompatActivity {
     public static final String EXTRA_COURSE = "com.example.yogaAdmin.EXTRA_COURSE";
@@ -43,6 +45,8 @@ public class CreateCourseActivity extends AppCompatActivity {
     private long courseId = -1;
     private long existingCourseCreatedDate = 0;
     private String firebaseKey = null;
+    private NetworkStatusLiveData networkStatusLiveData;
+    private TextView tvOffline;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,6 +56,16 @@ public class CreateCourseActivity extends AppCompatActivity {
         if (getSupportActionBar() != null) {
             getSupportActionBar().hide();
         }
+
+        tvOffline = findViewById(R.id.tv_offline);
+        networkStatusLiveData = new NetworkStatusLiveData(getApplicationContext());
+        networkStatusLiveData.observe(this, isOnline -> {
+            if (isOnline) {
+                tvOffline.setVisibility(View.GONE);
+            } else {
+                tvOffline.setVisibility(View.VISIBLE);
+            }
+        });
 
         
 
@@ -63,7 +77,7 @@ public class CreateCourseActivity extends AppCompatActivity {
         Intent intent = getIntent();
         if (intent.hasExtra(EXTRA_COURSE)) {
             setTitle("Edit Course");
-            btnCreateCourse.setText(R.string.button_update_course);
+            btnCreateCourse.setText("UPDATE COURSE");
             YogaCourse course = (YogaCourse) intent.getSerializableExtra(EXTRA_COURSE);
             if (course != null) {
                 courseId = course.getId();
@@ -208,7 +222,7 @@ public class CreateCourseActivity extends AppCompatActivity {
             hasErrors = true;
         }
 
-        String priceStr = editPrice.getText().toString().replace("£", "").trim();
+        String priceStr = editPrice.getText().toString().replace("£ ".trim(), "").trim();
         double price = 0;
         if (priceStr.isEmpty() || (price = Double.parseDouble(priceStr)) < 0) {
             showFieldError(editPrice, ivErrorPrice, false);
@@ -222,7 +236,7 @@ public class CreateCourseActivity extends AppCompatActivity {
         }
 
         if (hasErrors) {
-            Toast.makeText(this, getString(R.string.toast_error_validation), Toast.LENGTH_LONG).show();
+            Toast.makeText(this, "Please fill all the required fields", Toast.LENGTH_LONG).show();
             return;
         }
 
@@ -282,7 +296,7 @@ public class CreateCourseActivity extends AppCompatActivity {
         spinnerDifficulty.setSelection(0);
         editEquipment.setText("");
         spinnerAgeGroup.setSelection(0);
-        Toast.makeText(this, getString(R.string.toast_form_cleared), Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, "Form cleared", Toast.LENGTH_SHORT).show();
     }
 
     private void setupRealTimeValidation() {
@@ -340,7 +354,7 @@ public class CreateCourseActivity extends AppCompatActivity {
         editPrice.addTextChangedListener(new TextWatcher() {
             @Override
             public void afterTextChanged(Editable s) {
-                String text = s.toString().replace("£", "").trim();
+                String text = s.toString().replace(getString(R.string.format_price_prefix).trim(), "").trim();
                 if (!text.isEmpty()) {
                     try {
                         if (Double.parseDouble(text) >= 0) hideFieldError(editPrice, ivErrorPrice, false);

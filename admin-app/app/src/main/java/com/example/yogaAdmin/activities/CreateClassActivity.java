@@ -17,6 +17,7 @@ import androidx.lifecycle.ViewModelProvider;
 import com.example.yogaAdmin.R;
 import com.example.yogaAdmin.models.YogaClass;
 import com.example.yogaAdmin.models.YogaCourse;
+import com.example.yogaAdmin.utils.NetworkStatusLiveData;
 import com.example.yogaAdmin.viewmodel.YogaClassViewModel;
 
 import com.google.android.material.datepicker.CalendarConstraints;
@@ -54,6 +55,8 @@ public class CreateClassActivity extends AppCompatActivity {
     private String selectedDate = null;
     private boolean isEditMode = false;
     private String firebaseKey = null;
+    private NetworkStatusLiveData networkStatusLiveData;
+    private TextView tvOffline;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,6 +66,16 @@ public class CreateClassActivity extends AppCompatActivity {
         if (getSupportActionBar() != null) {
             getSupportActionBar().hide();
         }
+
+        tvOffline = findViewById(R.id.tv_offline);
+        networkStatusLiveData = new NetworkStatusLiveData(getApplicationContext());
+        networkStatusLiveData.observe(this, isOnline -> {
+            if (isOnline) {
+                tvOffline.setVisibility(View.GONE);
+            } else {
+                tvOffline.setVisibility(View.VISIBLE);
+            }
+        });
 
         courseId = getIntent().getLongExtra(EXTRA_COURSE_ID, -1);
         classId = getIntent().getLongExtra(EXTRA_CLASS_ID, -1);
@@ -129,24 +142,20 @@ public class CreateClassActivity extends AppCompatActivity {
 
     private void populateCourseInfo() {
         tvCourseName.setText(String.format(Locale.UK, "For: %s - %s at %s", course.getClassType(), course.getDayOfWeek(), course.getTime()));
-        tvDefaultCapacity.setText("Default: " + course.getCapacity());
+        tvDefaultCapacity.setText(String.format("Default: %d", course.getCapacity()));
 
         StringBuilder details = new StringBuilder();
-        details.append("📋 ").append(course.getClassType()).append("\n");
-        details.append("📅 ").append(course.getDayOfWeek()).append(" at ").append(course.getTime()).append("\n");
-        details.append("⏱️ ").append(course.getDuration()).append(" minutes\n");
-        details.append("👥 ").append(course.getCapacity()).append(" people\n");
-        details.append("💷 £").append(String.format(Locale.UK, "%.2f", course.getPrice()));
+        details.append(String.format(Locale.UK, "📋 %s\n📅 %s at %s\n⏱️ %d minutes\n👥 %d people\n💷 £%.2f", course.getClassType(), course.getDayOfWeek(), course.getTime(), course.getDuration(), course.getCapacity(), course.getPrice()));
 
         if (course.getInstructorName() != null && !course.getInstructorName().trim().isEmpty()) {
-            details.append("\n👨‍🏫 Default instructor: ").append(course.getInstructorName());
+            details.append(String.format("\n👨‍🏫 Default instructor: %s", course.getInstructorName()));
             if (!isEditMode) {
                 editTeacher.setText(course.getInstructorName());
             }
         }
 
         if (course.getDescription() != null && !course.getDescription().trim().isEmpty()) {
-            details.append("\n📝 ").append(course.getDescription());
+            details.append(String.format("\n📝 %s", course.getDescription()));
         }
 
         tvCourseDetails.setText(details.toString());
@@ -187,12 +196,23 @@ public class CreateClassActivity extends AppCompatActivity {
         int courseDayOfWeek = getCalendarDayOfWeek(course.getDayOfWeek());
 
         CalendarConstraints.Builder constraintsBuilder = new CalendarConstraints.Builder();
-        constraintsBuilder.setValidator(new DayOfWeekValidator(courseDayOfWeek));
-        constraintsBuilder.setStart(MaterialDatePicker.todayInUtcMilliseconds());
+
+        // Set the validator to allow dates from today onwards in the local timezone.
+        Calendar localToday = Calendar.getInstance(TimeZone.getDefault());
+        localToday.set(Calendar.HOUR_OF_DAY, 0);
+        localToday.set(Calendar.MINUTE, 0);
+        localToday.set(Calendar.SECOND, 0);
+        localToday.set(Calendar.MILLISECOND, 0);
+        long todayUtc = localToday.getTimeInMillis();
+
+        List<CalendarConstraints.DateValidator> validators = new ArrayList<>();
+        validators.add(new DayOfWeekValidator(courseDayOfWeek));
+        validators.add(DateValidatorPointForward.from(todayUtc));
+        constraintsBuilder.setValidator(new CompositeDateValidator(validators));
 
 
         MaterialDatePicker<Long> datePicker = MaterialDatePicker.Builder.datePicker()
-                .setTitleText("Select a " + course.getDayOfWeek())
+                .setTitleText(String.format("Select a %s", course.getDayOfWeek()))
                 .setSelection(initialSelection)
                 .setCalendarConstraints(constraintsBuilder.build())
                 .build();
@@ -302,7 +322,7 @@ public class CreateClassActivity extends AppCompatActivity {
 
         try {
             if (!isEditMode && yogaClassViewModel.classExists(courseId, selectedDate)) {
-                Toast.makeText(this, "A class already exists for this course on " + selectedDate, Toast.LENGTH_LONG).show();
+                Toast.makeText(this, String.format("A class already exists for this course on %s", selectedDate), Toast.LENGTH_LONG).show();
                 showFieldError(editDate, ivErrorDate);
                 return false;
             }
@@ -340,7 +360,7 @@ public class CreateClassActivity extends AppCompatActivity {
                 yogaClassViewModel.insert(yogaClass);
             }
         }
-        String message = repeatWeeks == 1 ? "Class created successfully!" : repeatWeeks + " classes created successfully!";
+        String message = repeatWeeks == 1 ? "Class created successfully!" : String.format("%d classes created successfully!", repeatWeeks);
         Toast.makeText(this, message, Toast.LENGTH_LONG).show();
         finish();
     }

@@ -21,6 +21,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.yogaAdmin.R;
 import com.example.yogaAdmin.adapter.ClassWithCourseInfoAdapter;
+import com.example.yogaAdmin.utils.NetworkStatusLiveData;
 import com.example.yogaAdmin.viewmodel.YogaClassViewModel;
 
 import java.util.Calendar;
@@ -38,6 +39,8 @@ public class SearchActivity extends AppCompatActivity {
     private Button btnClearAll;
     private ImageView btnAdvancedSearch;
     private LinearLayout advancedSearchContainer;
+    private NetworkStatusLiveData networkStatusLiveData;
+    private TextView tvOffline;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,6 +52,16 @@ public class SearchActivity extends AppCompatActivity {
         initViews();
         setupRecyclerView();
         setupListeners();
+
+        tvOffline = findViewById(R.id.tv_offline);
+        networkStatusLiveData = new NetworkStatusLiveData(getApplicationContext());
+        networkStatusLiveData.observe(this, isOnline -> {
+            if (isOnline) {
+                tvOffline.setVisibility(View.GONE);
+            } else {
+                tvOffline.setVisibility(View.VISIBLE);
+            }
+        });
 
         // Perform initial search to show all classes
         performSearch();
@@ -179,7 +192,7 @@ public class SearchActivity extends AppCompatActivity {
             recyclerViewResults.setVisibility(View.VISIBLE);
             emptyStateLayout.setVisibility(View.GONE);
             tvResultsCount.setVisibility(View.VISIBLE);
-            tvResultsCount.setText(getString(R.string.results_found, count));
+            tvResultsCount.setText(String.format("%d results found", count));
         } else {
             recyclerViewResults.setVisibility(View.GONE);
             emptyStateLayout.setVisibility(View.VISIBLE);
@@ -189,11 +202,11 @@ public class SearchActivity extends AppCompatActivity {
             TextView emptyTitle = findViewById(R.id.tv_empty_title);
             TextView emptySubtitle = findViewById(R.id.tv_empty_subtitle);
             if (hasSearchQuery) {
-                emptyTitle.setText(R.string.empty_search_no_results_header);
-                emptySubtitle.setText(R.string.empty_search_no_results_subheader);
+                emptyTitle.setText("No Results Found");
+                emptySubtitle.setText("No classes match your search criteria. Try adjusting your search terms.");
             } else {
-                emptyTitle.setText(R.string.empty_search_header);
-                emptySubtitle.setText(R.string.empty_search_subheader);
+                emptyTitle.setText("Ready to Search");
+                emptySubtitle.setText("Enter a teacher name or use advanced search to find classes");
             }
         }
     }
