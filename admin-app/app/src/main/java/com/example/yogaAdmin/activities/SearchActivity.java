@@ -28,7 +28,7 @@ import java.util.Calendar;
 
 public class SearchActivity extends AppCompatActivity {
 
-    private EditText editTeacherSearch, editDateSearch;
+    private EditText editInstructorSearch, editDateSearch;
     private Spinner spinnerDaySearch;
     private RecyclerView recyclerViewResults;
     private ClassWithCourseInfoAdapter adapter;
@@ -68,7 +68,7 @@ public class SearchActivity extends AppCompatActivity {
     }
 
     private void initViews() {
-        editTeacherSearch = findViewById(R.id.edit_teacher_search);
+        editInstructorSearch = findViewById(R.id.edit_instructor_search);
         editDateSearch = findViewById(R.id.edit_date_search);
         spinnerDaySearch = findViewById(R.id.spinner_day_search);
         recyclerViewResults = findViewById(R.id.recycler_view_results);
@@ -105,7 +105,7 @@ public class SearchActivity extends AppCompatActivity {
             }
         });
 
-        editTeacherSearch.addTextChangedListener(new TextWatcher() {
+        editInstructorSearch.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
 
@@ -150,7 +150,7 @@ public class SearchActivity extends AppCompatActivity {
         });
 
         btnClearAll.setOnClickListener(v -> {
-            editTeacherSearch.setText("");
+            editInstructorSearch.setText("");
             editDateSearch.setText("");
             spinnerDaySearch.setSelection(0);
             performSearch();
@@ -172,11 +172,11 @@ public class SearchActivity extends AppCompatActivity {
     }
 
     private void performSearch() {
-        String teacherName = editTeacherSearch.getText().toString().trim();
+        String instructorName = editInstructorSearch.getText().toString().trim();
         String date = editDateSearch.getText().toString().trim();
         String dayOfWeek = spinnerDaySearch.getSelectedItem().toString();
 
-        yogaClassViewModel.search(teacherName, date, dayOfWeek).observe(this, results -> {
+        yogaClassViewModel.search(instructorName, date, dayOfWeek).observe(this, results -> {
             if (results == null) return;
             adapter.submitList(results);
             updateUIWithResults(results.size());
@@ -184,7 +184,7 @@ public class SearchActivity extends AppCompatActivity {
     }
 
     private void updateUIWithResults(int count) {
-        boolean hasSearchQuery = !editTeacherSearch.getText().toString().trim().isEmpty() ||
+        boolean hasSearchQuery = !editInstructorSearch.getText().toString().trim().isEmpty() ||
                 !editDateSearch.getText().toString().trim().isEmpty() ||
                 (spinnerDaySearch.getSelectedItemPosition() > 0 && !spinnerDaySearch.getSelectedItem().toString().equals("All Days"));
 
@@ -206,7 +206,7 @@ public class SearchActivity extends AppCompatActivity {
                 emptySubtitle.setText("No classes match your search criteria. Try adjusting your search terms.");
             } else {
                 emptyTitle.setText("Ready to Search");
-                emptySubtitle.setText("Enter a teacher name or use advanced search to find classes");
+                emptySubtitle.setText("Enter a instructor name or use advanced search to find classes");
             }
         }
     }

@@ -53,8 +53,8 @@ public interface YogaClassDao {
     LiveData<List<YogaClass>> getAllClassesWithCourseInfo();
 
     @Transaction
-    @Query("SELECT * FROM yoga_classes WHERE assignedTeacher LIKE :teacherName")
-    LiveData<List<ClassWithCourseInfo>> searchByTeacher(String teacherName);
+    @Query("SELECT * FROM yoga_classes WHERE assignedInstructor LIKE :instructorName")
+    LiveData<List<ClassWithCourseInfo>> searchByInstructor(String instructorName);
 
     @Transaction
     @Query("SELECT * FROM yoga_classes WHERE date = :date")
@@ -69,8 +69,8 @@ public interface YogaClassDao {
     @Transaction
     @Query("SELECT DISTINCT yoga_classes.* FROM yoga_classes " +
             "LEFT JOIN yoga_courses ON yoga_classes.courseId = yoga_courses.id " +
-            "WHERE (:teacherName IS NULL OR yoga_classes.assignedTeacher LIKE :teacherName) " +
+            "WHERE (:instructorName IS NULL OR yoga_classes.assignedInstructor LIKE :instructorName) " +
             "AND (:date IS NULL OR yoga_classes.date = :date) " +
             "AND (:dayOfWeek IS NULL OR yoga_courses.dayOfWeek = :dayOfWeek)")
-    LiveData<List<ClassWithCourseInfo>> search(String teacherName, String date, String dayOfWeek);
+    LiveData<List<ClassWithCourseInfo>> search(String instructorName, String date, String dayOfWeek);
 }

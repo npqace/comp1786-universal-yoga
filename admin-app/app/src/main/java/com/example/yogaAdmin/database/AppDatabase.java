@@ -17,7 +17,7 @@ import com.example.yogaAdmin.models.YogaCourse;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-@Database(entities = {YogaCourse.class, YogaClass.class}, version = 5, exportSchema = false)
+@Database(entities = {YogaCourse.class, YogaClass.class}, version = 6, exportSchema = false)
 public abstract class AppDatabase extends RoomDatabase {
 
     public abstract YogaCourseDao yogaCourseDao();
@@ -42,7 +42,7 @@ public abstract class AppDatabase extends RoomDatabase {
                 if (INSTANCE == null) {
                     INSTANCE = Room.databaseBuilder(context.getApplicationContext(),
                                     AppDatabase.class, "yoga_database")
-                            .addMigrations(MIGRATION_4_5)
+                            .fallbackToDestructiveMigration()
                             .build();
                 }
             }

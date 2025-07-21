@@ -30,7 +30,7 @@ public class ClassWithCourseInfoAdapter extends ListAdapter<ClassWithCourseInfo,
         @Override
         public boolean areContentsTheSame(@NonNull ClassWithCourseInfo oldItem, @NonNull ClassWithCourseInfo newItem) {
             return oldItem.yogaClass.getDate().equals(newItem.yogaClass.getDate()) &&
-                    oldItem.yogaClass.getAssignedTeacher().equals(newItem.yogaClass.getAssignedTeacher()) &&
+                    oldItem.yogaClass.getAssignedInstructor().equals(newItem.yogaClass.getAssignedInstructor()) &&
                     oldItem.yogaCourse.getClassType().equals(newItem.yogaCourse.getClassType());
         }
     };
@@ -47,7 +47,7 @@ public class ClassWithCourseInfoAdapter extends ListAdapter<ClassWithCourseInfo,
     public void onBindViewHolder(@NonNull ClassWithCourseInfoViewHolder holder, int position) {
         ClassWithCourseInfo currentClass = getItem(position);
         holder.tvClassDate.setText(currentClass.yogaClass.getDate());
-        holder.tvAssignedTeacher.setText(currentClass.yogaClass.getAssignedTeacher());
+        holder.tvAssignedInstructor.setText(currentClass.yogaClass.getAssignedInstructor());
         holder.tvCourseInfo.setText(currentClass.yogaCourse.getClassType());
         holder.tvClassDayOfWeek.setText(currentClass.yogaCourse.getDayOfWeek());
         holder.tvCapacity.setText(String.valueOf(currentClass.yogaClass.getActualCapacity()));
@@ -63,7 +63,7 @@ public class ClassWithCourseInfoAdapter extends ListAdapter<ClassWithCourseInfo,
 
     public class ClassWithCourseInfoViewHolder extends RecyclerView.ViewHolder {
         private TextView tvClassDate;
-        private TextView tvAssignedTeacher;
+        private TextView tvAssignedInstructor;
         private TextView tvCourseInfo;
         private TextView tvClassDayOfWeek;
         private TextView tvCapacity;
@@ -75,7 +75,7 @@ public class ClassWithCourseInfoAdapter extends ListAdapter<ClassWithCourseInfo,
         public ClassWithCourseInfoViewHolder(@NonNull View itemView) {
             super(itemView);
             tvClassDate = itemView.findViewById(R.id.tv_class_date);
-            tvAssignedTeacher = itemView.findViewById(R.id.tv_assigned_teacher);
+            tvAssignedInstructor = itemView.findViewById(R.id.tv_assigned_instructor);
             tvCourseInfo = itemView.findViewById(R.id.tv_course_info);
             tvClassDayOfWeek = itemView.findViewById(R.id.tv_class_day_of_week);
             tvCapacity = itemView.findViewById(R.id.tv_capacity);

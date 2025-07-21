@@ -20,7 +20,7 @@ public class ClassDetailsActivity extends AppCompatActivity {
 
     public static final String EXTRA_CLASS_INFO = "com.example.yogaAdmin.EXTRA_CLASS_INFO";
 
-    private TextView tvClassDate, tvAssignedTeacher, tvCapacity, tvStatus, tvComments;
+    private TextView tvClassDate, tvAssignedInstructor, tvCapacity, tvStatus, tvComments;
     private TextView tvClassType, tvDayOfWeek, tvTime, tvDuration, tvPrice, tvDescription;
     private NetworkStatusLiveData networkStatusLiveData;
     private TextView tvOffline;
@@ -52,7 +52,7 @@ public class ClassDetailsActivity extends AppCompatActivity {
     private void initViews() {
         // Class Details
         tvClassDate = findViewById(R.id.tv_class_date);
-        tvAssignedTeacher = findViewById(R.id.tv_assigned_teacher);
+        tvAssignedInstructor = findViewById(R.id.tv_assigned_instructor);
         tvCapacity = findViewById(R.id.tv_capacity);
         tvStatus = findViewById(R.id.tv_status);
         tvComments = findViewById(R.id.tv_comments);
@@ -75,7 +75,7 @@ public class ClassDetailsActivity extends AppCompatActivity {
 
         // Populate Class Details
         tvClassDate.setText(yogaClass.getDate());
-        tvAssignedTeacher.setText(yogaClass.getAssignedTeacher());
+        tvAssignedInstructor.setText(yogaClass.getAssignedInstructor());
         tvCapacity.setText(String.valueOf(yogaClass.getActualCapacity()));
         tvStatus.setText(yogaClass.getStatus());
         tvComments.setText(yogaClass.getAdditionalComments() != null ? yogaClass.getAdditionalComments() : "");

@@ -80,11 +80,11 @@
         android:gravity="center_vertical">
 
         <EditText
-            android:id="@+id/edit_teacher_search"
+            android:id="@+id/edit_instructor_search"
             android:layout_width="0dp"
             android:layout_height="48dp"
             android:layout_weight="1"
-            android:hint="@string/hint_search_teacher"
+            android:hint="@string/hint_search_instructor"
             android:inputType="text"
             android:textSize="16sp"
             android:background="@drawable/form_field_background"

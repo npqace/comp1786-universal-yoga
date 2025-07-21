@@ -129,23 +129,23 @@
     <string name="title_search">Search Classes</string>
     <string name="search_hint_main">Search by class type, instructor, or day…</string>
     <string name="search_hint_date">Select date to search</string>
-    <string name="button_search_teacher">Search by Teacher</string>
+    <string name="button_search_instructor">Search by Instructor</string>
     <string name="button_advanced_search">Advanced Search</string>
     <string name="search_results_title">Search Results</string>
     <string name="search_empty_title">No Results Found</string>
     <string name="search_empty_subtitle">No classes match your search criteria. Try adjusting your search terms.</string>
     <string name="search_ready_title">Ready to Search</string>
-    <string name="search_ready_subtitle">Enter a teacher name or use advanced search to find classes</string>
+    <string name="search_ready_subtitle">Enter a instructor name or use advanced search to find classes</string>
     <string name="header_basic_search">🔍 Basic Search</string>
-    <string name="subheader_search_teacher">Teacher Name</string>
-    <string name="hint_search_teacher">Enter teacher name (e.g. Sarah, Johnson)</string>
+    <string name="subheader_search_instructor">Instructor Name</string>
+    <string name="hint_search_instructor">Enter instructor name (e.g. Sarah, Johnson)</string>
     <string name="header_advanced_search">⚙️ Advanced Search</string>
     <string name="subheader_specific_date">Specific Date</string>
     <string name="btn_apply_advanced">Apply Advanced Search</string>
     <string name="header_search_results">📋 Search Results</string>
 
     <string name="empty_search_header">Ready to Search</string>
-    <string name="empty_search_subheader">Enter a teacher name or use advanced search to find classes</string>
+    <string name="empty_search_subheader">Enter a instructor name or use advanced search to find classes</string>
     <string name="empty_search_no_results_header">No Results Found</string>
     <string name="empty_search_no_results_subheader">No classes match your search criteria. Try adjusting your search terms.</string>
 
@@ -202,7 +202,7 @@
     <string name="error_course_not_found">Error: Course not found</string>
     <string name="error_course_details_not_loaded">Course details not loaded yet.</string>
     <string name="error_select_date">Please select a date.</string>
-    <string name="error_enter_teacher">Please enter a teacher\'s name.</string>
+    <string name="error_enter_instructor">Please enter a instructor\'s name.</string>
     <string name="error_class_exists">A class already exists for this course on %s</string>
     <string name="error_checking_existing_class">Error checking for existing classes.</string>
 
@@ -238,7 +238,7 @@
     <string name="header_class_details">Class Details</string>
     <string name="header_course_details">Course Details</string>
     <string name="label_class_date">Date</string>
-    <string name="label_assigned_teacher">Assigned Teacher</string>
+    <string name="label_assigned_instructor">Assigned Instructor</string>
     <string name="label_capacity_details">Capacity</string>
     <string name="label_status">Status</string>
     <string name="label_comments">Additional Comments</string>

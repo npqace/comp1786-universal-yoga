@@ -47,10 +47,10 @@ public class CreateClassActivity extends AppCompatActivity {
     private long courseId;
     private long classId = -1;
 
-    private EditText editDate, editTeacher, editCapacity, editComments, editRepeatWeeks;
+    private EditText editDate, editInstructor, editCapacity, editComments, editRepeatWeeks;
     private TextView tvCourseName, tvCourseDetails, tvDefaultCapacity;
     private Button btnClear, btnCreateClass;
-    private ImageView ivErrorDate, ivErrorTeacher;
+    private ImageView ivErrorDate, ivErrorInstructor;
 
     private String selectedDate = null;
     private boolean isEditMode = false;
@@ -96,7 +96,7 @@ public class CreateClassActivity extends AppCompatActivity {
 
     private void initializeViews() {
         editDate = findViewById(R.id.edit_date);
-        editTeacher = findViewById(R.id.edit_teacher);
+        editInstructor = findViewById(R.id.edit_instructor);
         editCapacity = findViewById(R.id.edit_capacity);
         editComments = findViewById(R.id.edit_comments);
         editRepeatWeeks = findViewById(R.id.edit_repeat_weeks);
@@ -106,7 +106,7 @@ public class CreateClassActivity extends AppCompatActivity {
         btnClear = findViewById(R.id.btn_clear);
         btnCreateClass = findViewById(R.id.btn_create_class);
         ivErrorDate = findViewById(R.id.iv_error_date);
-        ivErrorTeacher = findViewById(R.id.iv_error_teacher);
+        ivErrorInstructor = findViewById(R.id.iv_error_instructor);
 
         ImageView btnBack = findViewById(R.id.btn_back);
         btnBack.setOnClickListener(v -> finish());
@@ -150,7 +150,7 @@ public class CreateClassActivity extends AppCompatActivity {
         if (course.getInstructorName() != null && !course.getInstructorName().trim().isEmpty()) {
             details.append(String.format("\n👨‍🏫 Default instructor: %s", course.getInstructorName()));
             if (!isEditMode) {
-                editTeacher.setText(course.getInstructorName());
+                editInstructor.setText(course.getInstructorName());
             }
         }
 
@@ -164,7 +164,7 @@ public class CreateClassActivity extends AppCompatActivity {
     private void populateClassInfo() {
         editDate.setText(existingClass.getDate());
         selectedDate = existingClass.getDate();
-        editTeacher.setText(existingClass.getAssignedTeacher());
+        editInstructor.setText(existingClass.getAssignedInstructor());
         editCapacity.setText(String.valueOf(existingClass.getActualCapacity()));
         editComments.setText(existingClass.getAdditionalComments());
         firebaseKey = existingClass.getFirebaseKey();
@@ -259,11 +259,11 @@ public class CreateClassActivity extends AppCompatActivity {
             @Override
             public void afterTextChanged(Editable s) {
                 if (editDate.hasFocus()) hideFieldError(editDate, ivErrorDate);
-                if (editTeacher.hasFocus()) hideFieldError(editTeacher, ivErrorTeacher);
+                if (editInstructor.hasFocus()) hideFieldError(editInstructor, ivErrorInstructor);
             }
         };
         editDate.addTextChangedListener(textWatcher);
-        editTeacher.addTextChangedListener(textWatcher);
+        editInstructor.addTextChangedListener(textWatcher);
     }
 
     private void setupClickListeners() {
@@ -273,20 +273,20 @@ public class CreateClassActivity extends AppCompatActivity {
 
     private void clearForm() {
         editDate.setText("");
-        editTeacher.setText(course != null && course.getInstructorName() != null ? course.getInstructorName() : "");
+        editInstructor.setText(course != null && course.getInstructorName() != null ? course.getInstructorName() : "");
         editCapacity.setText("");
         editComments.setText("");
         editRepeatWeeks.setText("");
         selectedDate = null;
         hideFieldError(editDate, ivErrorDate);
-        hideFieldError(editTeacher, ivErrorTeacher);
+        hideFieldError(editInstructor, ivErrorInstructor);
         Toast.makeText(this, "Form cleared", Toast.LENGTH_SHORT).show();
     }
 
     private void validateAndSaveClass() {
         if (!validateForm()) return;
 
-        String teacher = editTeacher.getText().toString().trim();
+        String instructor = editInstructor.getText().toString().trim();
         String comments = editComments.getText().toString().trim();
         int customCapacity = -1;
         if (!editCapacity.getText().toString().trim().isEmpty()) {
@@ -294,19 +294,19 @@ public class CreateClassActivity extends AppCompatActivity {
         }
 
         if (isEditMode) {
-            updateClass(teacher, comments, customCapacity);
+            updateClass(instructor, comments, customCapacity);
         } else {
             int repeatWeeks = 1;
             if (!editRepeatWeeks.getText().toString().trim().isEmpty()) {
                 repeatWeeks = Integer.parseInt(editRepeatWeeks.getText().toString().trim());
             }
-            createClasses(selectedDate, teacher, customCapacity, comments, repeatWeeks);
+            createClasses(selectedDate, instructor, customCapacity, comments, repeatWeeks);
         }
     }
 
     private boolean validateForm() {
         hideFieldError(editDate, ivErrorDate);
-        hideFieldError(editTeacher, ivErrorTeacher);
+        hideFieldError(editInstructor, ivErrorInstructor);
 
         if (selectedDate == null || selectedDate.trim().isEmpty()) {
             showFieldError(editDate, ivErrorDate);
@@ -314,9 +314,9 @@ public class CreateClassActivity extends AppCompatActivity {
             return false;
         }
 
-        if (editTeacher.getText().toString().trim().isEmpty()) {
-            showFieldError(editTeacher, ivErrorTeacher);
-            Toast.makeText(this, "Please enter a teacher's name.", Toast.LENGTH_SHORT).show();
+        if (editInstructor.getText().toString().trim().isEmpty()) {
+            showFieldError(editInstructor, ivErrorInstructor);
+            Toast.makeText(this, "Please enter a instructor's name.", Toast.LENGTH_SHORT).show();
             return false;
         }
 
@@ -334,8 +334,8 @@ public class CreateClassActivity extends AppCompatActivity {
         return true;
     }
 
-    private void updateClass(String teacher, String comments, int capacity) {
-        existingClass.setAssignedTeacher(teacher);
+    private void updateClass(String instructor, String comments, int capacity) {
+        existingClass.setAssignedInstructor(instructor);
         existingClass.setAdditionalComments(comments);
         existingClass.setActualCapacity(capacity > 0 ? capacity : course.getCapacity());
         existingClass.setDate(selectedDate);
@@ -345,14 +345,14 @@ public class CreateClassActivity extends AppCompatActivity {
         finish();
     }
 
-    private void createClasses(String startDate, String teacher, int customCapacity, String comments, int repeatWeeks) {
+    private void createClasses(String startDate, String instructor, int customCapacity, String comments, int repeatWeeks) {
         for (int i = 0; i < repeatWeeks; i++) {
             String classDate = calculateDateForWeek(startDate, i);
             if (classDate != null) {
                 YogaClass yogaClass = new YogaClass();
                 yogaClass.setCourseId(courseId);
                 yogaClass.setDate(classDate);
-                yogaClass.setAssignedTeacher(teacher);
+                yogaClass.setAssignedInstructor(instructor);
                 yogaClass.setActualCapacity(customCapacity > 0 ? customCapacity : course.getCapacity());
                 yogaClass.setAdditionalComments(comments.isEmpty() ? null : comments);
                 yogaClass.setStatus("Scheduled");

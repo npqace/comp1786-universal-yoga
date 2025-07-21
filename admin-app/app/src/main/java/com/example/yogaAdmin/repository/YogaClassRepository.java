@@ -101,8 +101,8 @@ public class YogaClassRepository {
         return future.get() > 0;
     }
 
-    public LiveData<List<ClassWithCourseInfo>> searchByTeacher(String teacherName) {
-        return yogaClassDao.searchByTeacher("%" + teacherName + "%");
+    public LiveData<List<ClassWithCourseInfo>> searchByInstructor(String instructorName) {
+        return yogaClassDao.searchByInstructor("%" + instructorName + "%");
     }
 
     public LiveData<List<ClassWithCourseInfo>> searchByDate(String date) {
@@ -113,10 +113,10 @@ public class YogaClassRepository {
         return yogaClassDao.searchByDayOfWeek(dayOfWeek);
     }
 
-    public LiveData<List<ClassWithCourseInfo>> search(String teacherName, String date, String dayOfWeek) {
-        String teacherQuery = (teacherName == null || teacherName.isEmpty()) ? null : "%" + teacherName + "%";
+    public LiveData<List<ClassWithCourseInfo>> search(String instructorName, String date, String dayOfWeek) {
+        String instructorQuery = (instructorName == null || instructorName.isEmpty()) ? null : "%" + instructorName + "%";
         String dateQuery = (date == null || date.isEmpty()) ? null : date;
         String dayOfWeekQuery = (dayOfWeek == null || dayOfWeek.isEmpty() || dayOfWeek.equals("All Days")) ? null : dayOfWeek;
-        return yogaClassDao.search(teacherQuery, dateQuery, dayOfWeekQuery);
+        return yogaClassDao.search(instructorQuery, dateQuery, dayOfWeekQuery);
     }
 }

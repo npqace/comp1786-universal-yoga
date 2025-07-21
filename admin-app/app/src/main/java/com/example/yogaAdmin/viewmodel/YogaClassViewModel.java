@@ -62,8 +62,8 @@ public class YogaClassViewModel extends AndroidViewModel {
         return repository.classExists(courseId, date);
     }
 
-    public LiveData<List<ClassWithCourseInfo>> searchByTeacher(String teacherName) {
-        return repository.searchByTeacher(teacherName);
+    public LiveData<List<ClassWithCourseInfo>> searchByInstructor(String instructorName) {
+        return repository.searchByInstructor(instructorName);
     }
 
     public LiveData<List<ClassWithCourseInfo>> searchByDate(String date) {
@@ -74,8 +74,8 @@ public class YogaClassViewModel extends AndroidViewModel {
         return repository.searchByDayOfWeek(dayOfWeek);
     }
 
-    public LiveData<List<ClassWithCourseInfo>> search(String teacherName, String date, String dayOfWeek) {
-        return repository.search(teacherName, date, dayOfWeek);
+    public LiveData<List<ClassWithCourseInfo>> search(String instructorName, String date, String dayOfWeek) {
+        return repository.search(instructorName, date, dayOfWeek);
     }
 
     public static class Factory extends ViewModelProvider.NewInstanceFactory {

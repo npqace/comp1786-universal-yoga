@@ -50,7 +50,7 @@ public class YogaClassAdapter extends ListAdapter<YogaClass, YogaClassAdapter.Yo
         public boolean areContentsTheSame(@NonNull YogaClass oldItem, @NonNull YogaClass newItem) {
             return oldItem.getDate().equals(newItem.getDate()) &&
                     oldItem.getStatus().equals(newItem.getStatus()) &&
-                    oldItem.getAssignedTeacher().equals(newItem.getAssignedTeacher()) &&
+                    oldItem.getAssignedInstructor().equals(newItem.getAssignedInstructor()) &&
                     oldItem.getCreatedDate() == newItem.getCreatedDate();
         }
     };
@@ -74,7 +74,7 @@ public class YogaClassAdapter extends ListAdapter<YogaClass, YogaClassAdapter.Yo
     }
 
      class YogaClassHolder extends RecyclerView.ViewHolder {
-        private final TextView tvClassDate, tvClassDayOfWeek, tvAssignedTeacher, tvCourseInfo, tvCapacity, tvComments, tvCreatedDate;
+        private final TextView tvClassDate, tvClassDayOfWeek, tvAssignedInstructor, tvCourseInfo, tvCapacity, tvComments, tvCreatedDate;
         private final Spinner spinnerStatus;
         private final View btnEdit, btnDelete;
         private final Context context;
@@ -84,7 +84,7 @@ public class YogaClassAdapter extends ListAdapter<YogaClass, YogaClassAdapter.Yo
             context = itemView.getContext();
             tvClassDate = itemView.findViewById(R.id.tv_class_date);
             tvClassDayOfWeek = itemView.findViewById(R.id.tv_class_day_of_week);
-            tvAssignedTeacher = itemView.findViewById(R.id.tv_assigned_teacher);
+            tvAssignedInstructor = itemView.findViewById(R.id.tv_assigned_instructor);
             tvCourseInfo = itemView.findViewById(R.id.tv_course_info);
             tvCapacity = itemView.findViewById(R.id.tv_capacity);
             tvComments = itemView.findViewById(R.id.tv_comments);
@@ -106,7 +106,7 @@ public class YogaClassAdapter extends ListAdapter<YogaClass, YogaClassAdapter.Yo
 
         public void bind(YogaClass yogaClass, YogaCourse yogaCourse, OnClassActionListener actionListener) {
             tvClassDate.setText(yogaClass.getDate());
-            tvAssignedTeacher.setText("With " + yogaClass.getAssignedTeacher());
+            tvAssignedInstructor.setText("With " + yogaClass.getAssignedInstructor());
             if (yogaCourse != null) {
                 tvCourseInfo.setText(String.format(Locale.UK, "%s • %s • %s", yogaCourse.getClassType(), yogaCourse.getTime(), yogaCourse.getFormattedPrice()));
                 tvClassDayOfWeek.setText(yogaCourse.getDayOfWeek());
