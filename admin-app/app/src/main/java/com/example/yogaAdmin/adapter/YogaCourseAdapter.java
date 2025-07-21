@@ -70,9 +70,9 @@ public class YogaCourseAdapter extends ListAdapter<YogaCourse, YogaCourseAdapter
         updateFieldVisibility(holder.tvRoom, "Room: ", currentCourse.getRoomNumber());
         updateFieldVisibility(holder.tvEquipment, "Equipment: ", currentCourse.getEquipmentNeeded());
 
-        // Conditional visibility for spinners
-        updateSpinnerFieldVisibility(holder.tvDifficulty, "Difficulty: ", currentCourse.getDifficultyLevel(), "Select Difficulty Level");
-        updateSpinnerFieldVisibility(holder.tvAgeGroup, "Age Group: ", currentCourse.getAgeGroup(), "Select Age Group");
+//        // Conditional visibility for spinners
+        updateSpinnerFieldVisibility(holder.tvDifficulty, "Difficulty: ", currentCourse.getDifficultyLevel(), "All Levels");
+        updateSpinnerFieldVisibility(holder.tvAgeGroup, "Age Group: ", currentCourse.getAgeGroup(), "All Ages");
 
         updateFieldVisibility(holder.tvDescription, "", currentCourse.getDescription());
     }
@@ -87,7 +87,7 @@ public class YogaCourseAdapter extends ListAdapter<YogaCourse, YogaCourseAdapter
     }
 
     private void updateSpinnerFieldVisibility(TextView textView, String prefix, String value, String defaultValue) {
-        if (value != null && !value.trim().isEmpty() && !value.equals(defaultValue)) {
+        if (value != null && !value.trim().isEmpty()) {
             textView.setText(prefix + value);
             textView.setVisibility(View.VISIBLE);
         } else {

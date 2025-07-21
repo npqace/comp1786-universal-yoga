@@ -39,21 +39,18 @@
 
     <!-- Difficulty Levels -->
     <string-array name="difficulty_levels">
-        <item>Select Difficulty Level</item>
+        <item>All Levels</item>
         <item>Beginner</item>
         <item>Intermediate</item>
         <item>Advanced</item>
-        <item>All Levels</item>
     </string-array>
 
     <!-- Age Groups -->
     <string-array name="age_groups">
-        <item>Select Age Group</item>
         <item>All Ages</item>
+        <item>Teens (13-17)</item>
         <item>Adults Only (18+)</item>
         <item>Seniors (55+)</item>
-        <item>Teens (13-17)</item>
         <item>Kids &amp; Family</item>
-        <item>Prenatal</item>
     </string-array>
 </resources>
