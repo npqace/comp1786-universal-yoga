@@ -27,6 +27,7 @@ public class YogaClass implements Serializable {
     private String date; // Specific date of the class
     private String assignedInstructor;
     private int actualCapacity;
+    private int slotsAvailable;
     private String additionalComments;
     private String status; // e.g., "Scheduled", "Completed", "Cancelled"
     private long createdDate;
@@ -68,6 +69,9 @@ public class YogaClass implements Serializable {
 
     public int getActualCapacity() { return actualCapacity; }
     public void setActualCapacity(int actualCapacity) { this.actualCapacity = actualCapacity; }
+
+    public int getSlotsAvailable() { return slotsAvailable; }
+    public void setSlotsAvailable(int slotsAvailable) { this.slotsAvailable = slotsAvailable; }
 
     public String getAdditionalComments() { return additionalComments; }
     public void setAdditionalComments(String additionalComments) { this.additionalComments = additionalComments; }
