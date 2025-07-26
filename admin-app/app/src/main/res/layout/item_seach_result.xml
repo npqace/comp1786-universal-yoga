@@ -1,0 +1,189 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="8dp"
+    app:cardCornerRadius="8dp"
+    app:cardElevation="3dp"
+    android:background="@color/white"
+    android:clickable="true"
+    android:focusable="true"
+    android:foreground="?android:attr/selectableItemBackground">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <!-- Header with date and status -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="8dp">
+
+            <ImageView
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:src="@drawable/ic_calendar"
+                android:layout_marginEnd="8dp"
+                app:tint="@color/primary_blue" />
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/tv_class_date"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/placeholder_class_date"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/primary_text"
+                    android:singleLine="true"
+                    android:ellipsize="end" />
+
+                <TextView
+                    android:id="@+id/tv_class_day_of_week"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/placeholder_class_day"
+                    android:textSize="12sp"
+                    android:textColor="@color/secondary_text"
+                    android:singleLine="true"
+                    android:ellipsize="end" />
+
+            </LinearLayout>
+
+            <!-- Status Container with improved styling -->
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:gravity="center"
+                android:layout_marginStart="8dp">
+
+                <!-- Status -->
+                <TextView
+                    android:id="@+id/tv_status"
+                    android:layout_width="120dp"
+                    android:layout_height="40dp"
+                    android:text="@string/status_scheduled"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/primary_text"
+                    android:background="@drawable/details_card_background"
+                    android:padding="6dp"
+                    android:textAlignment="center"
+                    android:gravity="center"
+                    android:elevation="2dp"
+                    android:dropDownWidth="140dp" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <!-- Assigned Instructor -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="6dp">
+
+            <ImageView
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:src="@drawable/ic_instructor"
+                android:layout_marginEnd="8dp" />
+
+            <TextView
+                android:id="@+id/tv_assigned_instructor"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/placeholder_class_instructor"
+                android:textSize="13sp"
+                android:textColor="@color/secondary_text"
+                android:singleLine="true"
+                android:ellipsize="end" />
+
+        </LinearLayout>
+
+        <!-- Course Information -->
+        <TextView
+            android:id="@+id/tv_course_info"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/placeholder_course_info"
+            android:textSize="13sp"
+            android:textColor="@color/primary_text"
+            android:background="@drawable/details_card_background"
+            android:padding="10dp"
+            android:layout_marginBottom="6dp"
+            android:singleLine="true"
+            android:ellipsize="end" />
+
+        <!-- Capacity -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="6dp">
+
+            <ImageView
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:src="@drawable/ic_people"
+                android:layout_marginEnd="8dp" />
+
+            <TextView
+                android:id="@+id/tv_capacity"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/placeholder_class_capacity"
+                android:textSize="13sp"
+                android:textColor="@color/secondary_text"
+                android:singleLine="true"
+                android:ellipsize="end" />
+
+        </LinearLayout>
+
+        <!-- Additional Comments (optional) -->
+        <TextView
+            android:id="@+id/tv_comments"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/placeholder_class_comment"
+            android:textSize="13sp"
+            android:textColor="@color/primary_text"
+            android:layout_marginBottom="6dp"
+            android:visibility="gone"
+            android:gravity="center_vertical"
+            android:drawablePadding="8dp"
+            app:drawableStartCompat="@drawable/ic_comment"
+            android:maxLines="2"
+            android:ellipsize="end" />
+
+        <!-- Created date -->
+        <TextView
+            android:id="@+id/tv_created_date"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/created_date"
+            android:textSize="11sp"
+            android:textColor="@color/secondary_text"
+            android:textStyle="italic"
+            android:layout_marginBottom="10dp"
+            android:singleLine="true"
+            android:ellipsize="end" />
+
+    </LinearLayout>
+
+</androidx.cardview.widget.CardView>
