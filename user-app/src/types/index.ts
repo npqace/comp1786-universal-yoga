@@ -8,7 +8,7 @@ export interface SearchFilters {
   name?: string;
   dayOfWeek?: string;
   timeOfDay?: string;
-  courseId?: string;
+  courseFirebaseKey?: string;
 }
 
 export interface LoadingState {
@@ -21,7 +21,7 @@ export type RootStackParamList = {
   Home: undefined;
   ClassList: undefined;
   Search: undefined;
-  ClassDetail: { classId: string; courseId?: string };
+  ClassDetail: { classId: string; courseFirebaseKey?: string };
 };
 
 export type TabParamList = {

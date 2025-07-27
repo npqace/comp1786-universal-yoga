@@ -64,7 +64,7 @@ export default function SearchBar({ onSearch, loading = false }: SearchBarProps)
     }
 
     if (selectedCourse !== 'All Courses') {
-      filters.courseId = selectedCourse;
+      filters.courseFirebaseKey = selectedCourse;
     }
 
     return filters;

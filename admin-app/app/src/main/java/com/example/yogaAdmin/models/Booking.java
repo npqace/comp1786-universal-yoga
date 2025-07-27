@@ -1,12 +1,7 @@
 package com.example.yogaAdmin.models;
 
-import androidx.room.Entity;
-import androidx.room.PrimaryKey;
-
-@Entity(tableName = "bookings")
 public class Booking {
-    @PrimaryKey(autoGenerate = true)
-    private long id;
+    private String id;
     private String userId;
     private String classId;
     private String bookingDate;
@@ -22,11 +17,11 @@ public class Booking {
     }
 
     // Getters and Setters
-    public long getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(String id) {
         this.id = id;
     }
 

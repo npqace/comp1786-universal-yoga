@@ -5,7 +5,7 @@ export interface YogaClass {
   id?: number;
   
   // Foreign key to the course template
-  courseId: number;
+  courseFirebaseKey: string;
   
   // Required fields for specific class session
   date: string; // Format: "dd/MM/yyyy"

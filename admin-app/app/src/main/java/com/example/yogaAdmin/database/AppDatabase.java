@@ -9,7 +9,7 @@ import androidx.room.RoomDatabase;
 import androidx.room.migration.Migration;
 import androidx.sqlite.db.SupportSQLiteDatabase;
 
-import com.example.yogaAdmin.dao.BookingDao;
+
 import com.example.yogaAdmin.dao.UserDao;
 import com.example.yogaAdmin.dao.YogaClassDao;
 import com.example.yogaAdmin.dao.YogaCourseDao;
@@ -21,13 +21,12 @@ import com.example.yogaAdmin.models.YogaCourse;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-@Database(entities = {YogaCourse.class, YogaClass.class, User.class, Booking.class}, version = 7, exportSchema = false)
+@Database(entities = {YogaCourse.class, YogaClass.class, User.class}, version = 9, exportSchema = false)
 public abstract class AppDatabase extends RoomDatabase {
 
     public abstract YogaCourseDao yogaCourseDao();
     public abstract YogaClassDao yogaClassDao();
     public abstract UserDao userDao();
-    public abstract BookingDao bookingDao();
 
     private static volatile AppDatabase INSTANCE;
     private static final int NUMBER_OF_THREADS = 4;

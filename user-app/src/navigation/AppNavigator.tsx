@@ -31,7 +31,7 @@ type TabParamList = {
 
 type RootStackParamList = {
   Home: undefined;
-  ClassDetail: { classId: string; courseId?: string };
+  ClassDetail: { classId: string; courseFirebaseKey?: string };
 };
 
 const Tab = createBottomTabNavigator<TabParamList>();

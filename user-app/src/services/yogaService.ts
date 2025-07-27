@@ -1,4 +1,4 @@
-import { ref, onValue, off, get, runTransaction } from 'firebase/database';
+import { ref, onValue, off, get, runTransaction, set } from 'firebase/database';
 import { database, auth } from './firebase';
 import { YogaClass, SearchFilters, Booking } from '../types';
 import { YogaCourse } from '../types/YogaCourse';
@@ -71,17 +71,17 @@ export class YogaService {
         this.getAllClasses()
       ]);
 
-      // The map should be keyed by the numeric `id` of the course.
-      const courseMap = new Map<number, YogaCourse>();
+      // The map should be keyed by the firebaseKey of the course.
+      const courseMap = new Map<string, YogaCourse>();
       courses.forEach(course => {
-        if (course.id) {
-          courseMap.set(course.id, course);
+        if (course.firebaseKey) {
+          courseMap.set(course.firebaseKey, course);
         }
       });
 
       return classes.map(cls => {
-        // Look up the course using the numeric `courseId` from the class.
-        const course = courseMap.get(cls.courseId);
+        // Look up the course using the courseFirebaseKey from the class.
+        const course = courseMap.get(cls.courseFirebaseKey);
         return {
           ...cls,
           course: course
@@ -98,7 +98,7 @@ export class YogaService {
    */
   async searchClasses(filters: SearchFilters): Promise<YogaClass[]> {
     try {
-      const { name, dayOfWeek, timeOfDay, courseId } = filters;
+      const { name, dayOfWeek, timeOfDay, courseFirebaseKey } = filters;
       const classesWithCourses = await this.getClassesWithCourses();
       
       return classesWithCourses.filter(cls => {
@@ -124,9 +124,8 @@ export class YogaService {
               break;
           }
         }
-        if (courseId) {
-          // Compare the courseId from the filter with the firebaseKey of the class's course
-          matches = matches && cls.course.firebaseKey === courseId;
+        if (courseFirebaseKey) {
+          matches = matches && cls.course.firebaseKey === courseFirebaseKey;
         }
         return matches;
       });
@@ -197,7 +196,7 @@ export class YogaService {
       const classData = classSnapshot.val() as YogaClass;
 
       // Also, get the associated course to have all details
-      const courseRef = ref(database, `courses/${classData.courseId}`);
+      const courseRef = ref(database, `courses/${classData.courseFirebaseKey}`);
       const courseSnapshot = await get(courseRef);
       if (!courseSnapshot.exists()) {
         throw new Error("The course for this class could not be found.");

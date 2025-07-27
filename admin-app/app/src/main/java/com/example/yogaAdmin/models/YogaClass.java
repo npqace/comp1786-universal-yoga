@@ -6,6 +6,8 @@ import androidx.room.Ignore;
 import androidx.room.Index;
 import androidx.room.PrimaryKey;
 
+import com.google.firebase.database.Exclude;
+
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -21,6 +23,7 @@ public class YogaClass implements Serializable {
     @PrimaryKey(autoGenerate = true)
     private long id;
     private String firebaseKey;
+    private String courseFirebaseKey;
     private long courseId;
 
     // Instance specific
@@ -58,8 +61,17 @@ public class YogaClass implements Serializable {
         this.firebaseKey = firebaseKey;
     }
 
+    @Exclude // Exclude from Firebase serialization, but keep for local Room DB
     public long getCourseId() { return courseId; }
     public void setCourseId(long courseId) { this.courseId = courseId; }
+
+    public String getCourseFirebaseKey() {
+        return courseFirebaseKey;
+    }
+
+    public void setCourseFirebaseKey(String courseFirebaseKey) {
+        this.courseFirebaseKey = courseFirebaseKey;
+    }
 
     public String getDate() { return date; }
     public void setDate(String date) { this.date = date; }
