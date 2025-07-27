@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, Button, StyleSheet, Alert } from 'react-native';
-import { createUserWithEmailAndPassword } from 'firebase/auth';
-import { auth } from '../../services/firebase';
+import { auth, signUp } from '../../services/firebase'; // Import the new signUp function
 import { StackNavigationProp } from '@react-navigation/stack';
 
 type AuthStackParamList = {
@@ -11,27 +10,34 @@ type AuthStackParamList = {
 type SignUpScreenNavigationProp = StackNavigationProp<AuthStackParamList, 'Login'>;
 
 const SignUpScreen = ({ navigation }: { navigation: SignUpScreenNavigationProp }) => {
+  const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
-  const handleSignUp = () => {
-    if (!email || !password) {
-      Alert.alert('Error', 'Please enter both email and password.');
+  const handleSignUp = async () => {
+    if (!name || !email || !password) {
+      Alert.alert('Error', 'Please fill in all fields.');
       return;
     }
-    createUserWithEmailAndPassword(auth, email, password)
-      .then(() => {
-        console.log('User account created & signed in!');
-        // Navigate to a different screen or show a success message
-      })
-      .catch(error => {
-        Alert.alert('Sign Up Failed', error.message);
-      });
+    try {
+      await signUp(name, email, password);
+      console.log('User account created & signed in!');
+      // Navigate to a different screen or show a success message
+    } catch (error: any) {
+      Alert.alert('Sign Up Failed', error.message);
+    }
   };
 
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Sign Up</Text>
+      <TextInput
+        style={styles.input}
+        placeholder="Name"
+        value={name}
+        onChangeText={setName}
+        autoCapitalize="words"
+      />
       <TextInput
         style={styles.input}
         placeholder="Email"

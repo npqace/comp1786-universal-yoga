@@ -1,7 +1,13 @@
 import { initializeApp, getApp, getApps } from 'firebase/app';
-import { initializeAuth, getReactNativePersistence } from 'firebase/auth';
-import { getDatabase } from 'firebase/database';
+import { 
+  initializeAuth, 
+  getReactNativePersistence, 
+  createUserWithEmailAndPassword,
+  updateProfile
+} from 'firebase/auth';
+import { getDatabase, ref, set } from 'firebase/database';
 import ReactNativeAsyncStorage from '@react-native-async-storage/async-storage';
+import { User } from '../types';
 
 const firebaseConfig = {
   apiKey: "AIzaSyAb21mpled_3NJiQqmN1wgIYwQnWgPCGs8",
@@ -21,4 +27,25 @@ const auth = initializeAuth(app, {
 });
 const database = getDatabase(app);
 
-export { app, auth, database }; 
+// New Sign-Up Function
+export const signUp = async (name: string, email: string, password: string) => {
+  const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+  const user = userCredential.user;
+
+  // Update the user's profile with their name
+  await updateProfile(user, { displayName: name });
+
+  // Also, save the user's public data to the Realtime Database
+  const userRef = ref(database, `users/${user.uid}`);
+  const userData: User = {
+    uid: user.uid,
+    email: user.email,
+    displayName: name,
+  };
+  await set(userRef, userData);
+
+  return userCredential;
+};
+
+
+export { app, auth, database };
