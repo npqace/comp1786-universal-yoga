@@ -382,6 +382,34 @@
                     android:textColor="@color/secondary_text"/>
             </LinearLayout>
 
+            <!-- Bookings Section -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Bookings"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:textColor="@color/primary_blue"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="12dp" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recycler_view_bookings"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                tools:listitem="@layout/item_booking"/>
+
+            <TextView
+                android:id="@+id/tv_no_bookings"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="No bookings for this class yet."
+                android:gravity="center"
+                android:padding="16dp"
+                android:background="@drawable/form_field_background"
+                android:visibility="visible"/>
+
         </LinearLayout>
 
     </LinearLayout>
