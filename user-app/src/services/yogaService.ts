@@ -189,39 +189,66 @@ export class YogaService {
     const classRef = ref(database, `classes/${classId}`);
 
     try {
+      // First, get the details of the class being booked
+      const classSnapshot = await get(classRef);
+      if (!classSnapshot.exists()) {
+        throw new Error("This class doesn't exist.");
+      }
+      const classData = classSnapshot.val() as YogaClass;
+
+      // Also, get the associated course to have all details
+      const courseRef = ref(database, `courses/${classData.courseId}`);
+      const courseSnapshot = await get(courseRef);
+      if (!courseSnapshot.exists()) {
+        throw new Error("The course for this class could not be found.");
+      }
+      const courseData = courseSnapshot.val() as YogaCourse;
+      
+      // Now, run the transaction to decrease the available slots
       await runTransaction(classRef, (currentData: YogaClass) => {
         if (currentData && typeof currentData.slotsAvailable === 'number') {
           if (currentData.slotsAvailable > 0) {
             currentData.slotsAvailable--;
           } else {
-            return; // Abort transaction
+            // Abort transaction by returning undefined
+            return; 
           }
         }
         return currentData;
       });
 
-      const newBookingRef = ref(database, `bookings/${user.uid}_${classId}`);
-      const userBookingRef = ref(database, `userBookings/${user.uid}/${classId}`);
-      const classBookingRef = ref(database, `classBookings/${classId}/${user.uid}`);
-
+      // Create the rich, denormalized booking object
+      const bookingId = `${user.uid}_${classId}`;
+      const newBookingRef = ref(database, `bookings/${bookingId}`);
+      
       const bookingData: Booking = {
-        id: `${user.uid}_${classId}`,
+        id: bookingId,
         userId: user.uid,
         classId: classId,
         bookingDate: new Date().toISOString(),
+        // Denormalized data
+        userName: user.displayName || 'Unknown User',
+        userEmail: user.email || 'No Email',
+        className: courseData.classType,
+        classDate: classData.date,
+        classTime: courseData.time,
       };
 
-      const snapshot = await get(newBookingRef);
-      if (!snapshot.exists()) {
-        await Promise.all([
-            runTransaction(newBookingRef, () => bookingData),
-            runTransaction(userBookingRef, () => true),
-            runTransaction(classBookingRef, () => true),
-        ]);
-      }
+      // Save the new booking object
+      await set(newBookingRef, bookingData);
+
+      // Also, update the user-specific and class-specific booking records for easy lookups
+      const userBookingRef = ref(database, `userBookings/${user.uid}/${classId}`);
+      await set(userBookingRef, true);
+
+      const classBookingRef = ref(database, `classBookings/${classId}/${user.uid}`);
+      await set(classBookingRef, true);
 
     } catch (error) {
       console.error('Booking failed:', error);
+      if (error instanceof Error) {
+        throw new Error(`Failed to book the class: ${error.message}`);
+      }
       throw new Error('Failed to book the class. Please try again.');
     }
   }
@@ -235,18 +262,20 @@ export class YogaService {
       return [];
     }
 
+    // Get the IDs of the classes the user has booked
     const userBookingsRef = ref(database, `userBookings/${user.uid}`);
     const snapshot = await get(userBookingsRef);
 
     if (snapshot.exists()) {
-      const bookingIds = Object.keys(snapshot.val());
+      const classIds = Object.keys(snapshot.val());
       const bookings: Booking[] = [];
 
-      for (const classId of bookingIds) {
+      // For each class ID, fetch the full booking object
+      for (const classId of classIds) {
         const bookingRef = ref(database, `bookings/${user.uid}_${classId}`);
         const bookingSnapshot = await get(bookingRef);
         if (bookingSnapshot.exists()) {
-          bookings.push(bookingSnapshot.val());
+          bookings.push(bookingSnapshot.val() as Booking);
         }
       }
       return bookings;
