@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, ScrollView, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, ScrollView, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import { RouteProp, useRoute } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import { useClassDetail } from '../hooks/useYogaData';
@@ -7,13 +7,27 @@ import { LoadingSpinner, ErrorMessage } from '../components';
 import DetailItem from '../components/DetailItem';
 import { RootStackParamList, formatPrice, getDayOfWeek } from '../types';
 import { globalStyles, colors, spacing, typography, borderRadius } from '../styles/globalStyles';
+import { YogaService } from '../services/yogaService';
 
 type ClassDetailRouteProp = RouteProp<RootStackParamList, 'ClassDetail'>;
 
 export default function ClassDetailScreen() {
   const route = useRoute<ClassDetailRouteProp>();
   const { classId } = route.params;
-  const { classDetail, loading, refresh } = useClassDetail(classId);
+  const { classDetail, isBooked, loading, refresh } = useClassDetail(classId);
+  const yogaService = YogaService.getInstance();
+
+  const handleBooking = async () => {
+    if (!classDetail?.firebaseKey) return;
+
+    try {
+      await yogaService.bookClass(classDetail.firebaseKey);
+      Alert.alert('Success', 'You have successfully booked this class.');
+      refresh(); // Refresh to update the UI
+    } catch (error) {
+      Alert.alert('Error', error instanceof Error ? error.message : 'An unknown error occurred.');
+    }
+  };
 
   if (loading.isLoading) {
     return <LoadingSpinner message="Loading class details..." />;
@@ -68,9 +82,27 @@ export default function ClassDetailScreen() {
         <DetailItem icon="person-outline" label="Instructor" value={classDetail.assignedInstructor} />
         <DetailItem icon="hourglass-outline" label="Duration" value={course.duration} unit="minutes" />
         <DetailItem icon="people-outline" label="Capacity" value={classDetail.actualCapacity || course.capacity} unit="people" />
+        <DetailItem icon="checkmark-circle-outline" label="Slots Available" value={classDetail.slotsAvailable} unit="slots left" />
         <DetailItem icon="location-outline" label="Room" value={course.roomNumber ? `Room ${course.roomNumber}` : ''} />
         <DetailItem icon="trending-up-outline" label="Difficulty" value={course.difficultyLevel} />
         <DetailItem icon="people-circle-outline" label="Age Group" value={course.ageGroup} />
+      </View>
+
+      {/* Booking Button */}
+      <View style={styles.bookingContainer}>
+        <TouchableOpacity
+          style={[
+            globalStyles.button,
+            styles.bookButton,
+            (!classDetail || classDetail.slotsAvailable === 0 || isBooked) && styles.disabledButton
+          ]}
+          disabled={!classDetail || classDetail.slotsAvailable === 0 || isBooked}
+          onPress={handleBooking}
+        >
+          <Text style={globalStyles.buttonText}>
+            {isBooked ? 'Already Booked' : (classDetail && classDetail.slotsAvailable && classDetail.slotsAvailable > 0 ? 'Book Now' : 'Class Full')}
+          </Text>
+        </TouchableOpacity>
       </View>
 
       {/* Description */}
@@ -168,4 +200,15 @@ const styles = StyleSheet.create({
     lineHeight: 24,
     fontStyle: 'italic',
   },
-}); 
+  bookingContainer: {
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.lg,
+  },
+  bookButton: {
+    backgroundColor: colors.primary,
+  },
+  disabledButton: {
+    backgroundColor: colors.disabled,
+  },
+});
+ 

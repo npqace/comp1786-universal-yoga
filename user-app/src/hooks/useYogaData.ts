@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { YogaService } from '../services/yogaService';
-import { YogaClass, LoadingState, SearchFilters } from '../types';
+import { YogaClass, LoadingState, SearchFilters, Booking } from '../types';
 import { YogaCourse } from '../types/YogaCourse';
 
 export function useYogaClasses() {
@@ -10,16 +10,11 @@ export function useYogaClasses() {
 
   const fetchClasses = useCallback(async () => {
     try {
-      console.log('📱 Hook: Starting to fetch classes...');
       setLoading({ isLoading: true });
       const fetchedClasses = await yogaService.getClassesWithCourses();
-      console.log('📱 Hook: Fetched classes count:', fetchedClasses.length);
-      console.log('📱 Hook: First class sample:', fetchedClasses[0]);
       setClasses(fetchedClasses);
       setLoading({ isLoading: false });
-      console.log('📱 Hook: State updated successfully');
     } catch (error) {
-      console.error('📱 Hook: Error fetching classes:', error);
       setLoading({ 
         isLoading: false, 
         error: error instanceof Error ? error.message : 'Failed to fetch classes' 
@@ -28,7 +23,6 @@ export function useYogaClasses() {
   }, [yogaService]);
 
   useEffect(() => {
-    console.log('📱 Hook: useEffect triggered, calling fetchClasses');
     fetchClasses();
   }, [fetchClasses]);
 
@@ -98,6 +92,7 @@ export function useClassSearch() {
 
 export function useClassDetail(classId: string | undefined) {
   const [classDetail, setClassDetail] = useState<YogaClass | null>(null);
+  const [isBooked, setIsBooked] = useState(false);
   const [loading, setLoading] = useState<LoadingState>({ isLoading: true });
   const yogaService = YogaService.getInstance();
 
@@ -110,7 +105,11 @@ export function useClassDetail(classId: string | undefined) {
     try {
       setLoading({ isLoading: true });
       const fetchedClass = await yogaService.getClassById(classId);
+      const userBookings = await yogaService.getUserBookings();
+      const alreadyBooked = userBookings.some(booking => booking.classId === classId);
+      
       setClassDetail(fetchedClass);
+      setIsBooked(alreadyBooked);
       setLoading({ isLoading: false });
     } catch (error) {
       setLoading({ 
@@ -128,5 +127,35 @@ export function useClassDetail(classId: string | undefined) {
     fetchClassDetail();
   }, [fetchClassDetail]);
 
-  return { classDetail, loading, refresh };
-} 
+  return { classDetail, isBooked, loading, refresh };
+}
+
+export function useUserBookings() {
+  const [bookings, setBookings] = useState<Booking[]>([]);
+  const [loading, setLoading] = useState<LoadingState>({ isLoading: true });
+  const yogaService = YogaService.getInstance();
+
+  const fetchBookings = useCallback(async () => {
+    try {
+      setLoading({ isLoading: true });
+      const userBookings = await yogaService.getUserBookings();
+      setBookings(userBookings);
+      setLoading({ isLoading: false });
+    } catch (error) {
+      setLoading({
+        isLoading: false,
+        error: error instanceof Error ? error.message : 'Failed to fetch bookings'
+      });
+    }
+  }, [yogaService]);
+
+  useEffect(() => {
+    fetchBookings();
+  }, [fetchBookings]);
+
+  const refresh = useCallback(() => {
+    fetchBookings();
+  }, [fetchBookings]);
+
+  return { bookings, loading, refresh };
+}

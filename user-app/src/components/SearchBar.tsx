@@ -1,9 +1,10 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { Picker } from '@react-native-picker/picker';
+import CustomDropdown from './CustomDropdown'; // Import the new custom component
 import { SearchFilters } from '../types';
 import { colors, globalStyles, spacing, typography, borderRadius } from '../styles/globalStyles';
+import { useYogaCourses } from '../hooks/useYogaData';
 
 interface SearchBarProps {
   onSearch: (filters: SearchFilters) => void;
@@ -11,28 +12,39 @@ interface SearchBarProps {
 }
 
 const DAYS_OF_WEEK = [
-  'All Days',
-  'Monday',
-  'Tuesday', 
-  'Wednesday',
-  'Thursday',
-  'Friday',
-  'Saturday',
-  'Sunday'
+  { label: 'All Days', value: 'All Days' },
+  { label: 'Monday', value: 'Monday' },
+  { label: 'Tuesday', value: 'Tuesday' },
+  { label: 'Wednesday', value: 'Wednesday' },
+  { label: 'Thursday', value: 'Thursday' },
+  { label: 'Friday', value: 'Friday' },
+  { label: 'Saturday', value: 'Saturday' },
+  { label: 'Sunday', value: 'Sunday' }
 ];
 
 const TIME_OPTIONS = [
-  'Any Time',
-  'Morning (6:00-12:00)',
-  'Afternoon (12:00-18:00)',
-  'Evening (18:00-22:00)'
+  { label: 'Any Time', value: 'Any Time' },
+  { label: 'Morning (6:00-12:00)', value: 'Morning (6:00-12:00)' },
+  { label: 'Afternoon (12:00-18:00)', value: 'Afternoon (12:00-18:00)' },
+  { label: 'Evening (18:00-22:00)', value: 'Evening (18:00-22:00)' }
 ];
 
 export default function SearchBar({ onSearch, loading = false }: SearchBarProps) {
   const [selectedDay, setSelectedDay] = useState('All Days');
   const [selectedTime, setSelectedTime] = useState('Any Time');
+  const [selectedCourse, setSelectedCourse] = useState('All Courses');
   const [searchText, setSearchText] = useState('');
   const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
+
+  const { courses, loading: coursesLoading } = useYogaCourses();
+
+  const courseOptions = useMemo(() => {
+    const options = courses.map(course => ({
+      label: course.classType,
+      value: course.firebaseKey, // Always use the firebaseKey for the value
+    }));
+    return [{ label: 'All Courses', value: 'All Courses' }, ...options];
+  }, [courses]);
 
   const buildFilters = useCallback(() => {
     const filters: SearchFilters = {};
@@ -50,8 +62,13 @@ export default function SearchBar({ onSearch, loading = false }: SearchBarProps)
       else if (selectedTime.includes('Afternoon')) filters.timeOfDay = 'afternoon';
       else if (selectedTime.includes('Evening')) filters.timeOfDay = 'evening';
     }
+
+    if (selectedCourse !== 'All Courses') {
+      filters.courseId = selectedCourse;
+    }
+
     return filters;
-  }, [searchText, selectedDay, selectedTime]);
+  }, [searchText, selectedDay, selectedTime, selectedCourse]);
 
   useEffect(() => {
     const delayDebounceFn = setTimeout(() => {
@@ -59,18 +76,17 @@ export default function SearchBar({ onSearch, loading = false }: SearchBarProps)
     }, 300); // Debounce search for 300ms
 
     return () => clearTimeout(delayDebounceFn);
-  }, [searchText, selectedDay, selectedTime, onSearch, buildFilters]);
+  }, [searchText, selectedDay, selectedTime, selectedCourse, onSearch, buildFilters]);
 
   const handleClear = () => {
     setSelectedDay('All Days');
     setSelectedTime('Any Time');
+    setSelectedCourse('All Courses');
     setSearchText('');
-    // onSearch will be triggered by useEffect after state updates
   };
 
   return (
     <View style={styles.container}>
-      {/* Search input and Filter Toggle */}
       <View style={styles.searchInputContainer}>
         <Ionicons name="search-outline" size={20} color={colors.textLight} />
         <TextInput
@@ -93,40 +109,38 @@ export default function SearchBar({ onSearch, loading = false }: SearchBarProps)
         </TouchableOpacity>
       </View>
 
-      {/* Filters */}
       {showAdvancedFilters && (
         <View style={styles.filtersContainer}>
           <View style={styles.filterGroup}>
+            <Text style={styles.filterLabel}>Yoga Course</Text>
+            <CustomDropdown
+              value={selectedCourse}
+              data={courseOptions}
+              onSelect={(item) => setSelectedCourse(item.value)}
+              defaultButtonText="All Courses"
+              />
+          </View>
+
+          <View style={styles.filterGroup}>
             <Text style={styles.filterLabel}>Day of Week</Text>
-            <View style={styles.pickerContainer}>
-              <Picker
-                selectedValue={selectedDay}
-                onValueChange={(itemValue) => setSelectedDay(itemValue)}
-                style={styles.picker}
-              >
-                {DAYS_OF_WEEK.map(day => (
-                  <Picker.Item key={day} label={day} value={day} />
-                ))}
-              </Picker>
-            </View>
+            <CustomDropdown
+              value={selectedDay}
+              data={DAYS_OF_WEEK}
+              onSelect={(item) => setSelectedDay(item.value)}
+              defaultButtonText="All Days"
+            />
           </View>
 
           <View style={styles.filterGroup}>
             <Text style={styles.filterLabel}>Time of Day</Text>
-            <View style={styles.pickerContainer}>
-              <Picker
-                selectedValue={selectedTime}
-                onValueChange={(itemValue) => setSelectedTime(itemValue)}
-                style={styles.picker}
-              >
-                {TIME_OPTIONS.map(time => (
-                  <Picker.Item key={time} label={time} value={time} />
-                ))}
-              </Picker>
-            </View>
+            <CustomDropdown
+              value={selectedTime}
+              data={TIME_OPTIONS}
+              onSelect={(item) => setSelectedTime(item.value)}
+              defaultButtonText="Any Time"
+            />
           </View>
 
-          {/* Clear button for advanced filters */}
           <TouchableOpacity 
             style={[styles.button, styles.clearButton]} 
             onPress={handleClear}
@@ -184,16 +198,6 @@ const styles = StyleSheet.create({
     color: colors.text,
     fontWeight: '600',
     marginBottom: spacing.xs,
-  },
-  pickerContainer: {
-    backgroundColor: colors.background,
-    borderRadius: borderRadius.medium,
-    borderWidth: 1,
-    borderColor: colors.border,
-  },
-  picker: {
-    height: 50,
-    color: colors.text,
   },
   button: {
     flexDirection: 'row',

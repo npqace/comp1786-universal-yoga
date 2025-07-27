@@ -14,6 +14,7 @@ export interface YogaClass {
   // Optional fields for this specific session
   additionalComments?: string;
   actualCapacity?: number;
+  slotsAvailable?: number;
   status?: 'scheduled' | 'cancelled' | 'completed';
   
   // Metadata fields

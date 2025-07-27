@@ -1,11 +1,14 @@
 export { formatCreatedDate, formatPrice } from './YogaCourse';
 export * from './YogaClass';
+export * from './User';
+export * from './Booking';
 
 // Common types for the app
 export interface SearchFilters {
   name?: string;
   dayOfWeek?: string;
   timeOfDay?: string;
+  courseId?: string;
 }
 
 export interface LoadingState {

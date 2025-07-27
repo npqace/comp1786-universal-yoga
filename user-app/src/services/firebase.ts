@@ -1,9 +1,8 @@
-import { initializeApp } from 'firebase/app';
-import { getDatabase, Database } from 'firebase/database';
+import { initializeApp, getApp, getApps } from 'firebase/app';
+import { initializeAuth, getReactNativePersistence } from 'firebase/auth';
+import { getDatabase } from 'firebase/database';
+import ReactNativeAsyncStorage from '@react-native-async-storage/async-storage';
 
-// TODO: Replace with your web app's Firebase configuration
-// Go to Firebase Console → Project Settings → Add Web App
-// Copy the config object from there
 const firebaseConfig = {
   apiKey: "AIzaSyAb21mpled_3NJiQqmN1wgIYwQnWgPCGs8",
   authDomain: "universal-yoga-3e267.firebaseapp.com",
@@ -15,9 +14,11 @@ const firebaseConfig = {
 };
 
 // Initialize Firebase
-const app = initializeApp(firebaseConfig);
+const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
 
-// Initialize Realtime Database and get a reference to the service
-export const database: Database = getDatabase(app);
+const auth = initializeAuth(app, {
+  persistence: getReactNativePersistence(ReactNativeAsyncStorage),
+});
+const database = getDatabase(app);
 
-export default app; 
+export { app, auth, database }; 
