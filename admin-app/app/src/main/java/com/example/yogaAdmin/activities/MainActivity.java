@@ -26,7 +26,6 @@ import com.example.yogaAdmin.adapter.YogaCourseAdapter;
 import com.example.yogaAdmin.models.YogaCourse;
 import com.example.yogaAdmin.utils.NetworkStatusLiveData;
 import com.example.yogaAdmin.viewmodel.YogaCourseViewModel;
-import com.example.yogaAdmin.services.FirebaseSyncManager;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.ArrayList;
@@ -205,19 +204,10 @@ public class MainActivity extends AppCompatActivity {
             } else if (itemId == R.id.action_about) {
                 showAboutDialog();
                 return true;
-            } else if (itemId == R.id.action_sync) {
-                syncDataToFirebase();
-                return true;
             }
             return false;
         });
         popupMenu.show();
-    }
-
-    private void syncDataToFirebase() {
-        Toast.makeText(this, "Syncing data to Firebase...", Toast.LENGTH_SHORT).show();
-        yogaCourseViewModel.syncAllData();
-        Toast.makeText(MainActivity.this, "Data synced successfully!", Toast.LENGTH_SHORT).show();
     }
 
     private void showResetConfirmationDialog() {

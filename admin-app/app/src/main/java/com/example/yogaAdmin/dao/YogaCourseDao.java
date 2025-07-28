@@ -14,7 +14,7 @@ import java.util.List;
 
 @Dao
 public interface YogaCourseDao {
-    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     long insert(YogaCourse yogaCourse);
 
     @Update
@@ -34,4 +34,7 @@ public interface YogaCourseDao {
 
     @Query("SELECT * FROM yoga_courses WHERE id = :courseId")
     LiveData<YogaCourse> getCourseById(long courseId);
+
+    @Query("SELECT * FROM yoga_courses WHERE firebaseKey = :firebaseKey")
+    YogaCourse getCourseByFirebaseKey(String firebaseKey);
 }

@@ -23,8 +23,27 @@ export function useYogaClasses() {
   }, [yogaService]);
 
   useEffect(() => {
+    // Initial fetch
     fetchClasses();
-  }, [fetchClasses]);
+
+    // Subscribe to real-time updates
+    const unsubscribe = yogaService.subscribeToClassesUpdates(async (updatedClasses) => {
+      try {
+        setLoading({ isLoading: true });
+        const classesWithCourses = await yogaService.getClassesWithCourses();
+        setClasses(classesWithCourses);
+        setLoading({ isLoading: false });
+      } catch (error) {
+        setLoading({ 
+          isLoading: false, 
+          error: error instanceof Error ? error.message : 'Failed to update classes' 
+        });
+      }
+    });
+
+    // Cleanup subscription on component unmount
+    return () => unsubscribe();
+  }, [yogaService, fetchClasses]);
 
   const refresh = useCallback(() => {
     fetchClasses();
@@ -120,8 +139,25 @@ export function useClassDetail(classId: string | undefined) {
   }, [classId, yogaService]);
 
   useEffect(() => {
+    // Initial fetch
     fetchClassDetail();
-  }, [fetchClassDetail]);
+
+    // Subscribe to real-time updates for all classes
+    const unsubscribe = yogaService.subscribeToClassesUpdates(async (updatedClasses) => {
+      try {
+        const updatedClass = updatedClasses.find(cls => cls.firebaseKey === classId);
+        if (updatedClass) {
+          const course = await yogaService.getCourseById(updatedClass.courseFirebaseKey);
+          setClassDetail({ ...updatedClass, course });
+        }
+      } catch (error) {
+        // Handle potential errors during update
+        console.error("Failed to process class updates:", error);
+      }
+    });
+
+    return () => unsubscribe();
+  }, [classId, yogaService, fetchClassDetail]);
 
   const refresh = useCallback(() => {
     fetchClassDetail();

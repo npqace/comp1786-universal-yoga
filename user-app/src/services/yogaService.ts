@@ -149,6 +149,23 @@ export class YogaService {
   }
 
   /**
+   * Get a specific course by ID
+   */
+  async getCourseById(courseId: string): Promise<YogaCourse | null> {
+    try {
+      const courseRef = ref(database, `courses/${courseId}`);
+      const snapshot = await get(courseRef);
+      if (snapshot.exists()) {
+        return { ...snapshot.val(), firebaseKey: courseId } as YogaCourse;
+      }
+      return null;
+    } catch (error) {
+      console.error('Error fetching course by ID:', error);
+      throw new Error('Failed to fetch course');
+    }
+  }
+
+  /**
    * Subscribe to real-time updates for classes
    */
   subscribeToClassesUpdates(callback: (classes: YogaClass[]) => void): () => void {
@@ -194,6 +211,11 @@ export class YogaService {
         throw new Error("This class doesn't exist.");
       }
       const classData = classSnapshot.val() as YogaClass;
+
+      // Check if the class is available for booking
+      if (classData.status?.toLowerCase() !== 'scheduled') {
+        throw new Error('This class cannot be booked because it is either cancelled or completed.');
+      }
 
       // Also, get the associated course to have all details
       const courseRef = ref(database, `courses/${classData.courseFirebaseKey}`);

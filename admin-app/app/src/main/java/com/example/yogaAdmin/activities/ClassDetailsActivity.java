@@ -18,6 +18,7 @@ import com.example.yogaAdmin.utils.NetworkStatusLiveData;
 
 import com.example.yogaAdmin.adapter.BookingAdapter;
 import com.example.yogaAdmin.viewmodel.BookingViewModel;
+import com.example.yogaAdmin.viewmodel.ClassDetailsViewModel;
 
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -25,7 +26,7 @@ import androidx.lifecycle.ViewModelProvider;
 
 public class ClassDetailsActivity extends AppCompatActivity {
 
-    public static final String EXTRA_CLASS_INFO = "com.example.yogaAdmin.EXTRA_CLASS_INFO";
+    public static final String EXTRA_CLASS_ID = "com.example.yogaAdmin.EXTRA_CLASS_ID";
 
     private TextView tvClassDate, tvAssignedInstructor, tvCapacity, tvStatus, tvComments;
     private TextView tvClassType, tvDayOfWeek, tvTime, tvDuration, tvPrice, tvDescription;
@@ -35,6 +36,7 @@ public class ClassDetailsActivity extends AppCompatActivity {
     private RecyclerView recyclerViewBookings;
     private BookingAdapter bookingAdapter;
     private BookingViewModel bookingViewModel;
+    private ClassDetailsViewModel classDetailsViewModel;
     private TextView tvNoBookings;
 
     @Override
@@ -54,11 +56,22 @@ public class ClassDetailsActivity extends AppCompatActivity {
 
         initViews();
 
-        ClassWithCourseInfo classWithCourseInfo = (ClassWithCourseInfo) getIntent().getSerializableExtra(EXTRA_CLASS_INFO);
+        long classId = getIntent().getLongExtra(EXTRA_CLASS_ID, -1);
 
-        if (classWithCourseInfo != null) {
-            populateUI(classWithCourseInfo);
-            setupBookingViewModel(classWithCourseInfo.yogaClass.getFirebaseKey());
+        if (classId != -1) {
+            ClassDetailsViewModel.Factory factory = new ClassDetailsViewModel.Factory(getApplication(), classId);
+            classDetailsViewModel = new ViewModelProvider(this, factory).get(ClassDetailsViewModel.class);
+
+            classDetailsViewModel.getYogaClass().observe(this, yogaClass -> {
+                if (yogaClass != null) {
+                    setupBookingViewModel(yogaClass.getFirebaseKey());
+                    classDetailsViewModel.yogaCourse.observe(this, yogaCourse -> {
+                        if (yogaCourse != null) {
+                            populateUI(new ClassWithCourseInfo(yogaClass, yogaCourse));
+                        }
+                    });
+                }
+            });
         }
     }
 

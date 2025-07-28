@@ -1,47 +1,54 @@
 package com.example.yogaAdmin.repository;
 
 import android.app.Application;
-
+import androidx.annotation.NonNull;
 import androidx.lifecycle.LiveData;
-
 import com.example.yogaAdmin.dao.YogaClassDao;
 import com.example.yogaAdmin.dao.YogaCourseDao;
 import com.example.yogaAdmin.database.AppDatabase;
 import com.example.yogaAdmin.models.ClassWithCourseInfo;
 import com.example.yogaAdmin.models.YogaClass;
 import com.example.yogaAdmin.models.YogaCourse;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-
+import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
 public class YogaClassRepository {
-    private YogaClassDao yogaClassDao;
-    private YogaCourseDao yogaCourseDao;
-    private LiveData<List<YogaClass>> allClasses;
-    private DatabaseReference firebaseDatabase;
+    private static volatile YogaClassRepository INSTANCE;
+    private final YogaClassDao yogaClassDao;
+    private final YogaCourseDao yogaCourseDao;
+    private final DatabaseReference firebaseDatabase;
+    private final Map<Long, ValueEventListener> activeListeners = new HashMap<>();
 
-    public YogaClassRepository(Application application, long courseId) {
+    private YogaClassRepository(Application application) {
         AppDatabase db = AppDatabase.getDatabase(application);
         yogaClassDao = db.yogaClassDao();
         yogaCourseDao = db.yogaCourseDao();
         firebaseDatabase = FirebaseDatabase.getInstance().getReference();
-        if (courseId != -1) {
-            allClasses = yogaClassDao.getClassesForCourse(courseId);
+    }
+
+    public static YogaClassRepository getInstance(Application application) {
+        if (INSTANCE == null) {
+            synchronized (YogaClassRepository.class) {
+                if (INSTANCE == null) {
+                    INSTANCE = new YogaClassRepository(application);
+                }
+            }
         }
-    }
-    public YogaClassRepository(Application application) {
-        AppDatabase db = AppDatabase.getDatabase(application);
-        yogaClassDao = db.yogaClassDao();
-        yogaCourseDao = db.yogaCourseDao();
-        firebaseDatabase = FirebaseDatabase.getInstance().getReference();
+        return INSTANCE;
     }
 
-    public LiveData<List<YogaClass>> getAllClasses() {
-        return allClasses;
+    public LiveData<List<YogaClass>> getClassesForCourse(long courseId) {
+        return yogaClassDao.getClassesForCourse(courseId);
     }
 
     public LiveData<YogaCourse> getCourseById(long courseId) {
@@ -52,17 +59,27 @@ public class YogaClassRepository {
         return yogaClassDao.getYogaClassById(classId);
     }
 
+    public YogaClass getClassByFirebaseKey(String firebaseKey) {
+        return yogaClassDao.getClassByFirebaseKey(firebaseKey);
+    }
+
     public void insert(YogaClass yogaClass) {
         AppDatabase.databaseWriteExecutor.execute(() -> {
             long id = yogaClassDao.insert(yogaClass);
             yogaClass.setId(id);
-
             String firebaseKey = firebaseDatabase.child("classes").push().getKey();
             yogaClass.setFirebaseKey(firebaseKey);
-            yogaClassDao.update(yogaClass); // Update with the new key
-
+            yogaClassDao.update(yogaClass);
             firebaseDatabase.child("classes").child(firebaseKey).setValue(yogaClass);
         });
+    }
+
+    public void insertFromSync(YogaClass yogaClass) {
+        AppDatabase.databaseWriteExecutor.execute(() -> yogaClassDao.insert(yogaClass));
+    }
+
+    public void updateFromSync(YogaClass yogaClass) {
+        AppDatabase.databaseWriteExecutor.execute(() -> yogaClassDao.update(yogaClass));
     }
 
     public void update(YogaClass yogaClass) {
@@ -99,18 +116,6 @@ public class YogaClassRepository {
         Callable<Integer> callable = () -> yogaClassDao.classExists(courseId, date);
         Future<Integer> future = AppDatabase.databaseWriteExecutor.submit(callable);
         return future.get() > 0;
-    }
-
-    public LiveData<List<ClassWithCourseInfo>> searchByInstructor(String instructorName) {
-        return yogaClassDao.searchByInstructor("%" + instructorName + "%");
-    }
-
-    public LiveData<List<ClassWithCourseInfo>> searchByDate(String date) {
-        return yogaClassDao.searchByDate(date);
-    }
-
-    public LiveData<List<ClassWithCourseInfo>> searchByDayOfWeek(String dayOfWeek) {
-        return yogaClassDao.searchByDayOfWeek(dayOfWeek);
     }
 
     public LiveData<List<ClassWithCourseInfo>> search(String instructorName, String date, String dayOfWeek) {

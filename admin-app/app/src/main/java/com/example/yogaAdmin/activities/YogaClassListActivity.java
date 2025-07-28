@@ -142,8 +142,7 @@ public class YogaClassListActivity extends AppCompatActivity {
             public void onItemClick(YogaClass yogaClass) {
                 if (yogaCourse != null) {
                     Intent intent = new Intent(YogaClassListActivity.this, ClassDetailsActivity.class);
-                    ClassWithCourseInfo classWithCourseInfo = new ClassWithCourseInfo(yogaClass, yogaCourse);
-                    intent.putExtra(ClassDetailsActivity.EXTRA_CLASS_INFO, classWithCourseInfo);
+                    intent.putExtra(ClassDetailsActivity.EXTRA_CLASS_ID, yogaClass.getId());
                     startActivity(intent);
                 } else {
                     Toast.makeText(YogaClassListActivity.this, "Course details not available yet.", Toast.LENGTH_SHORT).show();

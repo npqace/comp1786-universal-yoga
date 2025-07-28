@@ -61,7 +61,6 @@ public class YogaClass implements Serializable {
         this.firebaseKey = firebaseKey;
     }
 
-    @Exclude // Exclude from Firebase serialization, but keep for local Room DB
     public long getCourseId() { return courseId; }
     public void setCourseId(long courseId) { this.courseId = courseId; }
 

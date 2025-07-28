@@ -91,7 +91,7 @@ public class SearchActivity extends AppCompatActivity {
 
         adapter.setOnItemClickListener(classWithCourseInfo -> {
             Intent intent = new Intent(SearchActivity.this, ClassDetailsActivity.class);
-            intent.putExtra(ClassDetailsActivity.EXTRA_CLASS_INFO, classWithCourseInfo);
+            intent.putExtra(ClassDetailsActivity.EXTRA_CLASS_ID, classWithCourseInfo.yogaClass.getId());
             startActivity(intent);
         });
     }

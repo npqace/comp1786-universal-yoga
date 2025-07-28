@@ -14,6 +14,9 @@ import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.yogaAdmin.services.FirebaseSyncService;
+import com.example.yogaAdmin.utils.SharedPreferencesManager;
+
 public class SplashActivity extends AppCompatActivity {
 
     private static final int SPLASH_DURATION = 3000; // 3 seconds
@@ -35,6 +38,12 @@ public class SplashActivity extends AppCompatActivity {
         networkStatusLiveData.observe(this, isOnline -> {
             if (isOnline) {
                 tvOffline.setVisibility(View.GONE);
+                // Check for initial sync
+                SharedPreferencesManager prefsManager = new SharedPreferencesManager(this);
+                if (!prefsManager.isInitialSyncComplete()) {
+                    Intent syncIntent = new Intent(this, FirebaseSyncService.class);
+                    startService(syncIntent);
+                }
             } else {
                 tvOffline.setVisibility(View.VISIBLE);
             }

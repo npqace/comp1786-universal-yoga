@@ -4,17 +4,17 @@
 
     <item
         android:id="@+id/action_sync"
-        android:title="@string/menu_sync"
+        android:title="Sync Data"
         app:showAsAction="never" />
 
     <item
         android:id="@+id/action_reset_database"
-        android:title="@string/menu_reset_database"
+        android:title="Reset Database"
         app:showAsAction="never" />
 
     <item
         android:id="@+id/action_about"
-        android:title="@string/menu_about"
+        android:title="About"
         app:showAsAction="never" />
-
 </menu>
+

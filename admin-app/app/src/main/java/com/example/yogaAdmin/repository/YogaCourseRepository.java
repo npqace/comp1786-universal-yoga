@@ -14,12 +14,20 @@ import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.List;
 
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.ValueEventListener;
+import androidx.annotation.NonNull;
+
+import com.google.firebase.database.Query;
+
 public class YogaCourseRepository {
 
     private YogaCourseDao mYogaCourseDao;
     private YogaClassDao mYogaClassDao;
     private LiveData<List<YogaCourse>> mAllCourses;
     private DatabaseReference firebaseDatabase;
+    private DatabaseReference coursesRef;
 
 
     public YogaCourseRepository(Application application) {
@@ -28,6 +36,7 @@ public class YogaCourseRepository {
         mYogaClassDao = db.yogaClassDao();
         mAllCourses = mYogaCourseDao.getAllCourses();
         firebaseDatabase = FirebaseDatabase.getInstance().getReference();
+        coursesRef = firebaseDatabase.child("courses");
     }
 
     public LiveData<List<YogaCourse>> getAllCourses() {
@@ -50,6 +59,10 @@ public class YogaCourseRepository {
         return mYogaCourseDao.getCourseById(courseId);
     }
 
+    public YogaCourse getCourseByFirebaseKey(String firebaseKey) {
+        return mYogaCourseDao.getCourseByFirebaseKey(firebaseKey);
+    }
+
     public void insert(YogaCourse yogaCourse) {
         AppDatabase.databaseWriteExecutor.execute(() -> {
             long id = mYogaCourseDao.insert(yogaCourse);
@@ -63,6 +76,14 @@ public class YogaCourseRepository {
         });
     }
 
+    public void insertFromSync(YogaCourse yogaCourse) {
+        AppDatabase.databaseWriteExecutor.execute(() -> mYogaCourseDao.insert(yogaCourse));
+    }
+
+    public void updateFromSync(YogaCourse yogaCourse) {
+        AppDatabase.databaseWriteExecutor.execute(() -> mYogaCourseDao.update(yogaCourse));
+    }
+
     public void update(YogaCourse yogaCourse) {
         AppDatabase.databaseWriteExecutor.execute(() -> {
             mYogaCourseDao.update(yogaCourse);
@@ -74,15 +95,32 @@ public class YogaCourseRepository {
 
     public void delete(YogaCourse yogaCourse) {
         AppDatabase.databaseWriteExecutor.execute(() -> {
-            // First, delete all associated classes from Firebase
             List<YogaClass> classesToDelete = mYogaClassDao.getClassesForCourseSync(yogaCourse.getId());
             for (YogaClass yogaClass : classesToDelete) {
+                // Delete associated bookings from Firebase
                 if (yogaClass.getFirebaseKey() != null) {
+                    DatabaseReference bookingsRef = firebaseDatabase.child("bookings");
+                    Query bookingQuery = bookingsRef.orderByChild("classId").equalTo(yogaClass.getFirebaseKey());
+                    bookingQuery.addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                            for (DataSnapshot bookingSnapshot : dataSnapshot.getChildren()) {
+                                bookingSnapshot.getRef().removeValue();
+                            }
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError databaseError) {
+                            // Handle error
+                        }
+                    });
+
+                    // Delete the class from Firebase
                     firebaseDatabase.child("classes").child(yogaClass.getFirebaseKey()).removeValue();
                 }
             }
-            // The local DB will cascade delete the classes automatically.
-            // Now, delete the course from local and Firebase
+
+            // Delete the course from local and Firebase
             mYogaCourseDao.delete(yogaCourse);
             if (yogaCourse.getFirebaseKey() != null) {
                 firebaseDatabase.child("courses").child(yogaCourse.getFirebaseKey()).removeValue();
@@ -95,6 +133,7 @@ public class YogaCourseRepository {
             mYogaCourseDao.deleteAllCourses();
             firebaseDatabase.child("courses").removeValue();
             firebaseDatabase.child("classes").removeValue();
+            firebaseDatabase.child("bookings").removeValue(); // Also clear all bookings
         });
     }
 }

@@ -48,9 +48,9 @@ const MyBookingsScreen = () => {
     <View style={globalStyles.container}>
       {bookings.length === 0 ? (
         <EmptyState 
+          title="No Bookings"
           icon="sad-outline"
-          message="No Bookings Yet"
-          details="You haven't booked any classes. Explore our classes and find one that suits you!"
+          message="You haven't booked any classes yet."
         />
       ) : (
         <FlatList

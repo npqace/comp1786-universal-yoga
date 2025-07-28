@@ -23,7 +23,7 @@ public class YogaCourseViewModel extends AndroidViewModel {
         super(application);
         mRepository = new YogaCourseRepository(application);
         mAllCourses = mRepository.getAllCourses();
-        firebaseSyncManager = new FirebaseSyncManager();
+        firebaseSyncManager = new FirebaseSyncManager(application);
     }
 
     public LiveData<List<YogaCourse>> getAllCourses() {
@@ -52,13 +52,5 @@ public class YogaCourseViewModel extends AndroidViewModel {
 
     public void deleteAllCourses() {
         mRepository.deleteAllCourses();
-    }
-
-    public void syncAllData() {
-        AppDatabase.databaseWriteExecutor.execute(() -> {
-            List<YogaCourse> courses = mRepository.getCourseList();
-            List<YogaClass> classes = mRepository.getClassList();
-            firebaseSyncManager.uploadAllData(courses, classes);
-        });
     }
 }
