@@ -205,19 +205,10 @@ public class MainActivity extends AppCompatActivity {
             } else if (itemId == R.id.action_about) {
                 showAboutDialog();
                 return true;
-            } else if (itemId == R.id.action_sync) {
-                syncDataToFirebase();
-                return true;
             }
             return false;
         });
         popupMenu.show();
-    }
-
-    private void syncDataToFirebase() {
-        Toast.makeText(this, "Syncing data to Firebase...", Toast.LENGTH_SHORT).show();
-        yogaCourseViewModel.syncAllData();
-        Toast.makeText(MainActivity.this, "Data synced successfully!", Toast.LENGTH_SHORT).show();
     }
 
     private void showResetConfirmationDialog() {

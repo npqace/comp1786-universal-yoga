@@ -1,33 +1,28 @@
 package com.example.yogaAdmin.viewmodel;
 
 import android.app.Application;
-
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.ViewModelProvider;
-
 import com.example.yogaAdmin.models.ClassWithCourseInfo;
 import com.example.yogaAdmin.models.YogaClass;
 import com.example.yogaAdmin.models.YogaCourse;
 import com.example.yogaAdmin.repository.YogaClassRepository;
-
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 public class YogaClassViewModel extends AndroidViewModel {
-    private YogaClassRepository repository;
-    private LiveData<List<YogaClass>> allClasses;
+    private final YogaClassRepository repository;
+    private final LiveData<List<YogaClass>> allClasses;
+    private final long courseId;
 
     public YogaClassViewModel(@NonNull Application application, long courseId) {
         super(application);
-        repository = new YogaClassRepository(application, courseId);
-        allClasses = repository.getAllClasses();
-    }
-    public YogaClassViewModel(@NonNull Application application) {
-        super(application);
-        repository = new YogaClassRepository(application);
+        this.courseId = courseId;
+        repository = YogaClassRepository.getInstance(application);
+        allClasses = repository.getClassesForCourse(courseId);
     }
 
     public LiveData<List<YogaClass>> getAllClasses() {
@@ -62,20 +57,14 @@ public class YogaClassViewModel extends AndroidViewModel {
         return repository.classExists(courseId, date);
     }
 
-    public LiveData<List<ClassWithCourseInfo>> searchByInstructor(String instructorName) {
-        return repository.searchByInstructor(instructorName);
-    }
-
-    public LiveData<List<ClassWithCourseInfo>> searchByDate(String date) {
-        return repository.searchByDate(date);
-    }
-
-    public LiveData<List<ClassWithCourseInfo>> searchByDayOfWeek(String dayOfWeek) {
-        return repository.searchByDayOfWeek(dayOfWeek);
-    }
-
     public LiveData<List<ClassWithCourseInfo>> search(String instructorName, String date, String dayOfWeek) {
         return repository.search(instructorName, date, dayOfWeek);
+    }
+
+    @Override
+    protected void onCleared() {
+        super.onCleared();
+        repository.stopListeningForClassChanges(courseId);
     }
 
     public static class Factory extends ViewModelProvider.NewInstanceFactory {

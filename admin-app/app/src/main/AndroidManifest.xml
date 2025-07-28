@@ -40,6 +40,11 @@
         <activity
             android:name=".activities.ClassDetailsActivity"
             android:exported="false" />
+
+        <service
+            android:name=".services.FirebaseSyncService"
+            android:enabled="true"
+            android:exported="false" />
     </application>
 
 </manifest>

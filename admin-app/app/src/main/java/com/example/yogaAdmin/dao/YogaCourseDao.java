@@ -14,7 +14,7 @@ import java.util.List;
 
 @Dao
 public interface YogaCourseDao {
-    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     long insert(YogaCourse yogaCourse);
 
     @Update

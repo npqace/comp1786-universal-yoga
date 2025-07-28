@@ -18,7 +18,7 @@ export default function ClassDetailScreen() {
   const yogaService = YogaService.getInstance();
 
   const handleBooking = async () => {
-    if (!classDetail?.firebaseKey) return;
+    if (!classDetail?.firebaseKey || !isBookable) return;
 
     try {
       await yogaService.bookClass(classDetail.firebaseKey);
@@ -55,6 +55,15 @@ export default function ClassDetailScreen() {
 
   const course = classDetail.course;
   const dayOfWeek = getDayOfWeek(classDetail.date);
+  const isBookable = classDetail.status?.toLowerCase() === 'scheduled' && classDetail.slotsAvailable > 0;
+
+  const getButtonText = () => {
+    if (isBooked) return 'Already Booked';
+    if (classDetail.status?.toLowerCase() === 'completed') return 'Class Completed';
+    if (classDetail.status?.toLowerCase() === 'cancelled') return 'Class Cancelled';
+    if (classDetail.slotsAvailable === 0) return 'Class Full';
+    return 'Book Now';
+  };
 
   return (
     <ScrollView style={[globalStyles.container, styles.container]}>
@@ -94,13 +103,13 @@ export default function ClassDetailScreen() {
           style={[
             globalStyles.button,
             styles.bookButton,
-            (!classDetail || classDetail.slotsAvailable === 0 || isBooked) && styles.disabledButton
+            (!isBookable || isBooked) && styles.disabledButton
           ]}
-          disabled={!classDetail || classDetail.slotsAvailable === 0 || isBooked}
+          disabled={!isBookable || isBooked}
           onPress={handleBooking}
         >
           <Text style={globalStyles.buttonText}>
-            {isBooked ? 'Already Booked' : (classDetail && classDetail.slotsAvailable && classDetail.slotsAvailable > 0 ? 'Book Now' : 'Class Full')}
+            {getButtonText()}
           </Text>
         </TouchableOpacity>
       </View>

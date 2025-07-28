@@ -9,6 +9,8 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
+import com.google.firebase.database.Exclude;
+
 @Entity(tableName = "yoga_courses")
 public class YogaCourse implements Serializable {
     @PrimaryKey(autoGenerate = true)
@@ -95,15 +97,18 @@ public class YogaCourse implements Serializable {
     public void setCreatedDate(long createdDate) { this.createdDate = createdDate; }
 
     // Get formatted price string
+    @Exclude
     public String getFormattedPrice() {
         return String.format(java.util.Locale.UK, "£%.2f", price);
     }
 
     // Get formatted duration string
+    @Exclude
     public String getFormattedDuration() {
         return duration + " minutes";
     }
 
+    @Exclude
     public String getFormattedCreatedDate() {
         SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault());
         return "Created: " + sdf.format(new Date(createdDate));
