@@ -3,7 +3,7 @@ import { View, Text, ScrollView, StyleSheet, TouchableOpacity, Alert } from 'rea
 import { RouteProp, useRoute } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import { useClassDetail } from '../hooks/useYogaData';
-import { LoadingSpinner, ErrorMessage } from '../components';
+import { LoadingSpinner, ErrorMessage, StatusBadge } from '../components';
 import DetailItem from '../components/DetailItem';
 import { RootStackParamList, formatPrice, getDayOfWeek } from '../types';
 import { globalStyles, colors, spacing, typography, borderRadius } from '../styles/globalStyles';
@@ -73,11 +73,7 @@ export default function ClassDetailScreen() {
           <Text style={styles.classType}>{course.classType}</Text>
           <View style={styles.priceStatusContainer}>
             <Text style={styles.price}>{formatPrice(course.price)}</Text>
-            <View style={[styles.statusContainer, { backgroundColor: colors.primary }]}>
-              <Text style={styles.statusText}>
-                {classDetail.status?.toUpperCase() || 'SCHEDULED'}
-              </Text>
-            </View>
+            <StatusBadge status={classDetail.status} />
           </View>
         </View>
       </View>
@@ -161,16 +157,6 @@ const styles = StyleSheet.create({
     color: colors.primary,
     fontWeight: 'bold',
     marginBottom: spacing.xs,
-  },
-  statusContainer: {
-    paddingHorizontal: spacing.sm,
-    paddingVertical: spacing.xs,
-    borderRadius: borderRadius.small,
-  },
-  statusText: {
-    ...typography.bodySmall,
-    color: colors.surface,
-    fontWeight: '600',
   },
   detailsCard: {
     marginTop: 0,

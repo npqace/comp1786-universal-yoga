@@ -215,6 +215,12 @@
     <string name="status_completed">Completed</string>
     <string name="status_cancelled">Cancelled</string>
 
+    <string-array name="class_status_array">
+        <item>Scheduled</item>
+        <item>Completed</item>
+        <item>Cancelled</item>
+    </string-array>
+
     <!-- Format strings -->
     <string name="format_price">£%.2f</string>
     <string name="format_price_prefix">£ </string>
