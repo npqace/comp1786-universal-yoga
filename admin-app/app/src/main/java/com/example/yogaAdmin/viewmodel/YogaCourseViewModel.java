@@ -23,7 +23,7 @@ public class YogaCourseViewModel extends AndroidViewModel {
         super(application);
         mRepository = new YogaCourseRepository(application);
         mAllCourses = mRepository.getAllCourses();
-        firebaseSyncManager = new FirebaseSyncManager();
+        firebaseSyncManager = new FirebaseSyncManager(application);
     }
 
     public LiveData<List<YogaCourse>> getAllCourses() {

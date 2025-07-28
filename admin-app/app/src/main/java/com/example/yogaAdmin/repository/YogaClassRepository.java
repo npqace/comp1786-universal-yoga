@@ -48,43 +48,7 @@ public class YogaClassRepository {
     }
 
     public LiveData<List<YogaClass>> getClassesForCourse(long courseId) {
-        listenForClassChanges(courseId);
         return yogaClassDao.getClassesForCourse(courseId);
-    }
-
-    private void listenForClassChanges(long courseId) {
-        if (activeListeners.containsKey(courseId)) {
-            return; // Listener already active for this course
-        }
-        Query query = firebaseDatabase.child("classes").orderByChild("courseId").equalTo(courseId);
-        ValueEventListener listener = new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                    YogaClass yogaClass = snapshot.getValue(YogaClass.class);
-                    if (yogaClass != null) {
-                        AppDatabase.databaseWriteExecutor.execute(() -> yogaClassDao.insert(yogaClass));
-                    }
-                }
-            }
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-                // Log error
-            }
-        };
-        query.addValueEventListener(listener);
-        activeListeners.put(courseId, listener);
-    }
-
-    public void stopListeningForClassChanges(long courseId) {
-        if (activeListeners.containsKey(courseId)) {
-            ValueEventListener listener = activeListeners.get(courseId);
-            if (listener != null) {
-                Query query = firebaseDatabase.child("classes").orderByChild("courseId").equalTo(courseId);
-                query.removeEventListener(listener);
-            }
-            activeListeners.remove(courseId);
-        }
     }
 
     public LiveData<YogaCourse> getCourseById(long courseId) {
@@ -93,6 +57,10 @@ public class YogaClassRepository {
 
     public LiveData<YogaClass> getYogaClassById(long classId) {
         return yogaClassDao.getYogaClassById(classId);
+    }
+
+    public YogaClass getClassByFirebaseKey(String firebaseKey) {
+        return yogaClassDao.getClassByFirebaseKey(firebaseKey);
     }
 
     public void insert(YogaClass yogaClass) {
@@ -104,6 +72,10 @@ public class YogaClassRepository {
             yogaClassDao.update(yogaClass);
             firebaseDatabase.child("classes").child(firebaseKey).setValue(yogaClass);
         });
+    }
+
+    public void insertFromSync(YogaClass yogaClass) {
+        AppDatabase.databaseWriteExecutor.execute(() -> yogaClassDao.insert(yogaClass));
     }
 
     public void update(YogaClass yogaClass) {

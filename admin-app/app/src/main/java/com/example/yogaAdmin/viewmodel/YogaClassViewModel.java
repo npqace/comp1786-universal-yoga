@@ -61,12 +61,6 @@ public class YogaClassViewModel extends AndroidViewModel {
         return repository.search(instructorName, date, dayOfWeek);
     }
 
-    @Override
-    protected void onCleared() {
-        super.onCleared();
-        repository.stopListeningForClassChanges(courseId);
-    }
-
     public static class Factory extends ViewModelProvider.NewInstanceFactory {
         private final Application application;
         private final long courseId;

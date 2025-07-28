@@ -37,30 +37,7 @@ public class YogaCourseRepository {
         mAllCourses = mYogaCourseDao.getAllCourses();
         firebaseDatabase = FirebaseDatabase.getInstance().getReference();
         coursesRef = firebaseDatabase.child("courses");
-        coursesRef.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                    YogaCourse course = snapshot.getValue(YogaCourse.class);
-                    if (course != null) {
-                        syncLocalCourse(course);
-                    }
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-                // Handle error
-            }
-        });
     }
-
-    private void syncLocalCourse(YogaCourse yogaCourse) {
-        AppDatabase.databaseWriteExecutor.execute(() -> {
-            mYogaCourseDao.insert(yogaCourse);
-        });
-    }
-
 
     public LiveData<List<YogaCourse>> getAllCourses() {
         return mAllCourses;
@@ -82,6 +59,10 @@ public class YogaCourseRepository {
         return mYogaCourseDao.getCourseById(courseId);
     }
 
+    public YogaCourse getCourseByFirebaseKey(String firebaseKey) {
+        return mYogaCourseDao.getCourseByFirebaseKey(firebaseKey);
+    }
+
     public void insert(YogaCourse yogaCourse) {
         AppDatabase.databaseWriteExecutor.execute(() -> {
             long id = mYogaCourseDao.insert(yogaCourse);
@@ -93,6 +74,10 @@ public class YogaCourseRepository {
 
             firebaseDatabase.child("courses").child(firebaseKey).setValue(yogaCourse);
         });
+    }
+
+    public void insertFromSync(YogaCourse yogaCourse) {
+        AppDatabase.databaseWriteExecutor.execute(() -> mYogaCourseDao.insert(yogaCourse));
     }
 
     public void update(YogaCourse yogaCourse) {

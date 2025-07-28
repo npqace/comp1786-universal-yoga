@@ -34,4 +34,7 @@ public interface YogaCourseDao {
 
     @Query("SELECT * FROM yoga_courses WHERE id = :courseId")
     LiveData<YogaCourse> getCourseById(long courseId);
+
+    @Query("SELECT * FROM yoga_courses WHERE firebaseKey = :firebaseKey")
+    YogaCourse getCourseByFirebaseKey(String firebaseKey);
 }
