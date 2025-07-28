@@ -4,6 +4,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { YogaClass, getDayOfWeek } from '../types';
 import { formatPrice } from '../types/YogaCourse';
 import { colors, globalStyles, spacing, typography, borderRadius } from '../styles/globalStyles';
+import StatusBadge from './StatusBadge';
 
 interface YogaClassCardProps {
   yogaClass: YogaClass;
@@ -22,19 +23,6 @@ export default function YogaClassCard({ yogaClass, onPress }: YogaClassCardProps
   // Get price or show as TBD
   const price = course?.price ? formatPrice(course.price) : 'TBD';
 
-  const getStatusBackgroundColor = (status?: 'scheduled' | 'cancelled' | 'completed'): string => {
-    switch (status) {
-      case 'scheduled':
-        return colors.primary;
-      case 'completed':
-        return colors.success;
-      case 'cancelled':
-        return colors.error;
-      default:
-        return colors.primary;
-    }
-  };
-
   return (
     <TouchableOpacity style={[globalStyles.card, styles.card]} onPress={onPress}>
       {/* Header: Class Type and Price/Status */}
@@ -42,11 +30,7 @@ export default function YogaClassCard({ yogaClass, onPress }: YogaClassCardProps
         <Text style={styles.classType}>{classType}</Text>
         <View style={styles.priceStatusContainer}>
           <Text style={styles.price}>{price}</Text>
-          <View style={[styles.statusContainer, { backgroundColor: getStatusBackgroundColor(yogaClass.status) }]}>
-            <Text style={styles.statusText}>
-              {yogaClass.status?.toUpperCase() || 'SCHEDULED'}
-            </Text>
-          </View>
+          <StatusBadge status={yogaClass.status} />
         </View>
       </View>
       
@@ -174,16 +158,6 @@ const styles = StyleSheet.create({
     color: colors.primary,
     fontWeight: 'bold',
     marginBottom: spacing.xs,
-  },
-  statusContainer: {
-    paddingHorizontal: spacing.sm,
-    paddingVertical: spacing.xs,
-    borderRadius: borderRadius.small,
-  },
-  statusText: {
-    ...typography.caption,
-    color: colors.surface,
-    fontWeight: '600',
   },
   divider: {
     height: 1,

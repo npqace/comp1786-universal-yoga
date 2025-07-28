@@ -7,6 +7,8 @@ import android.graphics.drawable.StateListDrawable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.graphics.Typeface;
+import android.view.Gravity;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
@@ -130,59 +132,78 @@ public class YogaClassAdapter extends ListAdapter<YogaClass, YogaClassAdapter.Yo
         }
 
         private void setupStatusSpinner(YogaClass yogaClass, OnClassActionListener actionListener) {
-            String[] statuses = {"Scheduled", "Completed", "Cancelled"};
-            ArrayAdapter<String> adapter = new ArrayAdapter<>(context, android.R.layout.simple_spinner_item, statuses);
+            // Custom ArrayAdapter to set text color and style
+            final ArrayAdapter<CharSequence> adapter = new ArrayAdapter<CharSequence>(context, android.R.layout.simple_spinner_item, context.getResources().getTextArray(R.array.class_status_array)) {
+                @Override
+                public View getView(int position, View convertView, ViewGroup parent) {
+                    View view = super.getView(position, convertView, parent);
+                    TextView textView = (TextView) view;
+                    textView.setTextColor(ContextCompat.getColor(context, android.R.color.white));
+                    textView.setTypeface(null, Typeface.BOLD);
+                    textView.setGravity(Gravity.CENTER);
+                    return view;
+                }
+
+                @Override
+                public View getDropDownView(int position, View convertView, ViewGroup parent) {
+                    View view = super.getDropDownView(position, convertView, parent);
+                    TextView textView = (TextView) view;
+                    // Optional: Customize dropdown item appearance
+                    textView.setPadding(32, 32, 32, 32);
+                    textView.setGravity(Gravity.CENTER_VERTICAL);
+                    return view;
+                }
+            };
+
             adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
             spinnerStatus.setAdapter(adapter);
 
-            int currentStatusPosition = adapter.getPosition(yogaClass.getStatus());
-            spinnerStatus.setSelection(currentStatusPosition);
-            updateSpinnerBackground(yogaClass.getStatus());
-
+            // Set the initial selection
+            String currentStatus = yogaClass.getStatus();
+            if (currentStatus != null) {
+                int spinnerPosition = adapter.getPosition(currentStatus);
+                spinnerStatus.setSelection(spinnerPosition);
+                updateSpinnerBackground(currentStatus);
+            }
 
             spinnerStatus.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                 @Override
                 public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                     String newStatus = (String) parent.getItemAtPosition(position);
+                    updateSpinnerBackground(newStatus);
+
+                    // Update text color for the newly selected item view
+                    if (view instanceof TextView) {
+                        ((TextView) view).setTextColor(ContextCompat.getColor(context, android.R.color.white));
+                        ((TextView) view).setTypeface(null, Typeface.BOLD);
+                        ((TextView) view).setGravity(Gravity.CENTER);
+                    }
+
                     if (!newStatus.equals(yogaClass.getStatus())) {
-                        yogaClass.setStatus(newStatus);
                         actionListener.onUpdateStatus(yogaClass, newStatus);
-                        updateSpinnerBackground(newStatus);
                     }
                 }
 
                 @Override
-                public void onNothingSelected(AdapterView<?> parent) {}
+                public void onNothingSelected(AdapterView<?> parent) {
+                }
             });
         }
 
         private void updateSpinnerBackground(String status) {
-            int colorRes;
+            int backgroundRes;
             switch (status) {
                 case "Completed":
-                    colorRes = R.color.status_completed;
+                    backgroundRes = R.drawable.status_completed_background;
                     break;
                 case "Cancelled":
-                    colorRes = R.color.status_cancelled;
+                    backgroundRes = R.drawable.status_cancelled_background;
                     break;
                 default: // Scheduled
-                    colorRes = R.color.status_scheduled;
+                    backgroundRes = R.drawable.status_scheduled_background;
                     break;
             }
-            Drawable background = spinnerStatus.getBackground();
-            if (background instanceof StateListDrawable) {
-                StateListDrawable stateListDrawable = (StateListDrawable) background;
-                Drawable.ConstantState constantState = stateListDrawable.getConstantState();
-                if (constantState != null) {
-                    Drawable newDrawable = constantState.newDrawable().mutate();
-                    if (newDrawable instanceof GradientDrawable) {
-                        ((GradientDrawable) newDrawable).setColor(ContextCompat.getColor(context, colorRes));
-                        spinnerStatus.setBackground(newDrawable);
-                    }
-                }
-            } else if (background instanceof GradientDrawable) {
-                ((GradientDrawable) background).setColor(ContextCompat.getColor(context, colorRes));
-            }
+            spinnerStatus.setBackground(ContextCompat.getDrawable(context, backgroundRes));
         }
     }
 
