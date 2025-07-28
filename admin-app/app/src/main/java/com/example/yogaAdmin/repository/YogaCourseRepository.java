@@ -80,6 +80,10 @@ public class YogaCourseRepository {
         AppDatabase.databaseWriteExecutor.execute(() -> mYogaCourseDao.insert(yogaCourse));
     }
 
+    public void updateFromSync(YogaCourse yogaCourse) {
+        AppDatabase.databaseWriteExecutor.execute(() -> mYogaCourseDao.update(yogaCourse));
+    }
+
     public void update(YogaCourse yogaCourse) {
         AppDatabase.databaseWriteExecutor.execute(() -> {
             mYogaCourseDao.update(yogaCourse);

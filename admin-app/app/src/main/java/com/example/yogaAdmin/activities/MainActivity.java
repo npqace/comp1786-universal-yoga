@@ -26,7 +26,6 @@ import com.example.yogaAdmin.adapter.YogaCourseAdapter;
 import com.example.yogaAdmin.models.YogaCourse;
 import com.example.yogaAdmin.utils.NetworkStatusLiveData;
 import com.example.yogaAdmin.viewmodel.YogaCourseViewModel;
-import com.example.yogaAdmin.services.FirebaseSyncManager;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.ArrayList;
@@ -47,14 +46,11 @@ public class MainActivity extends AppCompatActivity {
     private List<YogaCourse> allCourses = new ArrayList<>();
     private NetworkStatusLiveData networkStatusLiveData;
     private TextView tvOffline;
-    private FirebaseSyncManager firebaseSyncManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        firebaseSyncManager = new FirebaseSyncManager(this);
 
         tvOffline = findViewById(R.id.tv_offline);
         networkStatusLiveData = new NetworkStatusLiveData(getApplicationContext());
@@ -202,10 +198,7 @@ public class MainActivity extends AppCompatActivity {
         popupMenu.getMenuInflater().inflate(R.menu.main_menu, popupMenu.getMenu());
         popupMenu.setOnMenuItemClickListener(item -> {
             int itemId = item.getItemId();
-            if (itemId == R.id.action_sync) {
-                triggerSync();
-                return true;
-            } else if (itemId == R.id.action_reset_database) {
+            if (itemId == R.id.action_reset_database) {
                 showResetConfirmationDialog();
                 return true;
             } else if (itemId == R.id.action_about) {
@@ -215,25 +208,6 @@ public class MainActivity extends AppCompatActivity {
             return false;
         });
         popupMenu.show();
-    }
-
-    private void triggerSync() {
-        Toast.makeText(this, "Performing full sync...", Toast.LENGTH_SHORT).show();
-        firebaseSyncManager.performInitialSync();
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-        // Start the sync process when the activity is visible
-        firebaseSyncManager.performInitialSync();
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-        // Stop the real-time sync when the activity is not visible to save resources
-        firebaseSyncManager.stopRealtimeSync();
     }
 
     private void showResetConfirmationDialog() {

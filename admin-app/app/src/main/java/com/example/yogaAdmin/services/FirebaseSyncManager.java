@@ -116,7 +116,7 @@ public class FirebaseSyncManager {
                             YogaCourse existingCourse = courseRepository.getCourseByFirebaseKey(course.getFirebaseKey());
                             if (existingCourse != null) {
                                 course.setId(existingCourse.getId());
-                                courseRepository.update(course);
+                                courseRepository.updateFromSync(course);
                             } else {
                                 courseRepository.insertFromSync(course);
                             }
@@ -140,7 +140,7 @@ public class FirebaseSyncManager {
                             YogaClass existingClass = classRepository.getClassByFirebaseKey(yogaClass.getFirebaseKey());
                             if (existingClass != null) {
                                 yogaClass.setId(existingClass.getId());
-                                classRepository.update(yogaClass);
+                                classRepository.updateFromSync(yogaClass);
                             } else {
                                 classRepository.insertFromSync(yogaClass);
                             }
