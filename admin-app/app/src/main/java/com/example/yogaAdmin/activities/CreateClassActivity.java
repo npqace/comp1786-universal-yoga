@@ -338,8 +338,11 @@ public class CreateClassActivity extends AppCompatActivity {
         existingClass.setAssignedInstructor(instructor);
         existingClass.setAdditionalComments(comments);
         existingClass.setActualCapacity(capacity > 0 ? capacity : course.getCapacity());
+        existingClass.setSlotsAvailable(existingClass.getActualCapacity());
         existingClass.setDate(selectedDate);
         existingClass.setFirebaseKey(firebaseKey);
+        // The courseFirebaseKey should already be set, but we ensure it is.
+        existingClass.setCourseFirebaseKey(course.getFirebaseKey());
         yogaClassViewModel.update(existingClass);
         Toast.makeText(this, "Class updated successfully!", Toast.LENGTH_SHORT).show();
         finish();
@@ -351,9 +354,11 @@ public class CreateClassActivity extends AppCompatActivity {
             if (classDate != null) {
                 YogaClass yogaClass = new YogaClass();
                 yogaClass.setCourseId(courseId);
+                yogaClass.setCourseFirebaseKey(course.getFirebaseKey());
                 yogaClass.setDate(classDate);
                 yogaClass.setAssignedInstructor(instructor);
                 yogaClass.setActualCapacity(customCapacity > 0 ? customCapacity : course.getCapacity());
+                yogaClass.setSlotsAvailable(yogaClass.getActualCapacity());
                 yogaClass.setAdditionalComments(comments.isEmpty() ? null : comments);
                 yogaClass.setStatus("Scheduled");
                 yogaClass.setCreatedDate(System.currentTimeMillis());

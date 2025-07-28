@@ -17,7 +17,7 @@ import com.example.yogaAdmin.models.YogaCourse;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-@Database(entities = {YogaCourse.class, YogaClass.class}, version = 6, exportSchema = false)
+@Database(entities = {YogaCourse.class, YogaClass.class}, version = 10, exportSchema = false)
 public abstract class AppDatabase extends RoomDatabase {
 
     public abstract YogaCourseDao yogaCourseDao();

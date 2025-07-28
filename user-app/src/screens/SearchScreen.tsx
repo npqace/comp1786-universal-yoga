@@ -20,7 +20,7 @@ export default function SearchScreen() {
   const handleClassPress = (yogaClass: YogaClass) => {
     navigation.navigate('ClassDetail', { 
       classId: yogaClass.firebaseKey || yogaClass.id?.toString() || '',
-      courseId: yogaClass.courseId?.toString()
+      courseFirebaseKey: yogaClass.courseFirebaseKey
     });
   };
 
@@ -71,10 +71,12 @@ export default function SearchScreen() {
 
   return (
     <View style={[globalStyles.container, styles.container]}>
-      <SearchBar 
-        onSearch={handleSearch}
-        loading={loading.isLoading}
-      />
+      <View style={{ zIndex: 1 }}>
+        <SearchBar 
+          onSearch={handleSearch}
+          loading={loading.isLoading}
+        />
+      </View>
       
       <View style={styles.contentContainer}>
         {renderContent()}

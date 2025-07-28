@@ -16,6 +16,13 @@ import com.example.yogaAdmin.models.YogaClass;
 import com.example.yogaAdmin.models.YogaCourse;
 import com.example.yogaAdmin.utils.NetworkStatusLiveData;
 
+import com.example.yogaAdmin.adapter.BookingAdapter;
+import com.example.yogaAdmin.viewmodel.BookingViewModel;
+
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.lifecycle.ViewModelProvider;
+
 public class ClassDetailsActivity extends AppCompatActivity {
 
     public static final String EXTRA_CLASS_INFO = "com.example.yogaAdmin.EXTRA_CLASS_INFO";
@@ -24,6 +31,11 @@ public class ClassDetailsActivity extends AppCompatActivity {
     private TextView tvClassType, tvDayOfWeek, tvTime, tvDuration, tvPrice, tvDescription;
     private NetworkStatusLiveData networkStatusLiveData;
     private TextView tvOffline;
+
+    private RecyclerView recyclerViewBookings;
+    private BookingAdapter bookingAdapter;
+    private BookingViewModel bookingViewModel;
+    private TextView tvNoBookings;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,6 +58,7 @@ public class ClassDetailsActivity extends AppCompatActivity {
 
         if (classWithCourseInfo != null) {
             populateUI(classWithCourseInfo);
+            setupBookingViewModel(classWithCourseInfo.yogaClass.getFirebaseKey());
         }
     }
 
@@ -65,8 +78,36 @@ public class ClassDetailsActivity extends AppCompatActivity {
         tvPrice = findViewById(R.id.tv_price);
         tvDescription = findViewById(R.id.tv_description);
 
+        // Bookings
+        recyclerViewBookings = findViewById(R.id.recycler_view_bookings);
+        tvNoBookings = findViewById(R.id.tv_no_bookings);
+        recyclerViewBookings.setLayoutManager(new LinearLayoutManager(this));
+        bookingAdapter = new BookingAdapter();
+        recyclerViewBookings.setAdapter(bookingAdapter);
+
         ImageView btnBack = findViewById(R.id.btn_back);
         btnBack.setOnClickListener(v -> finish());
+    }
+
+    private void setupBookingViewModel(String classId) {
+        if (classId == null || classId.isEmpty()) {
+            tvNoBookings.setVisibility(View.VISIBLE);
+            recyclerViewBookings.setVisibility(View.GONE);
+            return;
+        }
+
+        BookingViewModel.Factory factory = new BookingViewModel.Factory(getApplication(), classId);
+        bookingViewModel = new ViewModelProvider(this, factory).get(BookingViewModel.class);
+        bookingViewModel.getBookings().observe(this, bookings -> {
+            if (bookings != null && !bookings.isEmpty()) {
+                bookingAdapter.setBookings(bookings);
+                tvNoBookings.setVisibility(View.GONE);
+                recyclerViewBookings.setVisibility(View.VISIBLE);
+            } else {
+                tvNoBookings.setVisibility(View.VISIBLE);
+                recyclerViewBookings.setVisibility(View.GONE);
+            }
+        });
     }
 
     private void populateUI(ClassWithCourseInfo classWithCourseInfo) {

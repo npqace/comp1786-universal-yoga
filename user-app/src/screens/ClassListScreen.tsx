@@ -16,7 +16,7 @@ export default function ClassListScreen() {
   const handleClassPress = (yogaClass: YogaClass) => {
     navigation.navigate('ClassDetail', { 
       classId: yogaClass.firebaseKey || yogaClass.id?.toString() || '',
-      courseId: yogaClass.courseId?.toString()
+      courseFirebaseKey: yogaClass.courseFirebaseKey
     });
   };
 

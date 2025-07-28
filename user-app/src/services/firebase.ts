@@ -1,9 +1,14 @@
-import { initializeApp } from 'firebase/app';
-import { getDatabase, Database } from 'firebase/database';
+import { initializeApp, getApp, getApps } from 'firebase/app';
+import { 
+  initializeAuth, 
+  getReactNativePersistence, 
+  createUserWithEmailAndPassword,
+  updateProfile
+} from 'firebase/auth';
+import { getDatabase, ref, set } from 'firebase/database';
+import ReactNativeAsyncStorage from '@react-native-async-storage/async-storage';
+import { User } from '../types';
 
-// TODO: Replace with your web app's Firebase configuration
-// Go to Firebase Console → Project Settings → Add Web App
-// Copy the config object from there
 const firebaseConfig = {
   apiKey: "AIzaSyAb21mpled_3NJiQqmN1wgIYwQnWgPCGs8",
   authDomain: "universal-yoga-3e267.firebaseapp.com",
@@ -15,9 +20,32 @@ const firebaseConfig = {
 };
 
 // Initialize Firebase
-const app = initializeApp(firebaseConfig);
+const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
 
-// Initialize Realtime Database and get a reference to the service
-export const database: Database = getDatabase(app);
+const auth = initializeAuth(app, {
+  persistence: getReactNativePersistence(ReactNativeAsyncStorage),
+});
+const database = getDatabase(app);
 
-export default app; 
+// New Sign-Up Function
+export const signUp = async (name: string, email: string, password: string) => {
+  const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+  const user = userCredential.user;
+
+  // Update the user's profile with their name
+  await updateProfile(user, { displayName: name });
+
+  // Also, save the user's public data to the Realtime Database
+  const userRef = ref(database, `users/${user.uid}`);
+  const userData: User = {
+    uid: user.uid,
+    email: user.email,
+    displayName: name,
+  };
+  await set(userRef, userData);
+
+  return userCredential;
+};
+
+
+export { app, auth, database };

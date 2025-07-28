@@ -6,6 +6,8 @@ import androidx.room.Ignore;
 import androidx.room.Index;
 import androidx.room.PrimaryKey;
 
+import com.google.firebase.database.Exclude;
+
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -21,12 +23,14 @@ public class YogaClass implements Serializable {
     @PrimaryKey(autoGenerate = true)
     private long id;
     private String firebaseKey;
+    private String courseFirebaseKey;
     private long courseId;
 
     // Instance specific
     private String date; // Specific date of the class
     private String assignedInstructor;
     private int actualCapacity;
+    private int slotsAvailable;
     private String additionalComments;
     private String status; // e.g., "Scheduled", "Completed", "Cancelled"
     private long createdDate;
@@ -57,8 +61,17 @@ public class YogaClass implements Serializable {
         this.firebaseKey = firebaseKey;
     }
 
+    @Exclude // Exclude from Firebase serialization, but keep for local Room DB
     public long getCourseId() { return courseId; }
     public void setCourseId(long courseId) { this.courseId = courseId; }
+
+    public String getCourseFirebaseKey() {
+        return courseFirebaseKey;
+    }
+
+    public void setCourseFirebaseKey(String courseFirebaseKey) {
+        this.courseFirebaseKey = courseFirebaseKey;
+    }
 
     public String getDate() { return date; }
     public void setDate(String date) { this.date = date; }
@@ -68,6 +81,9 @@ public class YogaClass implements Serializable {
 
     public int getActualCapacity() { return actualCapacity; }
     public void setActualCapacity(int actualCapacity) { this.actualCapacity = actualCapacity; }
+
+    public int getSlotsAvailable() { return slotsAvailable; }
+    public void setSlotsAvailable(int slotsAvailable) { this.slotsAvailable = slotsAvailable; }
 
     public String getAdditionalComments() { return additionalComments; }
     public void setAdditionalComments(String additionalComments) { this.additionalComments = additionalComments; }
