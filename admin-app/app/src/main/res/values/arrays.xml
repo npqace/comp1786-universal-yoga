@@ -1,56 +1,63 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Days of Week -->
-    <string-array name="days_of_week">
-        <item>Select Day of Week</item>
-        <item>Monday</item>
-        <item>Tuesday</item>
-        <item>Wednesday</item>
-        <item>Thursday</item>
-        <item>Friday</item>
-        <item>Saturday</item>
-        <item>Sunday</item>
-    </string-array>
+<!-- Days of Week -->
+<string-array name="days_of_week">
+    <item>Select Day of Week</item>
+    <item>Monday</item>
+    <item>Tuesday</item>
+    <item>Wednesday</item>
+    <item>Thursday</item>
+    <item>Friday</item>
+    <item>Saturday</item>
+    <item>Sunday</item>
+</string-array>
 
-    <!-- Days of Week for Search (includes All Days option) -->
-    <string-array name="days_of_week_with_all">
-        <item>All Days</item>
-        <item>Monday</item>
-        <item>Tuesday</item>
-        <item>Wednesday</item>
-        <item>Thursday</item>
-        <item>Friday</item>
-        <item>Saturday</item>
-        <item>Sunday</item>
-    </string-array>
+<!-- Days of Week for Search (includes All Days option) -->
+<string-array name="days_of_week_with_all">
+    <item>All Days</item>
+    <item>Monday</item>
+    <item>Tuesday</item>
+    <item>Wednesday</item>
+    <item>Thursday</item>
+    <item>Friday</item>
+    <item>Saturday</item>
+    <item>Sunday</item>
+</string-array>
 
-    <!-- Class Types -->
-    <string-array name="class_types">
-        <item>Select Class Type</item>
-        <item>Flow Yoga</item>
-        <item>Aerial Yoga</item>
-        <item>Family Yoga</item>
-        <item>Hatha Yoga</item>
-        <item>Vinyasa Yoga</item>
-        <item>Yin Yoga</item>
-        <item>Hot Yoga</item>
-        <item>Restorative Yoga</item>
-    </string-array>
+<!-- Class Types -->
+<string-array name="class_types">
+    <item>Select Class Type</item>
+    <item>Flow Yoga</item>
+    <item>Aerial Yoga</item>
+    <item>Family Yoga</item>
+    <item>Hatha Yoga</item>
+    <item>Vinyasa Yoga</item>
+    <item>Yin Yoga</item>
+    <item>Hot Yoga</item>
+    <item>Restorative Yoga</item>
+</string-array>
 
-    <!-- Difficulty Levels -->
-    <string-array name="difficulty_levels">
-        <item>All Levels</item>
-        <item>Beginner</item>
-        <item>Intermediate</item>
-        <item>Advanced</item>
-    </string-array>
+<!--  Status  -->
+<string-array name="class_status_array">
+    <item>Active</item>
+    <item>Completed</item>
+    <item>Cancelled</item>
+</string-array>
 
-    <!-- Age Groups -->
-    <string-array name="age_groups">
-        <item>All Ages</item>
-        <item>Teens (13-17)</item>
-        <item>Adults Only (18+)</item>
-        <item>Seniors (55+)</item>
-        <item>Kids &amp; Family</item>
-    </string-array>
+<!-- Difficulty Levels -->
+<string-array name="difficulty_levels">
+    <item>All Levels</item>
+    <item>Beginner</item>
+    <item>Intermediate</item>
+    <item>Advanced</item>
+</string-array>
+
+<!-- Age Groups -->
+<string-array name="age_groups">
+    <item>All Ages</item>
+    <item>Teens (13-17)</item>
+    <item>Adults Only (18+)</item>
+    <item>Seniors (55+)</item>
+    <item>Kids &amp; Family</item>
+</string-array>
 </resources>

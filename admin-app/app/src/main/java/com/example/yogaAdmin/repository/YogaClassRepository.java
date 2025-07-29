@@ -121,7 +121,7 @@ public class YogaClassRepository {
     public LiveData<List<ClassWithCourseInfo>> search(String instructorName, String date, String dayOfWeek) {
         String instructorQuery = (instructorName == null || instructorName.isEmpty()) ? null : "%" + instructorName + "%";
         String dateQuery = (date == null || date.isEmpty()) ? null : date;
-        String dayOfWeekQuery = (dayOfWeek == null || dayOfWeek.isEmpty() || dayOfWeek.equals("All Days")) ? null : dayOfWeek;
+        String dayOfWeekQuery = (dayOfWeek == null || dayOfWeek.isEmpty() || dayOfWeek.equals("All Days")) ? null : "%" + dayOfWeek + "%";
         return yogaClassDao.search(instructorQuery, dateQuery, dayOfWeekQuery);
     }
 }

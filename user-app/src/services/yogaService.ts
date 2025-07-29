@@ -213,7 +213,7 @@ export class YogaService {
       const classData = classSnapshot.val() as YogaClass;
 
       // Check if the class is available for booking
-      if (classData.status?.toLowerCase() !== 'scheduled') {
+      if (classData.status?.toLowerCase() !== 'active') {
         throw new Error('This class cannot be booked because it is either cancelled or completed.');
       }
 

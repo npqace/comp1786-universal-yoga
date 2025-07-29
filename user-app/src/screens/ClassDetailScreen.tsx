@@ -55,7 +55,7 @@ export default function ClassDetailScreen() {
 
   const course = classDetail.course;
   const dayOfWeek = getDayOfWeek(classDetail.date);
-  const isBookable = classDetail.status?.toLowerCase() === 'scheduled' && classDetail.slotsAvailable > 0;
+  const isBookable = classDetail.status?.toLowerCase() === 'active' && classDetail.slotsAvailable > 0;
 
   const getButtonText = () => {
     if (isBooked) return 'Already Booked';

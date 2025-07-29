@@ -42,7 +42,7 @@ const CustomDropdown: FC<DropdownProps> = ({ data, onSelect, defaultButtonText, 
 
   const openDropdown = (): void => {
     DropdownButton.current?.measure((_fx, _fy, _w, h, _px, py) => {
-      setDropdownTop(py - 4);
+      setDropdownTop(py);
       setDropdownLeft(_px);
       setDropdownWidth(_w);
     });

@@ -32,7 +32,7 @@ public class YogaClass implements Serializable {
     private int actualCapacity;
     private int slotsAvailable;
     private String additionalComments;
-    private String status; // e.g., "Scheduled", "Completed", "Cancelled"
+    private String status; // e.g., "Active", "Completed", "Cancelled"
     private long createdDate;
 
 
@@ -46,7 +46,7 @@ public class YogaClass implements Serializable {
         this.assignedInstructor = assignedInstructor;
         this.actualCapacity = actualCapacity;
         this.additionalComments = additionalComments;
-        this.status = "Scheduled"; // Default status
+        this.status = "Active"; // Default status
         this.createdDate = System.currentTimeMillis();
     }
 

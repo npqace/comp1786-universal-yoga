@@ -211,15 +211,9 @@
     <string name="empty_create_course">Create your first yoga course using the + button</string>
 
     <!-- Status -->
-    <string name="status_scheduled">Scheduled</string>
+    <string name="status_active">Active</string>
     <string name="status_completed">Completed</string>
     <string name="status_cancelled">Cancelled</string>
-
-    <string-array name="class_status_array">
-        <item>Scheduled</item>
-        <item>Completed</item>
-        <item>Cancelled</item>
-    </string-array>
 
     <!-- Format strings -->
     <string name="format_price">£%.2f</string>

@@ -57,10 +57,6 @@ public class YogaClassViewModel extends AndroidViewModel {
         return repository.classExists(courseId, date);
     }
 
-    public LiveData<List<ClassWithCourseInfo>> search(String instructorName, String date, String dayOfWeek) {
-        return repository.search(instructorName, date, dayOfWeek);
-    }
-
     public static class Factory extends ViewModelProvider.NewInstanceFactory {
         private final Application application;
         private final long courseId;

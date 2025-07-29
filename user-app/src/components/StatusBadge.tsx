@@ -2,7 +2,7 @@ import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { colors, spacing, borderRadius, typography } from '../styles/globalStyles';
 
-export type Status = 'scheduled' | 'completed' | 'cancelled';
+export type Status = 'scheduled' | 'completed' | 'cancelled' | 'active';
 
 interface StatusBadgeProps {
   status?: string;
@@ -10,11 +10,12 @@ interface StatusBadgeProps {
 
 const getStatusBackgroundColor = (status?: Status): string => {
   switch (status) {
+    case 'active':
+      return colors.primary;
     case 'completed':
       return colors.success;
     case 'cancelled':
-      return colors.warning;
-    case 'scheduled':
+      return colors.error;
     default:
       return colors.primary;
   }

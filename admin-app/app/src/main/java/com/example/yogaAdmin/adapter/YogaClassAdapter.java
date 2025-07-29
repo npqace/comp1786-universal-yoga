@@ -1,9 +1,6 @@
 package com.example.yogaAdmin.adapter;
 
 import android.content.Context;
-import android.graphics.drawable.Drawable;
-import android.graphics.drawable.GradientDrawable;
-import android.graphics.drawable.StateListDrawable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -199,8 +196,8 @@ public class YogaClassAdapter extends ListAdapter<YogaClass, YogaClassAdapter.Yo
                 case "Cancelled":
                     backgroundRes = R.drawable.status_cancelled_background;
                     break;
-                default: // Scheduled
-                    backgroundRes = R.drawable.status_scheduled_background;
+                default: // Active
+                    backgroundRes = R.drawable.status_active_background;
                     break;
             }
             spinnerStatus.setBackground(ContextCompat.getDrawable(context, backgroundRes));

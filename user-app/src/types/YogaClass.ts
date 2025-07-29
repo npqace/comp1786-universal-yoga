@@ -15,7 +15,7 @@ export interface YogaClass {
   additionalComments?: string;
   actualCapacity?: number;
   slotsAvailable?: number;
-  status?: 'scheduled' | 'cancelled' | 'completed';
+  status?: 'scheduled' | 'cancelled' | 'completed' | 'active';
   
   // Metadata fields
   createdDate?: number;

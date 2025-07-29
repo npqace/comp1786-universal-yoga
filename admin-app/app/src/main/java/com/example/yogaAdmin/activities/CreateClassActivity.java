@@ -357,10 +357,10 @@ public class CreateClassActivity extends AppCompatActivity {
                 yogaClass.setCourseFirebaseKey(course.getFirebaseKey());
                 yogaClass.setDate(classDate);
                 yogaClass.setAssignedInstructor(instructor);
+                yogaClass.setStatus("Active");
                 yogaClass.setActualCapacity(customCapacity > 0 ? customCapacity : course.getCapacity());
                 yogaClass.setSlotsAvailable(yogaClass.getActualCapacity());
                 yogaClass.setAdditionalComments(comments.isEmpty() ? null : comments);
-                yogaClass.setStatus("Scheduled");
                 yogaClass.setCreatedDate(System.currentTimeMillis());
                 yogaClassViewModel.insert(yogaClass);
             }

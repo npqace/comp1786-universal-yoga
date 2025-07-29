@@ -22,17 +22,18 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.yogaAdmin.R;
 import com.example.yogaAdmin.adapter.ClassWithCourseInfoAdapter;
 import com.example.yogaAdmin.utils.NetworkStatusLiveData;
+import com.example.yogaAdmin.viewmodel.SearchViewModel;
 import com.example.yogaAdmin.viewmodel.YogaClassViewModel;
 
 import java.util.Calendar;
 
-public class SearchActivity extends AppCompatActivity {
+public class SearchActivity extends AppCompatActivity implements ClassWithCourseInfoAdapter.OnStatusChangeListener {
 
     private EditText editInstructorSearch, editDateSearch;
     private Spinner spinnerDaySearch;
     private RecyclerView recyclerViewResults;
     private ClassWithCourseInfoAdapter adapter;
-    private YogaClassViewModel yogaClassViewModel;
+    private SearchViewModel searchViewModel;
     private LinearLayout emptyStateLayout;
     private TextView tvResultsCount;
     private ImageView btnClearDate;
@@ -47,7 +48,7 @@ public class SearchActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_search);
 
-        yogaClassViewModel = new ViewModelProvider(this).get(YogaClassViewModel.class);
+        searchViewModel = new ViewModelProvider(this).get(SearchViewModel.class);
 
         initViews();
         setupRecyclerView();
@@ -94,6 +95,14 @@ public class SearchActivity extends AppCompatActivity {
             intent.putExtra(ClassDetailsActivity.EXTRA_CLASS_ID, classWithCourseInfo.yogaClass.getId());
             startActivity(intent);
         });
+
+        adapter.setOnStatusChangeListener(this);
+    }
+
+    @Override
+    public void onStatusChanged(com.example.yogaAdmin.models.YogaClass yogaClass, String newStatus) {
+        yogaClass.setStatus(newStatus);
+        searchViewModel.update(yogaClass);
     }
 
     private void setupListeners() {
@@ -176,7 +185,7 @@ public class SearchActivity extends AppCompatActivity {
         String date = editDateSearch.getText().toString().trim();
         String dayOfWeek = spinnerDaySearch.getSelectedItem().toString();
 
-        yogaClassViewModel.search(instructorName, date, dayOfWeek).observe(this, results -> {
+        searchViewModel.search(instructorName, date, dayOfWeek).observe(this, results -> {
             if (results == null) return;
             adapter.submitList(results);
             updateUIWithResults(results.size());
