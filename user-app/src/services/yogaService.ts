@@ -105,7 +105,11 @@ export class YogaService {
         if (!cls.course) return false;
         let matches = true;
         if (name) {
-          matches = matches && cls.course.classType.toLowerCase().includes(name.toLowerCase());
+          const lowerCaseName = name.toLowerCase();
+          matches = matches && (
+            cls.course.classType.toLowerCase().includes(lowerCaseName) ||
+            cls.assignedInstructor.toLowerCase().includes(lowerCaseName)
+          );
         }
         if (dayOfWeek) {
           matches = matches && cls.course.dayOfWeek.toLowerCase() === dayOfWeek.toLowerCase();

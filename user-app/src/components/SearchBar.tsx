@@ -91,7 +91,7 @@ export default function SearchBar({ onSearch, loading = false }: SearchBarProps)
         <Ionicons name="search-outline" size={20} color={colors.textLight} />
         <TextInput
           style={styles.searchInput}
-          placeholder="Search classes..."
+          placeholder="Search classes by course or instructor..."
           value={searchText}
           onChangeText={setSearchText}
           placeholderTextColor={colors.textLight}
@@ -180,6 +180,7 @@ const styles = StyleSheet.create({
     marginLeft: spacing.sm,
     fontSize: 16,
     color: colors.text,
+    overflow: 'hidden',
   },
   clearTextButton: {
     padding: spacing.xs,
