@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { StatusBar, StyleSheet, View, SafeAreaView } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createStackNavigator } from '@react-navigation/stack';
@@ -6,6 +7,8 @@ import { Ionicons } from '@expo/vector-icons';
 import { auth } from '../services/firebase';
 import { onAuthStateChanged } from 'firebase/auth';
 import { User } from '../types';
+import { OfflineBanner } from '../components';
+import { colors } from '../styles/globalStyles';
 
 // Import screens
 import ClassListScreen from '../screens/ClassListScreen';
@@ -41,7 +44,7 @@ const AuthStack = createStackNavigator<AuthStackParamList>();
 // Auth Navigator
 function AuthNavigator() {
   return (
-    <AuthStack.Navigator>
+    <AuthStack.Navigator id={undefined}>
       <AuthStack.Screen name="Login" component={LoginScreen} options={{ headerShown: false }} />
       <AuthStack.Screen name="SignUp" component={SignUpScreen} options={{ headerShown: false }} />
     </AuthStack.Navigator>
@@ -52,6 +55,7 @@ function AuthNavigator() {
 function TabNavigator() {
   return (
     <Tab.Navigator
+      id={undefined}
       screenOptions={({ route }) => ({
         tabBarIcon: ({ focused, color, size }) => {
           let iconName: keyof typeof Ionicons.glyphMap;
@@ -79,6 +83,7 @@ function TabNavigator() {
         headerTitleStyle: {
           fontWeight: 'bold',
         },
+        headerStatusBarHeight: 0,
       })}
     >
       <Tab.Screen 
@@ -120,7 +125,7 @@ function TabNavigator() {
 // Main App Navigator
 function MainStackNavigator() {
   return (
-    <Stack.Navigator>
+    <Stack.Navigator id={undefined}>
       <Stack.Screen 
         name="Home" 
         component={TabNavigator}
@@ -131,6 +136,7 @@ function MainStackNavigator() {
         component={ClassDetailScreen}
         options={{
           title: 'Class Details',
+          headerStatusBarHeight: 0,
           headerStyle: {
             backgroundColor: '#2196F3',
           },
@@ -163,8 +169,26 @@ export default function AppNavigator() {
   }, []);
 
   return (
-    <NavigationContainer>
-      {user ? <MainStackNavigator /> : <AuthNavigator />}
-    </NavigationContainer>
+    <SafeAreaView style={styles.container}>
+      <View style={styles.content}>
+        <StatusBar backgroundColor="transparent" barStyle="light-content" translucent={true} />
+        <OfflineBanner />
+        <NavigationContainer>
+          {user ? <MainStackNavigator /> : <AuthNavigator />}
+        </NavigationContainer>
+      </View>
+    </SafeAreaView>
   );
-} 
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: "black",
+    paddingTop: StatusBar.currentHeight || 0,
+  },
+  content: {
+    flex: 1,
+    backgroundColor: colors.primary,
+  },
+}); 
