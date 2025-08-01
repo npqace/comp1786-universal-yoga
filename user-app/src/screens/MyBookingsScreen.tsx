@@ -18,27 +18,31 @@ const MyBookingsScreen = () => {
   }
 
   const renderBookingItem = ({ item }: { item: Booking }) => (
-    <View style={[globalStyles.card, styles.bookingCard]}>
-      <View style={styles.cardHeader}>
+    <View style={styles.bookingCard}>
+      <View style={styles.accentBar} />
+      <View style={styles.cardContent}>
         <Text style={styles.className}>{item.className || 'Class Name Not Available'}</Text>
-      </View>
-      <View style={styles.cardBody}>
-        <View style={styles.detailRow}>
-          <Ionicons name="calendar-outline" size={16} color={colors.text} />
-          <Text style={styles.detailText}>{item.classDate || 'Date N/A'}</Text>
+        
+        <View style={styles.dateTimeContainer}>
+          <View style={styles.detailRow}>
+            <Ionicons name="calendar-outline" size={16} color={colors.primary} />
+            <Text style={styles.detailText}>{item.classDate || 'Date N/A'}</Text>
+          </View>
+          <View style={styles.detailRow}>
+            <Ionicons name="time-outline" size={16} color={colors.primary} />
+            <Text style={styles.detailText}>{item.classTime || 'Time N/A'}</Text>
+          </View>
         </View>
+
+        <View style={styles.separator} />
+
         <View style={styles.detailRow}>
-          <Ionicons name="time-outline" size={16} color={colors.text} />
-          <Text style={styles.detailText}>{item.classTime || 'Time N/A'}</Text>
+          <Ionicons name="person-outline" size={16} color={colors.textLight} />
+          <Text style={styles.detailTextMuted}>{item.userName || 'User N/A'}</Text>
         </View>
-        <View style={styles.detailRow}>
-          <Ionicons name="person-outline" size={16} color={colors.text} />
-          <Text style={styles.detailText}>{item.userName || 'User N/A'}</Text>
-        </View>
-      </View>
-      <View style={styles.cardFooter}>
+        
         <Text style={styles.bookingDate}>
-          Booked on: {new Date(item.bookingDate).toLocaleDateString()}
+          Booked on {new Date(item.bookingDate).toLocaleDateString()}
         </Text>
       </View>
     </View>
@@ -71,46 +75,60 @@ const styles = StyleSheet.create({
     padding: spacing.md,
   },
   bookingCard: {
-    marginBottom: spacing.md,
     backgroundColor: colors.surface,
-    borderRadius: borderRadius.medium,
-    elevation: 2,
+    borderRadius: borderRadius.large,
+    marginBottom: spacing.md,
+    flexDirection: 'row',
+    overflow: 'hidden',
+    elevation: 3,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.2,
-    shadowRadius: 1.41,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
   },
-  cardHeader: {
+  accentBar: {
+    width: 6,
+    backgroundColor: colors.primary,
+  },
+  cardContent: {
+    flex: 1,
     padding: spacing.md,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.border,
   },
   className: {
     ...typography.h3,
-    color: colors.primary,
+    color: colors.textDark,
+    marginBottom: spacing.sm,
   },
-  cardBody: {
-    padding: spacing.md,
+  dateTimeContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: spacing.md,
   },
   detailRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: spacing.sm,
   },
   detailText: {
     ...typography.body,
     color: colors.text,
     marginLeft: spacing.sm,
+    fontWeight: '600',
   },
-  cardFooter: {
-    padding: spacing.md,
-    borderTopWidth: 1,
-    borderTopColor: colors.border,
-    alignItems: 'center',
+  detailTextMuted: {
+    ...typography.body,
+    color: colors.textLight,
+    marginLeft: spacing.sm,
+  },
+  separator: {
+    height: 1,
+    backgroundColor: colors.border,
+    marginVertical: spacing.sm,
   },
   bookingDate: {
-    ...typography.bodySmall,
+    ...typography.caption,
     color: colors.textLight,
+    marginTop: spacing.md,
+    textAlign: 'right',
   },
 });
 

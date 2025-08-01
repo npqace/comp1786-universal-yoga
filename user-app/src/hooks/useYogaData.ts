@@ -1,18 +1,19 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { YogaService } from '../services/yogaService';
 import { YogaClass, LoadingState, SearchFilters, Booking } from '../types';
 import { YogaCourse } from '../types/YogaCourse';
 
-export function useYogaClasses() {
-  const [classes, setClasses] = useState<YogaClass[]>([]);
+export function useFilteredYogaClasses() {
+  const [allClasses, setAllClasses] = useState<YogaClass[]>([]);
   const [loading, setLoading] = useState<LoadingState>({ isLoading: true });
+  const [filters, setFilters] = useState<SearchFilters>({});
   const yogaService = YogaService.getInstance();
 
   const fetchClasses = useCallback(async () => {
     try {
       setLoading({ isLoading: true });
       const fetchedClasses = await yogaService.getClassesWithCourses();
-      setClasses(fetchedClasses);
+      setAllClasses(fetchedClasses);
       setLoading({ isLoading: false });
     } catch (error) {
       setLoading({ 
@@ -27,29 +28,68 @@ export function useYogaClasses() {
     fetchClasses();
 
     // Subscribe to real-time updates
-    const unsubscribe = yogaService.subscribeToClassesUpdates(async (updatedClasses) => {
+    const unsubscribe = yogaService.subscribeToClassesUpdates(async () => {
       try {
-        setLoading({ isLoading: true });
         const classesWithCourses = await yogaService.getClassesWithCourses();
-        setClasses(classesWithCourses);
-        setLoading({ isLoading: false });
+        setAllClasses(classesWithCourses);
       } catch (error) {
-        setLoading({ 
-          isLoading: false, 
-          error: error instanceof Error ? error.message : 'Failed to update classes' 
-        });
+        console.error("Failed to process class updates:", error);
       }
     });
 
-    // Cleanup subscription on component unmount
     return () => unsubscribe();
   }, [yogaService, fetchClasses]);
+
+  const filteredClasses = useMemo(() => {
+    const { name, dayOfWeek, timeOfDay, courseFirebaseKey } = filters;
+    if (!name && !dayOfWeek && !timeOfDay && !courseFirebaseKey) {
+      return allClasses;
+    }
+
+    return allClasses.filter(cls => {
+      if (!cls.course) return false;
+      let matches = true;
+      if (name) {
+        const lowerCaseName = name.toLowerCase();
+        matches = matches && (
+          cls.course.classType.toLowerCase().includes(lowerCaseName) ||
+          cls.assignedInstructor.toLowerCase().includes(lowerCaseName)
+        );
+      }
+      if (dayOfWeek) {
+        matches = matches && cls.course.dayOfWeek.toLowerCase() === dayOfWeek.toLowerCase();
+      }
+      if (timeOfDay && cls.course.time) {
+        const [hour] = cls.course.time.split(':').map(Number);
+        switch (timeOfDay) {
+          case 'morning':
+            matches = matches && hour >= 6 && hour < 12;
+            break;
+          case 'afternoon':
+            matches = matches && hour >= 12 && hour < 18;
+            break;
+          case 'evening':
+            matches = matches && hour >= 18 && hour < 22;
+            break;
+        }
+      }
+      if (courseFirebaseKey) {
+        matches = matches && cls.course.firebaseKey === courseFirebaseKey;
+      }
+      return matches;
+    });
+  }, [allClasses, filters]);
 
   const refresh = useCallback(() => {
     fetchClasses();
   }, [fetchClasses]);
 
-  return { classes, loading, refresh };
+  return { 
+    classes: filteredClasses, 
+    loading, 
+    refresh, 
+    setFilters 
+  };
 }
 
 export function useYogaCourses() {
@@ -80,33 +120,6 @@ export function useYogaCourses() {
   }, [fetchCourses]);
 
   return { courses, loading, refresh };
-}
-
-export function useClassSearch() {
-  const [searchResults, setSearchResults] = useState<YogaClass[]>([]);
-  const [loading, setLoading] = useState<LoadingState>({ isLoading: false });
-  const yogaService = YogaService.getInstance();
-
-  const searchClasses = useCallback(async (filters: SearchFilters) => {
-    try {
-      setLoading({ isLoading: true });
-      const results = await yogaService.searchClasses(filters);
-      setSearchResults(results);
-      setLoading({ isLoading: false });
-    } catch (error) {
-      setLoading({ 
-        isLoading: false, 
-        error: error instanceof Error ? error.message : 'Failed to search classes' 
-      });
-    }
-  }, [yogaService]);
-
-  const clearSearch = useCallback(() => {
-    setSearchResults([]);
-    setLoading({ isLoading: false });
-  }, []);
-
-  return { searchResults, loading, searchClasses, clearSearch };
 }
 
 export function useClassDetail(classId: string | undefined) {
@@ -171,10 +184,20 @@ export function useUserBookings() {
   const [loading, setLoading] = useState<LoadingState>({ isLoading: true });
   const yogaService = YogaService.getInstance();
 
-  const fetchBookings = useCallback(async () => {
+  useEffect(() => {
+    setLoading({ isLoading: true });
+    const unsubscribe = yogaService.subscribeToBookingsUpdates((updatedBookings) => {
+      setBookings(updatedBookings);
+      setLoading({ isLoading: false });
+    });
+
+    return () => unsubscribe();
+  }, [yogaService]);
+
+  const refresh = useCallback(async () => {
+    setLoading({ isLoading: true });
     try {
-      setLoading({ isLoading: true });
-      const userBookings = await yogaService.getUserBookings();
+      const userBookings = await yogaService.getUserBookings(); // One-time fetch for manual refresh
       setBookings(userBookings);
       setLoading({ isLoading: false });
     } catch (error) {
@@ -184,14 +207,6 @@ export function useUserBookings() {
       });
     }
   }, [yogaService]);
-
-  useEffect(() => {
-    fetchBookings();
-  }, [fetchBookings]);
-
-  const refresh = useCallback(() => {
-    fetchBookings();
-  }, [fetchBookings]);
 
   return { bookings, loading, refresh };
 }

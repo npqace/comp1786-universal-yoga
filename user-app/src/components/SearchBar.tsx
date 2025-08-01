@@ -157,9 +157,9 @@ export default function SearchBar({ onSearch, loading = false }: SearchBarProps)
 const styles = StyleSheet.create({
   container: {
     backgroundColor: colors.surface,
-    padding: spacing.md,
+    // padding: spacing.md,
     marginHorizontal: spacing.md,
-    marginVertical: spacing.sm,
+    // marginVertical: spacing.sm,
     borderRadius: borderRadius.medium,
     elevation: 2,
     shadowColor: '#000',
@@ -170,7 +170,7 @@ const styles = StyleSheet.create({
   searchInputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: colors.background,
+    // backgroundColor: colors.background,
     borderRadius: borderRadius.medium,
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.sm,
@@ -189,7 +189,9 @@ const styles = StyleSheet.create({
     paddingLeft: spacing.md,
   },
   filtersContainer: {
-    marginTop: spacing.md,
+    // marginTop: spacing.md,
+    paddingHorizontal: spacing.md,
+    paddingBottom: spacing.md,
   },
   filterGroup: {
     marginBottom: spacing.sm,

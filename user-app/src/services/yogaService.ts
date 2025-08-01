@@ -1,4 +1,4 @@
-import { ref, onValue, off, get, runTransaction, set } from 'firebase/database';
+import { ref, onValue, off, get, runTransaction, set, update } from 'firebase/database';
 import { database, auth } from './firebase';
 import { YogaClass, SearchFilters, Booking } from '../types';
 import { YogaCourse } from '../types/YogaCourse';
@@ -39,7 +39,7 @@ export class YogaService {
   /**
    * Fetch all yoga classes from Firebase
    */
-  async getAllClasses(): Promise<YogaClass[]> {
+  private async getAllClasses(): Promise<YogaClass[]> {
     try {
       const classesRef = ref(database, 'classes');
       const snapshot = await get(classesRef);
@@ -93,51 +93,7 @@ export class YogaService {
     }
   }
 
-  /**
-   * Search classes by day of week and/or time
-   */
-  async searchClasses(filters: SearchFilters): Promise<YogaClass[]> {
-    try {
-      const { name, dayOfWeek, timeOfDay, courseFirebaseKey } = filters;
-      const classesWithCourses = await this.getClassesWithCourses();
-      
-      return classesWithCourses.filter(cls => {
-        if (!cls.course) return false;
-        let matches = true;
-        if (name) {
-          const lowerCaseName = name.toLowerCase();
-          matches = matches && (
-            cls.course.classType.toLowerCase().includes(lowerCaseName) ||
-            cls.assignedInstructor.toLowerCase().includes(lowerCaseName)
-          );
-        }
-        if (dayOfWeek) {
-          matches = matches && cls.course.dayOfWeek.toLowerCase() === dayOfWeek.toLowerCase();
-        }
-        if (timeOfDay && cls.course.time) {
-          const [hour] = cls.course.time.split(':').map(Number);
-          switch (timeOfDay) {
-            case 'morning':
-              matches = matches && hour >= 6 && hour < 12;
-              break;
-            case 'afternoon':
-              matches = matches && hour >= 12 && hour < 18;
-              break;
-            case 'evening':
-              matches = matches && hour >= 18 && hour < 22;
-              break;
-          }
-        }
-        if (courseFirebaseKey) {
-          matches = matches && cls.course.firebaseKey === courseFirebaseKey;
-        }
-        return matches;
-      });
-    } catch (error) {
-      console.error('Error searching classes:', error);
-      throw new Error('Failed to search classes');
-    }
-  }
+  
 
   /**
    * Get a specific class by ID
@@ -175,7 +131,7 @@ export class YogaService {
   subscribeToClassesUpdates(callback: (classes: YogaClass[]) => void): () => void {
     const classesRef = ref(database, 'classes');
     
-    const unsubscribe = onValue(classesRef, (snapshot) => {
+    const listener = onValue(classesRef, (snapshot) => {
       if (snapshot.exists()) {
         const classesData = snapshot.val();
         let classes: YogaClass[];
@@ -194,7 +150,61 @@ export class YogaService {
       }
     });
 
-    return () => off(classesRef, 'value', unsubscribe);
+    return () => off(classesRef, 'value', listener);
+  }
+
+  /**
+   * Subscribe to real-time updates for a user's bookings
+   */
+  subscribeToBookingsUpdates(callback: (bookings: Booking[]) => void): () => void {
+    const user = auth.currentUser;
+    if (!user) {
+      callback([]);
+      return () => {}; // Return an empty unsubscribe function
+    }
+
+    const userBookingsRef = ref(database, `userBookings/${user.uid}`);
+    let activeBookingListeners: { ref: any; listener: any }[] = [];
+
+    const mainListener = onValue(userBookingsRef, (snapshot) => {
+      // Clear previous listeners to handle booking cancellations
+      activeBookingListeners.forEach(({ ref, listener }) => off(ref, 'value', listener));
+      activeBookingListeners = [];
+
+      if (snapshot.exists()) {
+        const classIds = Object.keys(snapshot.val());
+        const bookings: { [key: string]: Booking } = {};
+
+        if (classIds.length === 0) {
+          callback([]);
+          return;
+        }
+
+        classIds.forEach((classId) => {
+          const bookingId = `${user.uid}_${classId}`;
+          const bookingRef = ref(database, `bookings/${bookingId}`);
+          
+          const bookingListener = onValue(bookingRef, (bookingSnapshot) => {
+            if (bookingSnapshot.exists()) {
+              bookings[bookingId] = bookingSnapshot.val();
+              callback(Object.values(bookings).sort((a, b) => new Date(b.bookingDate).getTime() - new Date(a.bookingDate).getTime()));
+            } else {
+              delete bookings[bookingId];
+              callback(Object.values(bookings).sort((a, b) => new Date(b.bookingDate).getTime() - new Date(a.bookingDate).getTime()));
+            }
+          });
+
+          activeBookingListeners.push({ ref: bookingRef, listener: bookingListener });
+        });
+      } else {
+        callback([]);
+      }
+    });
+
+    return () => {
+      off(userBookingsRef, 'value', mainListener);
+      activeBookingListeners.forEach(({ ref, listener }) => off(ref, 'value', listener));
+    };
   }
 
   /**
@@ -306,5 +316,37 @@ export class YogaService {
       return bookings;
     }
     return [];
+  }
+
+  /**
+   * Update denormalized user data across the database
+   */
+  async updateDenormalizedUserData(userId: string, newName: string): Promise<void> {
+    try {
+      const updates: { [key: string]: any } = {};
+
+      // 1. Find all of the user's bookings to update them
+      const userBookingsRef = ref(database, `userBookings/${userId}`);
+      const userBookingsSnapshot = await get(userBookingsRef);
+
+      if (userBookingsSnapshot.exists()) {
+        const classIds = Object.keys(userBookingsSnapshot.val());
+        for (const classId of classIds) {
+          updates[`/bookings/${userId}_${classId}/userName`] = newName;
+        }
+      }
+
+      // 2. Update the user's name in the top-level 'users' collection
+      updates[`/users/${userId}/displayName`] = newName;
+      
+      // 3. Perform a single, atomic multi-path update
+      const dbRef = ref(database);
+      await update(dbRef, updates);
+
+    } catch (error) {
+      console.error('Error updating denormalized user data:', error);
+      // We don't re-throw the error to the user, as the primary action (profile update) was successful.
+      // We can add more robust error logging here if needed.
+    }
   }
 } 

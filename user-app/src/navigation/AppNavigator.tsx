@@ -8,16 +8,17 @@ import { auth } from '../services/firebase';
 import { onAuthStateChanged } from 'firebase/auth';
 import { User } from '../types';
 import { OfflineBanner } from '../components';
+import CustomHeader from '../components/CustomHeader';
 import { colors } from '../styles/globalStyles';
 
 // Import screens
 import ClassListScreen from '../screens/ClassListScreen';
-import SearchScreen from '../screens/SearchScreen';
 import ClassDetailScreen from '../screens/ClassDetailScreen';
 import LoginScreen from '../screens/auth/LoginScreen';
 import SignUpScreen from '../screens/auth/SignUpScreen';
 import ProfileScreen from '../screens/ProfileScreen';
 import MyBookingsScreen from '../screens/MyBookingsScreen';
+import DetailHeader from '../components/DetailHeader';
 
 // Define Param Lists
 type AuthStackParamList = {
@@ -27,7 +28,6 @@ type AuthStackParamList = {
 
 type TabParamList = {
   Classes: undefined;
-  Search: undefined;
   MyBookings: undefined;
   Profile: undefined;
 };
@@ -58,66 +58,26 @@ function TabNavigator() {
       id={undefined}
       screenOptions={({ route }) => ({
         tabBarIcon: ({ focused, color, size }) => {
-          let iconName: keyof typeof Ionicons.glyphMap;
+          let iconName: keyof typeof Ionicons.glyphMap = 'help-outline';
 
           if (route.name === 'Classes') {
             iconName = focused ? 'list' : 'list-outline';
-          } else if (route.name === 'Search') {
-            iconName = focused ? 'search' : 'search-outline';
           } else if (route.name === 'MyBookings') {
             iconName = focused ? 'calendar' : 'calendar-outline';
           } else if (route.name === 'Profile') {
             iconName = focused ? 'person' : 'person-outline';
-          } else {
-            iconName = 'help-outline';
           }
 
           return <Ionicons name={iconName} size={size} color={color} />;
         },
-        tabBarActiveTintColor: '#2196F3',
+        tabBarActiveTintColor: colors.primary,
         tabBarInactiveTintColor: 'gray',
-        headerStyle: {
-          backgroundColor: '#2196F3',
-        },
-        headerTintColor: '#ffffff',
-        headerTitleStyle: {
-          fontWeight: 'bold',
-        },
-        headerStatusBarHeight: 0,
+        header: ({ options }) => <CustomHeader title={options.title} />,
       })}
     >
-      <Tab.Screen 
-        name="Classes" 
-        component={ClassListScreen}
-        options={{
-          title: 'Yoga Classes',
-          headerTitle: 'Available Classes'
-        }}
-      />
-      <Tab.Screen 
-        name="Search" 
-        component={SearchScreen}
-        options={{
-          title: 'Search',
-          headerTitle: 'Search Classes'
-        }}
-      />
-      <Tab.Screen
-        name="MyBookings"
-        component={MyBookingsScreen}
-        options={{
-          title: 'My Bookings',
-          headerTitle: 'My Bookings'
-        }}
-      />
-      <Tab.Screen
-        name="Profile"
-        component={ProfileScreen}
-        options={{
-          title: 'Profile',
-          headerTitle: 'My Profile'
-        }}
-      />
+      <Tab.Screen name="Classes" component={ClassListScreen} options={{ title: 'Yoga Classes' }} />
+      <Tab.Screen name="MyBookings" component={MyBookingsScreen} options={{ title: 'My Bookings' }} />
+      <Tab.Screen name="Profile" component={ProfileScreen} options={{ title: 'Profile' }} />
     </Tab.Navigator>
   );
 }
@@ -126,25 +86,13 @@ function TabNavigator() {
 function MainStackNavigator() {
   return (
     <Stack.Navigator id={undefined}>
-      <Stack.Screen 
-        name="Home" 
-        component={TabNavigator}
-        options={{ headerShown: false }}
-      />
-      <Stack.Screen 
-        name="ClassDetail" 
+      <Stack.Screen name="Home" component={TabNavigator} options={{ headerShown: false }} />
+      <Stack.Screen
+        name="ClassDetail"
         component={ClassDetailScreen}
-        options={{
-          title: 'Class Details',
-          headerStatusBarHeight: 0,
-          headerStyle: {
-            backgroundColor: '#2196F3',
-          },
-          headerTintColor: '#ffffff',
-          headerTitleStyle: {
-            fontWeight: 'bold',
-          },
-        }}
+        options={() => ({
+          header: () => <DetailHeader title="Class Details" />,
+        })}
       />
     </Stack.Navigator>
   );
@@ -154,7 +102,7 @@ export default function AppNavigator() {
   const [user, setUser] = useState<User | null>(null);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, userState => {
+    const unsubscribe = onAuthStateChanged(auth, (userState) => {
       if (userState) {
         setUser({
           uid: userState.uid,
@@ -165,18 +113,16 @@ export default function AppNavigator() {
         setUser(null);
       }
     });
-    return unsubscribe; // unsubscribe on unmount
+    return unsubscribe;
   }, []);
 
   return (
     <SafeAreaView style={styles.container}>
-      <View style={styles.content}>
-        <StatusBar backgroundColor="transparent" barStyle="light-content" translucent={true} />
-        <OfflineBanner />
-        <NavigationContainer>
-          {user ? <MainStackNavigator /> : <AuthNavigator />}
-        </NavigationContainer>
-      </View>
+      <StatusBar backgroundColor={colors.primary} barStyle="light-content" />
+      <OfflineBanner />
+      <NavigationContainer>
+        {user ? <MainStackNavigator /> : <AuthNavigator />}
+      </NavigationContainer>
     </SafeAreaView>
   );
 }
@@ -189,6 +135,6 @@ const styles = StyleSheet.create({
   },
   content: {
     flex: 1,
-    backgroundColor: colors.primary,
+    backgroundColor: colors.background,
   },
-}); 
+});

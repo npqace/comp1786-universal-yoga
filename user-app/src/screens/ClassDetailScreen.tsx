@@ -67,17 +67,6 @@ export default function ClassDetailScreen() {
 
   return (
     <ScrollView style={[globalStyles.container, styles.container]}>
-      {/* Header Card */}
-      <View style={[globalStyles.card, styles.headerCard]}>
-        <View style={styles.headerContent}>
-          <Text style={styles.classType}>{course.classType}</Text>
-          <View style={styles.priceStatusContainer}>
-            <Text style={styles.price}>{formatPrice(course.price)}</Text>
-            <StatusBadge status={classDetail.status} />
-          </View>
-        </View>
-      </View>
-
       {/* Class Details */}
       <View style={[globalStyles.card, styles.detailsCard]}>
         <Text style={styles.sectionTitle}>Class Information</Text>

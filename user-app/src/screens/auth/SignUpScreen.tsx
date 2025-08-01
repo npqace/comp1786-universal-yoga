@@ -1,7 +1,20 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, Button, StyleSheet, Alert } from 'react-native';
-import { auth, signUp } from '../../services/firebase'; // Import the new signUp function
+import {
+  View,
+  Text,
+  TextInput,
+  StyleSheet,
+  Alert,
+  TouchableOpacity,
+  Image,
+  KeyboardAvoidingView,
+  Platform,
+  SafeAreaView,
+} from 'react-native';
+import { signUp } from '../../services/firebase';
 import { StackNavigationProp } from '@react-navigation/stack';
+import { colors, globalStyles, spacing, typography } from '../../styles/globalStyles';
+import Logo from '../../../assets/yoga-logo.svg';
 
 type AuthStackParamList = {
   Login: undefined;
@@ -13,49 +26,80 @@ const SignUpScreen = ({ navigation }: { navigation: SignUpScreenNavigationProp }
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
 
   const handleSignUp = async () => {
     if (!name || !email || !password) {
       Alert.alert('Error', 'Please fill in all fields.');
       return;
     }
+    setLoading(true);
     try {
       await signUp(name, email, password);
       console.log('User account created & signed in!');
-      // Navigate to a different screen or show a success message
     } catch (error: any) {
       Alert.alert('Sign Up Failed', error.message);
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Sign Up</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Name"
-        value={name}
-        onChangeText={setName}
-        autoCapitalize="words"
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="Email"
-        value={email}
-        onChangeText={setEmail}
-        keyboardType="email-address"
-        autoCapitalize="none"
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="Password"
-        value={password}
-        onChangeText={setPassword}
-        secureTextEntry
-      />
-      <Button title="Sign Up" onPress={handleSignUp} />
-      <Button title="Already have an account? Login" onPress={() => navigation.navigate('Login')} />
-    </View>
+    <SafeAreaView style={globalStyles.safeArea}>
+      <KeyboardAvoidingView
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        style={styles.container}
+      >
+        <View style={styles.content}>
+          <Logo width={100} height={100} style={styles.logo} />
+          <Text style={styles.title}>Create an Account</Text>
+          <Text style={styles.subtitle}>Start your yoga journey with us</Text>
+
+          <TextInput
+            style={[globalStyles.input, styles.input]}
+            placeholder="Name"
+            value={name}
+            onChangeText={setName}
+            autoCapitalize="words"
+            placeholderTextColor={colors.textLight}
+          />
+          <TextInput
+            style={[globalStyles.input, styles.input]}
+            placeholder="Email"
+            value={email}
+            onChangeText={setEmail}
+            keyboardType="email-address"
+            autoCapitalize="none"
+            placeholderTextColor={colors.textLight}
+          />
+          <TextInput
+            style={[globalStyles.input, styles.input]}
+            placeholder="Password"
+            value={password}
+            onChangeText={setPassword}
+            secureTextEntry
+            placeholderTextColor={colors.textLight}
+          />
+
+          <TouchableOpacity
+            style={[globalStyles.button, styles.signUpButton]}
+            onPress={handleSignUp}
+            disabled={loading}
+          >
+            <Text style={globalStyles.buttonText}>{loading ? 'Creating Account...' : 'Sign Up'}</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.loginLink}
+            onPress={() => navigation.navigate('Login')}
+          >
+            <Text style={styles.loginText}>
+              Already have an account? <Text style={styles.loginLinkText}>Log In</Text>
+            </Text>
+          </TouchableOpacity>
+        </View>
+      </KeyboardAvoidingView>
+    </SafeAreaView>
   );
 };
 
@@ -63,19 +107,46 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: 'center',
-    padding: 16,
+  },
+  content: {
+    paddingHorizontal: spacing.lg,
+  },
+  logo: {
+    width: 100,
+    height: 100,
+    alignSelf: 'center',
+    marginBottom: spacing.xl,
   },
   title: {
-    fontSize: 24,
-    marginBottom: 16,
+    ...typography.h2,
+    color: colors.textDark,
     textAlign: 'center',
+    marginBottom: spacing.sm,
+  },
+  subtitle: {
+    ...typography.body,
+    color: colors.textLight,
+    textAlign: 'center',
+    marginBottom: spacing.xl,
   },
   input: {
-    height: 40,
-    borderColor: 'gray',
-    borderWidth: 1,
-    marginBottom: 12,
-    paddingHorizontal: 8,
+    paddingVertical: spacing.md,
+    marginBottom: spacing.md,
+  },
+  signUpButton: {
+    marginTop: spacing.md,
+  },
+  loginLink: {
+    marginTop: spacing.lg,
+    alignItems: 'center',
+  },
+  loginText: {
+    ...typography.body,
+    color: colors.textLight,
+  },
+  loginLinkText: {
+    color: colors.primary,
+    fontWeight: 'bold',
   },
 });
 
