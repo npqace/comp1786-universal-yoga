@@ -10,4 +10,6 @@ export interface Booking {
   className?: string;
   classDate?: string;
   classTime?: string;
+  price?: number;
+  classStatus?: 'active' | 'completed' | 'cancelled';
 }

@@ -1,11 +1,13 @@
-import { initializeApp, getApp, getApps } from 'firebase/app';
+import { initializeApp, getApp, getApps, FirebaseApp } from 'firebase/app';
 import { 
+  getAuth,
   initializeAuth, 
   getReactNativePersistence, 
   createUserWithEmailAndPassword,
-  updateProfile
+  updateProfile,
+  Auth
 } from 'firebase/auth';
-import { getDatabase, ref, set } from 'firebase/database';
+import { getDatabase, ref, set, Database } from 'firebase/database';
 import ReactNativeAsyncStorage from '@react-native-async-storage/async-storage';
 import { User } from '../types';
 
@@ -19,13 +21,29 @@ const firebaseConfig = {
   appId: "1:284957734317:web:cdc0a2c091a1a4dd4c1d24"
 };
 
-// Initialize Firebase
-const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
+let app: FirebaseApp;
+let auth: Auth;
+let database: Database;
 
-const auth = initializeAuth(app, {
-  persistence: getReactNativePersistence(ReactNativeAsyncStorage),
-});
-const database = getDatabase(app);
+if (!getApps().length) {
+  try {
+    app = initializeApp(firebaseConfig);
+    auth = initializeAuth(app, {
+      persistence: getReactNativePersistence(ReactNativeAsyncStorage),
+    });
+  } catch (error) {
+    // This can happen in certain edge cases with hot-reloading
+    console.error("Firebase initialization error", error);
+    app = getApp();
+    auth = getAuth(app);
+  }
+} else {
+  app = getApp();
+  auth = getAuth(app);
+}
+
+database = getDatabase(app);
+
 
 // New Sign-Up Function
 export const signUp = async (name: string, email: string, password: string) => {

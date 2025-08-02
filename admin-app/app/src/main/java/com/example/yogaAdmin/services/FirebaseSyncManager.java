@@ -169,18 +169,20 @@ public class FirebaseSyncManager {
 
     public void uploadAllData(List<YogaCourse> courses, List<YogaClass> classes) {
         DatabaseReference coursesRef = databaseReference.child("courses");
-        coursesRef.removeValue(); // Clear all courses before syncing
         if (courses != null) {
             for (YogaCourse course : courses) {
-                coursesRef.child(course.getFirebaseKey()).setValue(course);
+                if (course.getFirebaseKey() != null && !course.getFirebaseKey().isEmpty()) {
+                    coursesRef.child(course.getFirebaseKey()).setValue(course);
+                }
             }
         }
 
         DatabaseReference classesRef = databaseReference.child("classes");
-        classesRef.removeValue(); // Clear all classes before syncing
         if (classes != null) {
             for (YogaClass yogaClass : classes) {
-                classesRef.child(yogaClass.getFirebaseKey()).setValue(yogaClass);
+                if (yogaClass.getFirebaseKey() != null && !yogaClass.getFirebaseKey().isEmpty()) {
+                    classesRef.child(yogaClass.getFirebaseKey()).setValue(yogaClass);
+                }
             }
         }
     }

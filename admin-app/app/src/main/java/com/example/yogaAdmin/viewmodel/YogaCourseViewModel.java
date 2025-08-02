@@ -53,4 +53,12 @@ public class YogaCourseViewModel extends AndroidViewModel {
     public void deleteAllCourses() {
         mRepository.deleteAllCourses();
     }
+
+    public void syncData() {
+        AppDatabase.databaseWriteExecutor.execute(() -> {
+            List<YogaCourse> courses = mRepository.getCourseList();
+            List<YogaClass> classes = mRepository.getClassList();
+            firebaseSyncManager.uploadAllData(courses, classes);
+        });
+    }
 }

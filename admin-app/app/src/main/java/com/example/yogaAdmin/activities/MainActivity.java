@@ -198,7 +198,11 @@ public class MainActivity extends AppCompatActivity {
         popupMenu.getMenuInflater().inflate(R.menu.main_menu, popupMenu.getMenu());
         popupMenu.setOnMenuItemClickListener(item -> {
             int itemId = item.getItemId();
-            if (itemId == R.id.action_reset_database) {
+            if (itemId == R.id.action_sync) {
+                Toast.makeText(this, "Syncing data...", Toast.LENGTH_SHORT).show();
+                yogaCourseViewModel.syncData();
+                return true;
+            } else if (itemId == R.id.action_reset_database) {
                 showResetConfirmationDialog();
                 return true;
             } else if (itemId == R.id.action_about) {

@@ -104,7 +104,6 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   listContainer: {
-    paddingVertical: spacing.sm,
-    paddingBottom: spacing.lg,
+    paddingBottom: spacing.sm,
   },
 }); 

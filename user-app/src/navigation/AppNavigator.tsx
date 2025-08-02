@@ -118,7 +118,7 @@ export default function AppNavigator() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <StatusBar backgroundColor={colors.primary} barStyle="light-content" />
+      <StatusBar backgroundColor="transparent" barStyle="light-content" />
       <OfflineBanner />
       <NavigationContainer>
         {user ? <MainStackNavigator /> : <AuthNavigator />}
@@ -130,8 +130,7 @@ export default function AppNavigator() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "black",
-    paddingTop: StatusBar.currentHeight || 0,
+    paddingTop: 10,
   },
   content: {
     flex: 1,

@@ -3,11 +3,13 @@ import { View, Text, ScrollView, StyleSheet, TouchableOpacity, Alert } from 'rea
 import { RouteProp, useRoute } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import { useClassDetail } from '../hooks/useYogaData';
-import { LoadingSpinner, ErrorMessage, StatusBadge } from '../components';
+import { useNetworkStatus } from '../hooks/useNetworkStatus';
+import { LoadingSpinner, ErrorMessage } from '../components';
 import DetailItem from '../components/DetailItem';
-import { RootStackParamList, formatPrice, getDayOfWeek } from '../types';
-import { globalStyles, colors, spacing, typography, borderRadius } from '../styles/globalStyles';
+import { RootStackParamList, getDayOfWeek } from '../types';
+import { globalStyles, colors, spacing, typography } from '../styles/globalStyles';
 import { YogaService } from '../services/yogaService';
+import { useToast } from '../context/ToastContext';
 
 type ClassDetailRouteProp = RouteProp<RootStackParamList, 'ClassDetail'>;
 
@@ -15,14 +17,16 @@ export default function ClassDetailScreen() {
   const route = useRoute<ClassDetailRouteProp>();
   const { classId } = route.params;
   const { classDetail, isBooked, loading, refresh } = useClassDetail(classId);
+  const isOffline = useNetworkStatus();
   const yogaService = YogaService.getInstance();
+  const { showToast } = useToast();
 
   const handleBooking = async () => {
     if (!classDetail?.firebaseKey || !isBookable) return;
 
     try {
       await yogaService.bookClass(classDetail.firebaseKey);
-      Alert.alert('Success', 'You have successfully booked this class.');
+      showToast('You have successfully booked this class.', 'success');
       refresh(); // Refresh to update the UI
     } catch (error) {
       Alert.alert('Error', error instanceof Error ? error.message : 'An unknown error occurred.');
@@ -58,6 +62,7 @@ export default function ClassDetailScreen() {
   const isBookable = classDetail.status?.toLowerCase() === 'active' && classDetail.slotsAvailable > 0;
 
   const getButtonText = () => {
+    if (isOffline) return 'Offline: Cannot Book';
     if (isBooked) return 'Already Booked';
     if (classDetail.status?.toLowerCase() === 'completed') return 'Class Completed';
     if (classDetail.status?.toLowerCase() === 'cancelled') return 'Class Cancelled';
@@ -88,9 +93,9 @@ export default function ClassDetailScreen() {
           style={[
             globalStyles.button,
             styles.bookButton,
-            (!isBookable || isBooked) && styles.disabledButton
+            (!isBookable || isBooked || isOffline) && styles.disabledButton
           ]}
-          disabled={!isBookable || isBooked}
+          disabled={!isBookable || isBooked || isOffline}
           onPress={handleBooking}
         >
           <Text style={globalStyles.buttonText}>

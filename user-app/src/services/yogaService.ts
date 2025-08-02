@@ -267,6 +267,8 @@ export class YogaService {
         className: courseData.classType,
         classDate: classData.date,
         classTime: courseData.time,
+        price: courseData.price,
+        classStatus: classData.status,
       };
 
       // Save the new booking object
@@ -285,6 +287,47 @@ export class YogaService {
         throw new Error(`Failed to book the class: ${error.message}`);
       }
       throw new Error('Failed to book the class. Please try again.');
+    }
+  }
+
+  /**
+   * Cancel a booking for the current user
+   */
+  async cancelBooking(classId: string): Promise<void> {
+    const user = auth.currentUser;
+    if (!user) {
+      throw new Error('You must be logged in to cancel a booking.');
+    }
+
+    const classRef = ref(database, `classes/${classId}`);
+    const bookingId = `${user.uid}_${classId}`;
+    const bookingRef = ref(database, `bookings/${bookingId}`);
+    const userBookingRef = ref(database, `userBookings/${user.uid}/${classId}`);
+    const classBookingRef = ref(database, `classBookings/${classId}/${user.uid}`);
+
+    try {
+      // Use a transaction to safely increment the available slots
+      await runTransaction(classRef, (currentData: YogaClass) => {
+        if (currentData && typeof currentData.slotsAvailable === 'number') {
+          currentData.slotsAvailable++;
+        }
+        return currentData;
+      });
+
+      // Use a multi-path update to remove all booking-related data atomically
+      const updates: { [key: string]: null } = {};
+      updates[`/bookings/${bookingId}`] = null;
+      updates[`/userBookings/${user.uid}/${classId}`] = null;
+      updates[`/classBookings/${classId}/${user.uid}`] = null;
+
+      await update(ref(database), updates);
+
+    } catch (error) {
+      console.error('Cancellation failed:', error);
+      if (error instanceof Error) {
+        throw new Error(`Failed to cancel the booking: ${error.message}`);
+      }
+      throw new Error('Failed to cancel the booking. Please try again.');
     }
   }
 

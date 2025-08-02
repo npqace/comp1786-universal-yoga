@@ -71,6 +71,7 @@ public interface YogaClassDao {
     @Query("SELECT * FROM yoga_classes " +
             "WHERE (:instructorName IS NULL OR assignedInstructor LIKE :instructorName) " +
             "AND (:date IS NULL OR date = :date) " +
-            "AND (:dayOfWeek IS NULL OR courseId IN (SELECT id FROM yoga_courses WHERE dayOfWeek LIKE :dayOfWeek))")
+            "AND (:dayOfWeek IS NULL OR courseId IN (SELECT id FROM yoga_courses WHERE dayOfWeek LIKE :dayOfWeek))" +
+            "ORDER BY SUBSTR(date, 7, 4) ASC, SUBSTR(date, 4, 2) ASC, SUBSTR(date, 1, 2) ASC")
     LiveData<List<ClassWithCourseInfo>> search(String instructorName, String date, String dayOfWeek);
 }

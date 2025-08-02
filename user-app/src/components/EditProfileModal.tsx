@@ -10,6 +10,7 @@ import {
 import { YogaService } from '../services/yogaService';
 import { globalStyles, colors, spacing, typography, borderRadius } from '../styles/globalStyles';
 import { Ionicons } from '@expo/vector-icons';
+import { useToast } from '../context/ToastContext';
 
 interface EditProfileModalProps {
   visible: boolean;
@@ -19,6 +20,7 @@ interface EditProfileModalProps {
 const EditProfileModal = ({ visible, onClose }: EditProfileModalProps) => {
   const user = auth.currentUser;
   const yogaService = YogaService.getInstance();
+  const { showToast } = useToast();
 
   const [displayName, setDisplayName] = useState('');
   const [password, setPassword] = useState('');
@@ -60,7 +62,7 @@ const EditProfileModal = ({ visible, onClose }: EditProfileModalProps) => {
         return;
       }
 
-      Alert.alert('Success', 'Your display name has been updated.');
+      showToast('Your display name has been updated.', 'success');
       onClose();
     } catch (error: any) {
       Alert.alert('Error', error.message);
@@ -89,7 +91,8 @@ const EditProfileModal = ({ visible, onClose }: EditProfileModalProps) => {
       
       await updatePassword(user, password);
       
-      Alert.alert('Success', 'Your profile has been updated successfully.', [{ text: 'OK', onPress: onClose }]);
+      showToast('Your profile has been updated successfully.', 'success');
+      onClose();
 
     } catch (error: any) {
       Alert.alert('Error', `An error occurred: ${error.message}`);
