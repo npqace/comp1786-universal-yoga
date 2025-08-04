@@ -230,6 +230,8 @@ public class YogaCourseRepository {
             firebaseDatabase.child("courses").removeValue();
             firebaseDatabase.child("classes").removeValue();
             firebaseDatabase.child("bookings").removeValue();
+            firebaseDatabase.child("classBookings").removeValue();
+            firebaseDatabase.child("userBookings").removeValue();
         });
     }
 }

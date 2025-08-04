@@ -189,10 +189,14 @@ public class YogaClassRepository {
         AppDatabase.databaseWriteExecutor.execute(() -> {
             // Get all classes for the course to delete them from Firebase.
             List<YogaClass> classes = yogaClassDao.getClassesForCourseSync(courseId);
+            Map<String, Object> updates = new HashMap<>();
             for(YogaClass yogaClass : classes) {
                 if (yogaClass.getFirebaseKey() != null) {
-                    firebaseDatabase.child("classes").child(yogaClass.getFirebaseKey()).removeValue();
+                    updates.put("/classes/" + yogaClass.getFirebaseKey(), null);
                 }
+            }
+            if (!updates.isEmpty()){
+                firebaseDatabase.updateChildren(updates);
             }
             // Delete all classes for the course from Room.
             yogaClassDao.deleteClassesByCourseId(courseId);
