@@ -1,3 +1,7 @@
+/**
+ * @file MyBookingsScreen.tsx
+ * @description Screen to display the current user's booked classes.
+ */
 import React from 'react';
 import { View, Text, StyleSheet, FlatList, TouchableOpacity, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
@@ -11,12 +15,18 @@ import { Ionicons } from '@expo/vector-icons';
 import { YogaService } from '../services/yogaService';
 import { useToast } from '../context/ToastContext';
 
+// Type definitions for navigation
 type RootStackParamList = {
   ClassDetail: { classId: string };
 };
 
 type MyBookingsScreenNavigationProp = StackNavigationProp<RootStackParamList, 'ClassDetail'>;
 
+/**
+ * @screen MyBookingsScreen
+ * @description This screen displays a list of classes that the current user has booked.
+ * It allows users to view their bookings and cancel them.
+ */
 const MyBookingsScreen = () => {
   const { bookings, loading, refresh } = useUserBookings();
   const isOffline = useNetworkStatus();
@@ -24,6 +34,11 @@ const MyBookingsScreen = () => {
   const navigation = useNavigation<MyBookingsScreenNavigationProp>();
   const { showToast } = useToast();
 
+  /**
+   * @method handleCancelBooking
+   * @description Handles the cancellation of a booking after confirming with the user.
+   * @param {string} classId - The ID of the class to cancel.
+   */
   const handleCancelBooking = (classId: string) => {
     Alert.alert(
       "Confirm Cancellation",
@@ -37,6 +52,7 @@ const MyBookingsScreen = () => {
             try {
               await yogaService.cancelBooking(classId);
               showToast('Booking cancelled successfully.', 'success');
+              // The real-time listener in useUserBookings will automatically update the list
             } catch (error) {
               const errorMessage = error instanceof Error ? error.message : "An unknown error occurred.";
               Alert.alert("Cancellation Failed", errorMessage);
@@ -47,20 +63,34 @@ const MyBookingsScreen = () => {
     );
   };
 
+  /**
+   * @method handleCardPress
+   * @description Navigates to the ClassDetail screen for the selected booking.
+   * @param {string} classId - The ID of the class associated with the booking.
+   */
   const handleCardPress = (classId: string) => {
     navigation.navigate('ClassDetail', { classId });
   };
 
+  // Calculate the total price of all bookings
   const totalPrice = bookings.reduce((total, booking) => total + (booking.price || 0), 0);
 
+  // Show loading spinner on initial load
   if (loading.isLoading && bookings.length === 0) {
     return <LoadingSpinner message="Loading your bookings..." />;
   }
 
+  // Show error message if fetching fails
   if (loading.error) {
     return <ErrorMessage message={loading.error} onRetry={refresh} />;
   }
 
+  /**
+   * @method renderBookingItem
+   * @description Renders a single booking item in the FlatList.
+   * @param {{ item: Booking }} props - The booking item to render.
+   * @returns {React.ReactElement} A touchable card representing a booking.
+   */
   const renderBookingItem = ({ item }: { item: Booking }) => (
     <TouchableOpacity onPress={() => handleCardPress(item.classId)} style={styles.bookingCard}>
       <View style={styles.accentBar} />
@@ -94,12 +124,13 @@ const MyBookingsScreen = () => {
           Booked on {new Date(item.bookingDate).toLocaleDateString()}
         </Text>
 
+        {/* Show cancel button only for active classes */}
         {item.classStatus?.toLowerCase() === 'active' && (
           <TouchableOpacity 
             style={[styles.cancelButton, isOffline && styles.disabledButton]} 
             disabled={isOffline}
             onPress={(e) => {
-              e.stopPropagation(); // Prevent card press from firing
+              e.stopPropagation(); // Prevent card press from firing when the button is pressed
               handleCancelBooking(item.classId);
             }}
           > 
@@ -116,6 +147,7 @@ const MyBookingsScreen = () => {
   return (
     <View style={styles.container}>
       {bookings.length === 0 && !loading.isLoading ? (
+        // Show empty state if there are no bookings
         <EmptyState 
           title="No Bookings"
           icon="sad-outline"
@@ -131,6 +163,7 @@ const MyBookingsScreen = () => {
             refreshing={loading.isLoading}
             contentContainerStyle={styles.listContainer}
           />
+          {/* Footer with total price */}
           {bookings.length > 0 && (
             <View style={styles.footerContainer}>
               <Text style={styles.totalPriceLabel}>Total Price:</Text>
@@ -150,7 +183,7 @@ const styles = StyleSheet.create({
   },
   listContainer: {
     padding: spacing.md,
-    paddingBottom: spacing.md, // Remove extra padding
+    paddingBottom: spacing.md,
   },
   bookingCard: {
     backgroundColor: colors.surface,
@@ -245,7 +278,7 @@ const styles = StyleSheet.create({
   },
   footerContainer: {
     padding: spacing.lg,
-    paddingBottom: spacing.md, // Adjust for safe area if needed
+    paddingBottom: spacing.md,
     backgroundColor: colors.surface,
     borderTopWidth: 1,
     borderColor: colors.border,

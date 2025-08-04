@@ -1,5 +1,13 @@
+/**
+ * @file globalStyles.ts
+ * @description Defines the global styles, colors, spacing, and typography for the application.
+ */
 import { StyleSheet } from 'react-native';
 
+/**
+ * @constant colors
+ * @description A palette of colors used throughout the application.
+ */
 export const colors = {
   primary: '#2196F3',
   primaryDark: '#1976D2',
@@ -18,6 +26,10 @@ export const colors = {
   disabled: '#BDBDBD',
 };
 
+/**
+ * @constant spacing
+ * @description A set of predefined spacing values for consistent layout.
+ */
 export const spacing = {
   xs: 4,
   sm: 8,
@@ -27,6 +39,10 @@ export const spacing = {
   xxl: 48,
 };
 
+/**
+ * @constant borderRadius
+ * @description A set of predefined border radius values for consistent component styling.
+ */
 export const borderRadius = {
   small: 4,
   medium: 8,
@@ -34,6 +50,10 @@ export const borderRadius = {
   xlarge: 16,
 };
 
+/**
+ * @constant typography
+ * @description A set of predefined text styles for consistent typography.
+ */
 export const typography = {
   h1: {
     fontSize: 32,
@@ -67,6 +87,10 @@ export const typography = {
   },
 };
 
+/**
+ * @constant globalStyles
+ * @description A StyleSheet containing reusable global styles for components.
+ */
 export const globalStyles = StyleSheet.create({
   container: {
     flex: 1,
@@ -141,4 +165,4 @@ export const globalStyles = StyleSheet.create({
     textAlign: 'center',
     marginTop: spacing.md,
   },
-}); 
+});

@@ -1,3 +1,7 @@
+/**
+ * @file ProfileScreen.tsx
+ * @description Screen for displaying user profile information and actions like editing and logging out.
+ */
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, Alert, TouchableOpacity, SafeAreaView, Image } from 'react-native';
 import { auth } from '../services/firebase';
@@ -6,11 +10,21 @@ import { globalStyles, colors, spacing, typography } from '../styles/globalStyle
 import { Ionicons } from '@expo/vector-icons';
 import EditProfileModal from '../components/EditProfileModal';
 
+/**
+ * @screen ProfileScreen
+ * @description Displays the current user's profile information, including their avatar,
+ * display name, and email. It provides options to edit the profile or log out.
+ */
 const ProfileScreen = () => {
   const [modalVisible, setModalVisible] = useState(false);
-  // We need a state to force re-render when user profile is updated
+  // We need a state to force re-render when user profile is updated via the modal
   const [user, setUser] = useState(auth.currentUser);
 
+  /**
+   * @effect
+   * @description Subscribes to authentication state changes to keep the user
+   * information up-to-date in real-time (e.g., after a profile edit).
+   */
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       setUser(user);
@@ -18,21 +32,30 @@ const ProfileScreen = () => {
     return unsubscribe;
   }, []);
 
+  /**
+   * @method handleLogout
+   * @description Signs the user out of their Firebase account.
+   */
   const handleLogout = () => {
     signOut(auth).catch(error => {
       Alert.alert('Logout Failed', error.message);
     });
   };
 
+  /**
+   * @method handleModalClose
+   * @description Closes the edit profile modal.
+   */
   const handleModalClose = () => {
     setModalVisible(false);
-    // The onAuthStateChanged listener will handle the UI update automatically
+    // The onAuthStateChanged listener will handle the UI update automatically if the profile was changed.
   };
 
   return (
     <SafeAreaView style={globalStyles.safeArea}>
       <View style={styles.container}>
         <View style={styles.profileHeader}>
+          {/* Avatar is generated using an external service based on user's name or email */}
           <Image
             source={{ uri: `https://ui-avatars.com/api/?name=${user?.displayName || user?.email}&background=random&color=fff&size=128` }}
             style={styles.avatar}
@@ -42,6 +65,7 @@ const ProfileScreen = () => {
         </View>
 
         <View style={styles.buttonContainer}>
+          {/* Button to open the Edit Profile modal */}
           <TouchableOpacity 
             style={[globalStyles.button, styles.editButton]}
             onPress={() => setModalVisible(true)}
@@ -50,6 +74,7 @@ const ProfileScreen = () => {
             <Text style={styles.buttonText}>Edit Profile</Text>
           </TouchableOpacity>
 
+          {/* Button to log out */}
           <TouchableOpacity 
             style={[globalStyles.button, styles.logoutButton]}
             onPress={handleLogout}
@@ -59,6 +84,7 @@ const ProfileScreen = () => {
           </TouchableOpacity>
         </View>
       </View>
+      {/* The EditProfileModal is rendered here but only visible when modalVisible is true */}
       {user && <EditProfileModal visible={modalVisible} onClose={handleModalClose} />}
     </SafeAreaView>
   );

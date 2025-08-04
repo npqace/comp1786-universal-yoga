@@ -1,3 +1,7 @@
+/**
+ * @file ClassDetailScreen.tsx
+ * @description Screen to display the detailed information of a specific yoga class.
+ */
 import React from 'react';
 import { View, Text, ScrollView, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import { RouteProp, useRoute } from '@react-navigation/native';
@@ -11,8 +15,13 @@ import { globalStyles, colors, spacing, typography } from '../styles/globalStyle
 import { YogaService } from '../services/yogaService';
 import { useToast } from '../context/ToastContext';
 
+// Type for the navigation route parameters
 type ClassDetailRouteProp = RouteProp<RootStackParamList, 'ClassDetail'>;
 
+/**
+ * @screen ClassDetailScreen
+ * @description Displays all details for a selected yoga class and allows the user to book it.
+ */
 export default function ClassDetailScreen() {
   const route = useRoute<ClassDetailRouteProp>();
   const { classId } = route.params;
@@ -21,22 +30,28 @@ export default function ClassDetailScreen() {
   const yogaService = YogaService.getInstance();
   const { showToast } = useToast();
 
+  /**
+   * @method handleBooking
+   * @description Handles the class booking process.
+   */
   const handleBooking = async () => {
     if (!classDetail?.firebaseKey || !isBookable) return;
 
     try {
       await yogaService.bookClass(classDetail.firebaseKey);
       showToast('You have successfully booked this class.', 'success');
-      refresh(); // Refresh to update the UI
+      refresh(); // Refresh to update the UI (e.g., isBooked state, slots available)
     } catch (error) {
       Alert.alert('Error', error instanceof Error ? error.message : 'An unknown error occurred.');
     }
   };
 
+  // Show loading spinner while fetching data
   if (loading.isLoading) {
     return <LoadingSpinner message="Loading class details..." />;
   }
 
+  // Show error message if fetching fails
   if (loading.error) {
     return (
       <ErrorMessage 
@@ -47,6 +62,7 @@ export default function ClassDetailScreen() {
     );
   }
 
+  // Show error message if class details are not found
   if (!classDetail || !classDetail.course) {
     return (
       <ErrorMessage 
@@ -59,8 +75,14 @@ export default function ClassDetailScreen() {
 
   const course = classDetail.course;
   const dayOfWeek = getDayOfWeek(classDetail.date);
+  // A class is bookable if it's active and has slots available
   const isBookable = classDetail.status?.toLowerCase() === 'active' && classDetail.slotsAvailable > 0;
 
+  /**
+   * @method getButtonText
+   * @description Determines the text to display on the booking button based on the class and user status.
+   * @returns {string} The text for the button.
+   */
   const getButtonText = () => {
     if (isOffline) return 'Offline: Cannot Book';
     if (isBooked) return 'Already Booked';
@@ -72,7 +94,7 @@ export default function ClassDetailScreen() {
 
   return (
     <ScrollView style={[globalStyles.container, styles.container]}>
-      {/* Class Details */}
+      {/* Class Details Card */}
       <View style={[globalStyles.card, styles.detailsCard]}>
         <Text style={styles.sectionTitle}>Class Information</Text>
         <DetailItem icon="calendar-outline" label="Date" value={classDetail.date} />
@@ -93,6 +115,7 @@ export default function ClassDetailScreen() {
           style={[
             globalStyles.button,
             styles.bookButton,
+            // Disable button if not bookable, already booked, or offline
             (!isBookable || isBooked || isOffline) && styles.disabledButton
           ]}
           disabled={!isBookable || isBooked || isOffline}
@@ -104,19 +127,19 @@ export default function ClassDetailScreen() {
         </TouchableOpacity>
       </View>
 
-      {/* Description */}
+      {/* Description Card */}
       <View style={[globalStyles.card, styles.descriptionCard]}>
         <Text style={styles.sectionTitle}>Description</Text>
         <Text style={styles.description}>{course.description}</Text>
       </View>
 
-      {/* Equipment */}
+      {/* Equipment Card */}
       <View style={[globalStyles.card, styles.equipmentCard]}>
         <Text style={styles.sectionTitle}>Equipment Needed</Text>
         <Text style={styles.equipment}>{course.equipmentNeeded}</Text>
       </View>
 
-      {/* Additional Comments */}
+      {/* Additional Comments Card */}
       <View style={[globalStyles.card, styles.commentsCard]}>
         <Text style={styles.sectionTitle}>Additional Notes</Text>
         <Text style={styles.comments}>{classDetail.additionalComments}</Text>
@@ -200,4 +223,3 @@ const styles = StyleSheet.create({
     backgroundColor: colors.disabled,
   },
 });
- 

@@ -1,3 +1,7 @@
+/**
+ * @file LoginScreen.tsx
+ * @description Screen for user login.
+ */
 import React, { useState } from 'react';
 import {
   View,
@@ -17,18 +21,29 @@ import { StackNavigationProp } from '@react-navigation/stack';
 import { colors, globalStyles, spacing, typography } from '../../styles/globalStyles';
 import Logo from '../../../assets/yoga-logo.svg';
 
+// Type definitions for navigation
 type AuthStackParamList = {
   SignUp: undefined;
 };
 
 type LoginScreenNavigationProp = StackNavigationProp<AuthStackParamList, 'SignUp'>;
 
+/**
+ * @screen LoginScreen
+ * @description Allows an existing user to log in using their email and password.
+ * @param {{ navigation: LoginScreenNavigationProp }} props - Navigation props.
+ */
 const LoginScreen = ({ navigation }: { navigation: LoginScreenNavigationProp }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
 
+  /**
+   * @method handleLogin
+   * @description Handles the user login process using Firebase Authentication.
+   */
   const handleLogin = () => {
+    // Basic validation
     if (!email || !password) {
       Alert.alert('Error', 'Please enter both email and password.');
       return;
@@ -36,9 +51,11 @@ const LoginScreen = ({ navigation }: { navigation: LoginScreenNavigationProp }) 
     setLoading(true);
     signInWithEmailAndPassword(auth, email, password)
       .then(() => {
+        // On success, the onAuthStateChanged listener in AppNavigator will handle the navigation
         console.log('User signed in!');
       })
       .catch(error => {
+        // Display an error message on failure
         Alert.alert('Login Failed', error.message);
       })
       .finally(() => {
@@ -57,6 +74,7 @@ const LoginScreen = ({ navigation }: { navigation: LoginScreenNavigationProp }) 
           <Text style={styles.title}>Welcome Back!</Text>
           <Text style={styles.subtitle}>Log in to your account</Text>
 
+          {/* Email Input */}
           <TextInput
             style={[globalStyles.input, styles.input]}
             placeholder="Email"
@@ -66,6 +84,7 @@ const LoginScreen = ({ navigation }: { navigation: LoginScreenNavigationProp }) 
             autoCapitalize="none"
             placeholderTextColor={colors.textLight}
           />
+          {/* Password Input */}
           <TextInput
             style={[globalStyles.input, styles.input]}
             placeholder="Password"
@@ -75,6 +94,7 @@ const LoginScreen = ({ navigation }: { navigation: LoginScreenNavigationProp }) 
             placeholderTextColor={colors.textLight}
           />
 
+          {/* Login Button */}
           <TouchableOpacity
             style={[globalStyles.button, styles.loginButton]}
             onPress={handleLogin}
@@ -83,6 +103,7 @@ const LoginScreen = ({ navigation }: { navigation: LoginScreenNavigationProp }) 
             <Text style={globalStyles.buttonText}>{loading ? 'Logging in...' : 'Login'}</Text>
           </TouchableOpacity>
 
+          {/* Link to Sign Up Screen */}
           <TouchableOpacity
             style={styles.signUpLink}
             onPress={() => navigation.navigate('SignUp')}

@@ -1,3 +1,7 @@
+/**
+ * @file SearchBar.tsx
+ * @description A component that provides search and filtering functionality for yoga classes.
+ */
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
@@ -6,11 +10,18 @@ import { SearchFilters } from '../types';
 import { colors, globalStyles, spacing, typography, borderRadius } from '../styles/globalStyles';
 import { useYogaCourses } from '../hooks/useYogaData';
 
+/**
+ * @interface SearchBarProps
+ * @description Props for the SearchBar component.
+ * @property {(filters: SearchFilters) => void} onSearch - Callback function to execute when search filters change.
+ * @property {boolean} [loading] - Indicates if the search is currently in a loading state.
+ */
 interface SearchBarProps {
   onSearch: (filters: SearchFilters) => void;
   loading?: boolean;
 }
 
+// Constants for filter options
 const DAYS_OF_WEEK = [
   { label: 'All Days', value: 'All Days' },
   { label: 'Monday', value: 'Monday' },
@@ -29,6 +40,12 @@ const TIME_OPTIONS = [
   { label: 'Evening (18:00-22:00)', value: 'Evening (18:00-22:00)' }
 ];
 
+/**
+ * @component SearchBar
+ * @description A comprehensive search bar with advanced filtering options for yoga classes.
+ * It allows searching by name, and filtering by course, day of the week, and time of day.
+ * @param {SearchBarProps} props - The props for the component.
+ */
 export default function SearchBar({ onSearch, loading = false }: SearchBarProps) {
   const [selectedDay, setSelectedDay] = useState('All Days');
   const [selectedTime, setSelectedTime] = useState('Any Time');
@@ -36,8 +53,10 @@ export default function SearchBar({ onSearch, loading = false }: SearchBarProps)
   const [searchText, setSearchText] = useState('');
   const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
 
+  // Fetch yoga courses for the course filter dropdown
   const { courses, loading: coursesLoading } = useYogaCourses();
 
+  // Memoize course options to prevent re-computation on every render
   const courseOptions = useMemo(() => {
     const options = courses.map(course => ({
       label: course.classType,
@@ -46,6 +65,11 @@ export default function SearchBar({ onSearch, loading = false }: SearchBarProps)
     return [{ label: 'All Courses', value: 'All Courses' }, ...options];
   }, [courses]);
 
+  /**
+   * @method buildFilters
+   * @description Constructs the search filters object based on the current state of the search inputs.
+   * @returns {SearchFilters} The filters object to be used in the search query.
+   */
   const buildFilters = useCallback(() => {
     const filters: SearchFilters = {};
     
@@ -70,6 +94,10 @@ export default function SearchBar({ onSearch, loading = false }: SearchBarProps)
     return filters;
   }, [searchText, selectedDay, selectedTime, selectedCourse]);
 
+  /**
+   * @effect
+   * @description Debounces the search execution. The `onSearch` callback is only called 300ms after the user stops typing or changing filters.
+   */
   useEffect(() => {
     const delayDebounceFn = setTimeout(() => {
       onSearch(buildFilters());
@@ -78,6 +106,10 @@ export default function SearchBar({ onSearch, loading = false }: SearchBarProps)
     return () => clearTimeout(delayDebounceFn);
   }, [searchText, selectedDay, selectedTime, selectedCourse, onSearch, buildFilters]);
 
+  /**
+   * @method handleClear
+   * @description Clears all search filters and resets the state to default values.
+   */
   const handleClear = () => {
     setSelectedDay('All Days');
     setSelectedTime('Any Time');
@@ -87,6 +119,7 @@ export default function SearchBar({ onSearch, loading = false }: SearchBarProps)
 
   return (
     <View style={styles.container}>
+      {/* Main search input */}
       <View style={styles.searchInputContainer}>
         <Ionicons name="search-outline" size={20} color={colors.textLight} />
         <TextInput
@@ -109,6 +142,7 @@ export default function SearchBar({ onSearch, loading = false }: SearchBarProps)
         </TouchableOpacity>
       </View>
 
+      {/* Advanced filters section, shown conditionally */}
       {showAdvancedFilters && (
         <View style={styles.filtersContainer}>
           <View style={styles.filterGroup}>

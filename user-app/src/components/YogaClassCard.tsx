@@ -1,3 +1,7 @@
+/**
+ * @file YogaClassCard.tsx
+ * @description A card component to display summary information about a yoga class.
+ */
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
@@ -6,11 +10,22 @@ import { formatPrice } from '../types/YogaCourse';
 import { colors, globalStyles, spacing, typography, borderRadius } from '../styles/globalStyles';
 import StatusBadge from './StatusBadge';
 
+/**
+ * @interface YogaClassCardProps
+ * @description Props for the YogaClassCard component.
+ * @property {YogaClass} yogaClass - The yoga class data to display.
+ * @property {() => void} onPress - Function to call when the card is pressed.
+ */
 interface YogaClassCardProps {
   yogaClass: YogaClass;
   onPress: () => void;
 }
 
+/**
+ * @component YogaClassCard
+ * @description A card component that displays key details of a yoga class in a compact and readable format.
+ * @param {YogaClassCardProps} props - The props for the component.
+ */
 export default function YogaClassCard({ yogaClass, onPress }: YogaClassCardProps) {
   const course = yogaClass.course;
 
@@ -39,6 +54,7 @@ export default function YogaClassCard({ yogaClass, onPress }: YogaClassCardProps
 
       {/* Class Details */}
       <View style={styles.detailsContainer}>
+        {/* Left Column of Details */}
         <View style={styles.detailColumn}>
           <View style={styles.row}>
             <Ionicons name="calendar-outline" size={16} color={colors.primary} />
@@ -67,6 +83,7 @@ export default function YogaClassCard({ yogaClass, onPress }: YogaClassCardProps
           )}
         </View>
 
+        {/* Right Column of Details */}
         <View style={styles.detailColumn}>
           {(yogaClass.actualCapacity || course?.capacity) && (
             <View style={styles.row}>
@@ -100,6 +117,7 @@ export default function YogaClassCard({ yogaClass, onPress }: YogaClassCardProps
         </View>
       </View>
 
+      {/* Equipment Needed */}
       {course?.equipmentNeeded && (
         <View style={[styles.row, styles.fullWidthRow]}>
           <Ionicons name="barbell-outline" size={16} color={colors.primary} />
@@ -204,4 +222,4 @@ const styles = StyleSheet.create({
     color: colors.textLight,
     marginLeft: spacing.xs,
   },
-}); 
+});

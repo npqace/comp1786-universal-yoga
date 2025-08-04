@@ -1,13 +1,27 @@
+/**
+ * @file CustomHeader.tsx
+ * @description A reusable header component for the application.
+ */
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { colors } from '../styles/globalStyles';
 import Logo from '../../assets/yoga-logo.svg';
 
+/**
+ * @interface CustomHeaderProps
+ * @description Props for the CustomHeader component.
+ * @property {string} [title] - The optional title to display in the header. Defaults to 'Universal Yoga'.
+ */
 interface CustomHeaderProps {
   title?: string;
 }
 
+/**
+ * @component CustomHeader
+ * @description A reusable header component that displays the app logo and a title.
+ * @param {CustomHeaderProps} props - The props for the component.
+ */
 const CustomHeader: React.FC<CustomHeaderProps> = ({ title }) => {
   return (
     <View style={styles.headerContainer}>
@@ -17,6 +31,7 @@ const CustomHeader: React.FC<CustomHeaderProps> = ({ title }) => {
           <Text style={styles.title}>{title || 'Universal Yoga'}</Text>
           <Text style={styles.subtitle}>Your Path to Wellness</Text>
         </View>
+        {/* Future implementation for a menu icon can be added here */}
         {/* <Ionicons name="menu" size={24} color="white" /> */}
       </View>
     </View>

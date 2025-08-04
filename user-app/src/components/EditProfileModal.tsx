@@ -1,3 +1,7 @@
+/**
+ * @file EditProfileModal.tsx
+ * @description A modal component for editing user profile information.
+ */
 import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, Modal, KeyboardAvoidingView, Platform } from 'react-native';
 import { auth } from '../services/firebase';
@@ -12,11 +16,23 @@ import { globalStyles, colors, spacing, typography, borderRadius } from '../styl
 import { Ionicons } from '@expo/vector-icons';
 import { useToast } from '../context/ToastContext';
 
+/**
+ * @interface EditProfileModalProps
+ * @description Props for the EditProfileModal component.
+ * @property {boolean} visible - Whether the modal is visible.
+ * @property {() => void} onClose - Function to call when the modal is closed.
+ */
 interface EditProfileModalProps {
   visible: boolean;
   onClose: () => void;
 }
 
+/**
+ * @component EditProfileModal
+ * @description A modal that allows users to update their display name and password.
+ * It handles re-authentication for sensitive operations like changing a password.
+ * @param {EditProfileModalProps} props - The props for the component.
+ */
 const EditProfileModal = ({ visible, onClose }: EditProfileModalProps) => {
   const user = auth.currentUser;
   const yogaService = YogaService.getInstance();
@@ -29,6 +45,10 @@ const EditProfileModal = ({ visible, onClose }: EditProfileModalProps) => {
   const [loading, setLoading] = useState(false);
   const [reauthNeeded, setReauthNeeded] = useState(false);
 
+  /**
+   * @effect
+   * @description Resets the form state whenever the modal becomes visible.
+   */
   useEffect(() => {
     if (visible && user) {
       setDisplayName(user.displayName || '');
@@ -40,6 +60,11 @@ const EditProfileModal = ({ visible, onClose }: EditProfileModalProps) => {
     }
   }, [visible, user]);
 
+  /**
+   * @method handleUpdate
+   * @description Handles the initial profile update request.
+   * Updates the display name immediately and triggers the re-authentication flow if a new password is entered.
+   */
   const handleUpdate = async () => {
     if (!user) return;
 
@@ -51,11 +76,13 @@ const EditProfileModal = ({ visible, onClose }: EditProfileModalProps) => {
     setLoading(true);
 
     try {
+      // Update display name if it has changed
       if (displayName !== user.displayName) {
         await updateProfile(user, { displayName });
         await yogaService.updateDenormalizedUserData(user.uid, displayName);
       }
 
+      // If a new password is set, require re-authentication
       if (password) {
         setReauthNeeded(true);
         setLoading(false);
@@ -73,6 +100,10 @@ const EditProfileModal = ({ visible, onClose }: EditProfileModalProps) => {
     }
   };
 
+  /**
+   * @method handleReauthenticate
+   * @description Handles the re-authentication process and updates the password.
+   */
   const handleReauthenticate = async () => {
     if (!user || !user.email) {
         Alert.alert('Error', 'No user is signed in.');
@@ -86,9 +117,11 @@ const EditProfileModal = ({ visible, onClose }: EditProfileModalProps) => {
 
     setLoading(true);
     try {
+      // Re-authenticate the user with their current password
       const credential = EmailAuthProvider.credential(user.email, currentPassword);
       await reauthenticateWithCredential(user, credential);
       
+      // If re-authentication is successful, update the password
       await updatePassword(user, password);
       
       showToast('Your profile has been updated successfully.', 'success');
@@ -101,6 +134,11 @@ const EditProfileModal = ({ visible, onClose }: EditProfileModalProps) => {
     }
   };
 
+  /**
+   * @method renderReAuthForm
+   * @description Renders the form for re-authenticating the user.
+   * @returns {React.ReactElement} The re-authentication form.
+   */
   const renderReAuthForm = () => (
     <>
       <Text style={styles.label}>For security, please enter your current password to change it.</Text>
@@ -123,6 +161,11 @@ const EditProfileModal = ({ visible, onClose }: EditProfileModalProps) => {
     </>
   );
 
+  /**
+   * @method renderEditForm
+   * @description Renders the main form for editing profile details.
+   * @returns {React.ReactElement} The edit profile form.
+   */
   const renderEditForm = () => (
     <>
       <Text style={styles.label}>Display Name</Text>
@@ -185,6 +228,7 @@ const EditProfileModal = ({ visible, onClose }: EditProfileModalProps) => {
             </TouchableOpacity>
           </View>
           <View style={styles.form}>
+            {/* Conditionally render the re-auth form or the edit form */}
             {reauthNeeded ? renderReAuthForm() : renderEditForm()}
           </View>
         </View>

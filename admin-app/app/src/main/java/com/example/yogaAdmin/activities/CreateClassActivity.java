@@ -1,6 +1,5 @@
 package com.example.yogaAdmin.activities;
 
-import android.app.DatePickerDialog;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -34,19 +33,26 @@ import java.util.Locale;
 import java.util.TimeZone;
 import java.util.concurrent.ExecutionException;
 
+/**
+ * Activity for creating a new yoga class or editing an existing one.
+ * It operates in two modes: 'create' and 'edit'.
+ * In 'create' mode, it can also create multiple classes over a number of weeks.
+ */
 public class CreateClassActivity extends AppCompatActivity {
 
+    // Keys for passing data via Intent extras.
     public static final String EXTRA_COURSE_ID = "EXTRA_COURSE_ID";
     public static final String EXTRA_COURSE_NAME = "EXTRA_COURSE_NAME";
     public static final String EXTRA_CLASS_ID = "EXTRA_CLASS_ID";
 
     private YogaClassViewModel yogaClassViewModel;
-    private YogaCourse course;
-    private YogaClass existingClass;
+    private YogaCourse course; // The parent course for which the class is being created.
+    private YogaClass existingClass; // The class being edited, if in edit mode.
 
     private long courseId;
     private long classId = -1;
 
+    // UI Components
     private EditText editDate, editInstructor, editCapacity, editComments, editRepeatWeeks;
     private TextView tvCourseName, tvCourseDetails, tvDefaultCapacity;
     private Button btnClear, btnCreateClass;
@@ -63,24 +69,24 @@ public class CreateClassActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_create_class);
 
+        // Hide the default action bar.
         if (getSupportActionBar() != null) {
             getSupportActionBar().hide();
         }
 
+        // Observe network status and show an offline indicator if needed.
         tvOffline = findViewById(R.id.tv_offline);
         networkStatusLiveData = new NetworkStatusLiveData(getApplicationContext());
         networkStatusLiveData.observe(this, isOnline -> {
-            if (isOnline) {
-                tvOffline.setVisibility(View.GONE);
-            } else {
-                tvOffline.setVisibility(View.VISIBLE);
-            }
+            tvOffline.setVisibility(isOnline ? View.GONE : View.VISIBLE);
         });
 
+        // Retrieve IDs from the intent to determine mode (create/edit) and context.
         courseId = getIntent().getLongExtra(EXTRA_COURSE_ID, -1);
         classId = getIntent().getLongExtra(EXTRA_CLASS_ID, -1);
         isEditMode = classId != -1;
 
+        // A course ID is mandatory.
         if (courseId == -1) {
             Toast.makeText(this, "Error: Course not found", Toast.LENGTH_SHORT).show();
             finish();
@@ -94,6 +100,10 @@ public class CreateClassActivity extends AppCompatActivity {
         setupDatePicker();
     }
 
+    /**
+     * Initializes all UI components and sets up the back button.
+     * Adjusts UI elements based on whether the activity is in edit mode.
+     */
     private void initializeViews() {
         editDate = findViewById(R.id.edit_date);
         editInstructor = findViewById(R.id.edit_instructor);
@@ -111,6 +121,7 @@ public class CreateClassActivity extends AppCompatActivity {
         ImageView btnBack = findViewById(R.id.btn_back);
         btnBack.setOnClickListener(v -> finish());
 
+        // If in edit mode, change the title, button text, and hide the repeat weeks field.
         if (isEditMode) {
             TextView tvTitle = findViewById(R.id.tv_title);
             tvTitle.setText("Edit Class");
@@ -119,10 +130,14 @@ public class CreateClassActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Sets up the ViewModel and observes LiveData for the course and class details.
+     */
     private void setupViewModel() {
         YogaClassViewModel.Factory factory = new YogaClassViewModel.Factory(getApplication(), courseId);
         yogaClassViewModel = new ViewModelProvider(this, factory).get(YogaClassViewModel.class);
 
+        // Observe the parent course details.
         yogaClassViewModel.getCourseById(courseId).observe(this, c -> {
             if (c != null) {
                 course = c;
@@ -130,6 +145,7 @@ public class CreateClassActivity extends AppCompatActivity {
             }
         });
 
+        // If in edit mode, observe the specific class to be edited.
         if (isEditMode) {
             yogaClassViewModel.getYogaClassById(classId).observe(this, yc -> {
                 if (yc != null) {
@@ -140,13 +156,18 @@ public class CreateClassActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Populates the UI with details from the parent YogaCourse.
+     */
     private void populateCourseInfo() {
         tvCourseName.setText(String.format(Locale.UK, "For: %s - %s at %s", course.getClassType(), course.getDayOfWeek(), course.getTime()));
         tvDefaultCapacity.setText(String.format("Default: %d", course.getCapacity()));
 
+        // Build a detailed description string.
         StringBuilder details = new StringBuilder();
         details.append(String.format(Locale.UK, "📋 %s\n📅 %s at %s\n⏱️ %d minutes\n👥 %d people\n💷 £%.2f", course.getClassType(), course.getDayOfWeek(), course.getTime(), course.getDuration(), course.getCapacity(), course.getPrice()));
 
+        // Pre-fill instructor name if available in the course.
         if (course.getInstructorName() != null && !course.getInstructorName().trim().isEmpty()) {
             details.append(String.format("\n👨‍🏫 Default instructor: %s", course.getInstructorName()));
             if (!isEditMode) {
@@ -161,6 +182,9 @@ public class CreateClassActivity extends AppCompatActivity {
         tvCourseDetails.setText(details.toString());
     }
 
+    /**
+     * Populates the form fields with data from an existing YogaClass when in edit mode.
+     */
     private void populateClassInfo() {
         editDate.setText(existingClass.getDate());
         selectedDate = existingClass.getDate();
@@ -170,16 +194,23 @@ public class CreateClassActivity extends AppCompatActivity {
         firebaseKey = existingClass.getFirebaseKey();
     }
 
+    /**
+     * Sets up the click listener for the date EditText to show the date picker.
+     */
     private void setupDatePicker() {
         editDate.setOnClickListener(v -> showDatePicker());
     }
 
+    /**
+     * Creates and shows a MaterialDatePicker, constrained to future dates on the correct day of the week.
+     */
     private void showDatePicker() {
         if (course == null) {
             Toast.makeText(this, "Course details not loaded yet.", Toast.LENGTH_SHORT).show();
             return;
         }
 
+        // Set the initial date for the picker (today or the already selected date).
         long initialSelection = MaterialDatePicker.todayInUtcMilliseconds();
         if (selectedDate != null) {
             try {
@@ -189,28 +220,23 @@ public class CreateClassActivity extends AppCompatActivity {
                     initialSelection = date.getTime();
                 }
             } catch (ParseException e) {
-                // Ignore and use today's date
+                // Ignore and use today's date if parsing fails.
             }
         }
 
         int courseDayOfWeek = getCalendarDayOfWeek(course.getDayOfWeek());
 
+        // Set up constraints for the date picker.
         CalendarConstraints.Builder constraintsBuilder = new CalendarConstraints.Builder();
+        long todayUtc = MaterialDatePicker.todayInUtcMilliseconds();
 
-        // Set the validator to allow dates from today onwards in the local timezone.
-        Calendar localToday = Calendar.getInstance(TimeZone.getDefault());
-        localToday.set(Calendar.HOUR_OF_DAY, 0);
-        localToday.set(Calendar.MINUTE, 0);
-        localToday.set(Calendar.SECOND, 0);
-        localToday.set(Calendar.MILLISECOND, 0);
-        long todayUtc = localToday.getTimeInMillis();
-
+        // The validator must allow dates that are on the correct day of the week AND are in the future.
         List<CalendarConstraints.DateValidator> validators = new ArrayList<>();
         validators.add(new DayOfWeekValidator(courseDayOfWeek));
         validators.add(DateValidatorPointForward.from(todayUtc));
         constraintsBuilder.setValidator(new CompositeDateValidator(validators));
 
-
+        // Build and show the date picker.
         MaterialDatePicker<Long> datePicker = MaterialDatePicker.Builder.datePicker()
                 .setTitleText(String.format("Select a %s", course.getDayOfWeek()))
                 .setSelection(initialSelection)
@@ -218,25 +244,27 @@ public class CreateClassActivity extends AppCompatActivity {
                 .build();
 
         datePicker.addOnPositiveButtonClickListener(selection -> {
-            // The selection is in UTC milliseconds. Convert it to the local time zone.
+            // Convert the selected UTC timestamp to a local date string.
             Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
             calendar.setTimeInMillis(selection);
-            // The above calendar is in UTC. To format it correctly in the local timezone,
-            // we create a new calendar instance with the default (local) timezone
-            // and set its fields from the UTC calendar.
             Calendar localCalendar = Calendar.getInstance();
             localCalendar.set(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH));
 
             SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.UK);
             selectedDate = sdf.format(localCalendar.getTime());
             editDate.setText(selectedDate);
-            hideFieldError(editDate, ivErrorDate);
+            hideFieldError(editDate, ivErrorDate); // Clear any previous error state.
         });
 
         datePicker.show(getSupportFragmentManager(), "MATERIAL_DATE_PICKER");
     }
 
 
+    /**
+     * Converts a day of the week string (e.g., "Monday") to a Calendar day constant (e.g., Calendar.MONDAY).
+     * @param dayOfWeek The string representation of the day.
+     * @return The corresponding Calendar constant, or -1 if invalid.
+     */
     private int getCalendarDayOfWeek(String dayOfWeek) {
         switch (dayOfWeek.toLowerCase()) {
             case "sunday": return Calendar.SUNDAY;
@@ -250,6 +278,9 @@ public class CreateClassActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Sets up TextWatchers to hide field errors as the user types.
+     */
     private void setupFormValidation() {
         TextWatcher textWatcher = new TextWatcher() {
             @Override
@@ -258,6 +289,7 @@ public class CreateClassActivity extends AppCompatActivity {
             public void onTextChanged(CharSequence s, int start, int before, int count) {}
             @Override
             public void afterTextChanged(Editable s) {
+                // When the user starts typing in a field, hide its error indicator.
                 if (editDate.hasFocus()) hideFieldError(editDate, ivErrorDate);
                 if (editInstructor.hasFocus()) hideFieldError(editInstructor, ivErrorInstructor);
             }
@@ -266,25 +298,36 @@ public class CreateClassActivity extends AppCompatActivity {
         editInstructor.addTextChangedListener(textWatcher);
     }
 
+    /**
+     * Sets up click listeners for the clear and create/update buttons.
+     */
     private void setupClickListeners() {
         btnClear.setOnClickListener(v -> clearForm());
         btnCreateClass.setOnClickListener(v -> validateAndSaveClass());
     }
 
+    /**
+     * Clears all input fields in the form.
+     */
     private void clearForm() {
         editDate.setText("");
+        // Reset instructor to the course default if available.
         editInstructor.setText(course != null && course.getInstructorName() != null ? course.getInstructorName() : "");
         editCapacity.setText("");
         editComments.setText("");
         editRepeatWeeks.setText("");
         selectedDate = null;
+        // Hide any visible error indicators.
         hideFieldError(editDate, ivErrorDate);
         hideFieldError(editInstructor, ivErrorInstructor);
         Toast.makeText(this, "Form cleared", Toast.LENGTH_SHORT).show();
     }
 
+    /**
+     * Validates the form input and then proceeds to save or update the class.
+     */
     private void validateAndSaveClass() {
-        if (!validateForm()) return;
+        if (!validateForm()) return; // Stop if validation fails.
 
         String instructor = editInstructor.getText().toString().trim();
         String comments = editComments.getText().toString().trim();
@@ -304,22 +347,30 @@ public class CreateClassActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Performs validation checks on the form fields.
+     * @return True if the form is valid, false otherwise.
+     */
     private boolean validateForm() {
+        // Reset previous error states.
         hideFieldError(editDate, ivErrorDate);
         hideFieldError(editInstructor, ivErrorInstructor);
 
+        // Check if a date has been selected.
         if (selectedDate == null || selectedDate.trim().isEmpty()) {
             showFieldError(editDate, ivErrorDate);
             Toast.makeText(this, "Please select a date.", Toast.LENGTH_SHORT).show();
             return false;
         }
 
+        // Check if an instructor name has been entered.
         if (editInstructor.getText().toString().trim().isEmpty()) {
             showFieldError(editInstructor, ivErrorInstructor);
-            Toast.makeText(this, "Please enter a instructor's name.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Please enter an instructor's name.", Toast.LENGTH_SHORT).show();
             return false;
         }
 
+        // Check if a class for this course already exists on the selected date (only in create mode).
         try {
             if (!isEditMode && yogaClassViewModel.classExists(courseId, selectedDate)) {
                 Toast.makeText(this, String.format("A class already exists for this course on %s", selectedDate), Toast.LENGTH_LONG).show();
@@ -334,20 +385,26 @@ public class CreateClassActivity extends AppCompatActivity {
         return true;
     }
 
+    /**
+     * Updates an existing YogaClass with the new data from the form.
+     */
     private void updateClass(String instructor, String comments, int capacity) {
         existingClass.setAssignedInstructor(instructor);
         existingClass.setAdditionalComments(comments);
         existingClass.setActualCapacity(capacity > 0 ? capacity : course.getCapacity());
-        existingClass.setSlotsAvailable(existingClass.getActualCapacity());
+        existingClass.setSlotsAvailable(existingClass.getActualCapacity()); // Reset available slots
         existingClass.setDate(selectedDate);
         existingClass.setFirebaseKey(firebaseKey);
-        // The courseFirebaseKey should already be set, but we ensure it is.
-        existingClass.setCourseFirebaseKey(course.getFirebaseKey());
+        existingClass.setCourseFirebaseKey(course.getFirebaseKey()); // Ensure course key is set.
         yogaClassViewModel.update(existingClass);
         Toast.makeText(this, "Class updated successfully!", Toast.LENGTH_SHORT).show();
         finish();
     }
 
+    /**
+     * Creates one or more new YogaClass instances based on the form data.
+     * @param repeatWeeks The number of consecutive weeks to create the class for.
+     */
     private void createClasses(String startDate, String instructor, int customCapacity, String comments, int repeatWeeks) {
         for (int i = 0; i < repeatWeeks; i++) {
             String classDate = calculateDateForWeek(startDate, i);
@@ -358,8 +415,9 @@ public class CreateClassActivity extends AppCompatActivity {
                 yogaClass.setDate(classDate);
                 yogaClass.setAssignedInstructor(instructor);
                 yogaClass.setStatus("Active");
+                // Use custom capacity if provided, otherwise use the course default.
                 yogaClass.setActualCapacity(customCapacity > 0 ? customCapacity : course.getCapacity());
-                yogaClass.setSlotsAvailable(yogaClass.getActualCapacity());
+                yogaClass.setSlotsAvailable(yogaClass.getActualCapacity()); // Initially, all slots are available.
                 yogaClass.setAdditionalComments(comments.isEmpty() ? null : comments);
                 yogaClass.setCreatedDate(System.currentTimeMillis());
                 yogaClassViewModel.insert(yogaClass);
@@ -370,6 +428,12 @@ public class CreateClassActivity extends AppCompatActivity {
         finish();
     }
 
+    /**
+     * Calculates a new date string by adding a number of weeks to a start date.
+     * @param startDate The starting date string in "dd/MM/yyyy" format.
+     * @param weekOffset The number of weeks to add.
+     * @return The new date string, or null if parsing fails.
+     */
     private String calculateDateForWeek(String startDate, int weekOffset) {
         try {
             SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.UK);
@@ -386,11 +450,21 @@ public class CreateClassActivity extends AppCompatActivity {
         return null;
     }
 
+    /**
+     * Shows a visual error indicator on a form field.
+     * @param field The EditText field to highlight.
+     * @param errorIcon The error icon to make visible.
+     */
     private void showFieldError(EditText field, ImageView errorIcon) {
         field.setBackgroundResource(R.drawable.edit_text_error_background);
         errorIcon.setVisibility(View.VISIBLE);
     }
 
+    /**
+     * Hides the visual error indicator on a form field.
+     * @param field The EditText field to reset.
+     * @param errorIcon The error icon to hide.
+     */
     private void hideFieldError(EditText field, ImageView errorIcon) {
         field.setBackgroundResource(R.drawable.enhanced_edit_text_background);
         errorIcon.setVisibility(View.GONE);

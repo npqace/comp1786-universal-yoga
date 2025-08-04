@@ -12,6 +12,11 @@ import androidx.core.content.ContextCompat;
 
 import com.example.yogaAdmin.R;
 
+/**
+ * A custom dialog for selecting a time (hour, minute, AM/PM).
+ * It provides a user-friendly interface with number pickers and buttons,
+ * and returns the selected time in a 24-hour format string.
+ */
 public class TimePickerDialog extends Dialog {
 
     private OnTimeSelectedListener listener;
@@ -22,10 +27,22 @@ public class TimePickerDialog extends Dialog {
 
     private boolean isAM = true;
 
+    /**
+     * Interface for callback when a time is selected.
+     */
     public interface OnTimeSelectedListener {
+        /**
+         * Called when the user confirms a time selection.
+         * @param time The selected time as a string in "HH:mm" format.
+         */
         void onTimeSelected(String time);
     }
 
+    /**
+     * Constructs a new TimePickerDialog.
+     * @param context The context in which the dialog should run.
+     * @param listener The callback that will run when a time is selected.
+     */
     public TimePickerDialog(@NonNull Context context, OnTimeSelectedListener listener) {
         super(context);
         this.listener = listener;
@@ -43,6 +60,9 @@ public class TimePickerDialog extends Dialog {
         updateSelectedTime();
     }
 
+    /**
+     * Initializes all the view components from the layout file.
+     */
     private void initializeViews() {
         hourPicker = findViewById(R.id.hour_picker);
         minutePicker = findViewById(R.id.minute_picker);
@@ -56,6 +76,9 @@ public class TimePickerDialog extends Dialog {
         selectAMPM(true);
     }
 
+    /**
+     * Configures the number pickers for hours and minutes.
+     */
     private void setupNumberPickers() {
         // Setup hour picker (1-12)
         hourPicker.setMinValue(1);
@@ -69,16 +92,21 @@ public class TimePickerDialog extends Dialog {
         minutePicker.setValue(0); // Default to 00
         minutePicker.setWrapSelectorWheel(true);
 
-        // Add listeners to update selected time
+        // Add listeners to update the selected time display whenever the value changes.
         hourPicker.setOnValueChangedListener((picker, oldVal, newVal) -> updateSelectedTime());
         minutePicker.setOnValueChangedListener((picker, oldVal, newVal) -> updateSelectedTime());
     }
 
 
 
+    /**
+     * Toggles the state between AM and PM and updates the UI accordingly.
+     * @param isAMSelected True if AM is selected, false for PM.
+     */
     private void selectAMPM(boolean isAMSelected) {
         isAM = isAMSelected;
 
+        // Update button backgrounds and text colors to indicate selection
         if (isAM) {
             btnAM.setBackground(ContextCompat.getDrawable(getContext(), R.drawable.time_button_selected_background));
             btnAM.setTextColor(ContextCompat.getColor(getContext(), R.color.white));
@@ -94,6 +122,9 @@ public class TimePickerDialog extends Dialog {
         updateSelectedTime();
     }
 
+    /**
+     * Updates the TextView to display the currently selected time in 24-hour format.
+     */
     private void updateSelectedTime() {
         // Get values from pickers
         int selectedHour = hourPicker.getValue();
@@ -101,41 +132,46 @@ public class TimePickerDialog extends Dialog {
 
         // Convert to 24-hour format for display consistency
         int hour24 = selectedHour;
-        if (!isAM && selectedHour != 12) {
+        if (!isAM && selectedHour != 12) { // PM case, not 12 PM
             hour24 = selectedHour + 12;
-        } else if (isAM && selectedHour == 12) {
+        } else if (isAM && selectedHour == 12) { // 12 AM case (midnight)
             hour24 = 0;
         }
 
+        // Format and display the time
         String timeString = String.format("%02d:%02d", hour24, selectedMinute);
         tvSelectedTime.setText(timeString);
         btnConfirm.setEnabled(true);
     }
 
+    /**
+     * Sets up click listeners for the AM/PM, confirm, and cancel buttons.
+     */
     private void setupClickListeners() {
         btnAM.setOnClickListener(v -> selectAMPM(true));
         btnPM.setOnClickListener(v -> selectAMPM(false));
 
         btnConfirm.setOnClickListener(v -> {
             if (listener != null) {
-                // Get values from pickers
+                // Get final values from pickers
                 int selectedHour = hourPicker.getValue();
                 int selectedMinute = minutePicker.getValue();
 
                 // Convert to 24-hour format
                 int hour24 = selectedHour;
-                if (!isAM && selectedHour != 12) {
+                if (!isAM && selectedHour != 12) { // PM case, not 12 PM
                     hour24 = selectedHour + 12;
-                } else if (isAM && selectedHour == 12) {
+                } else if (isAM && selectedHour == 12) { // 12 AM case (midnight)
                     hour24 = 0;
                 }
 
+                // Pass the formatted time string to the listener
                 String timeString = String.format("%02d:%02d", hour24, selectedMinute);
                 listener.onTimeSelected(timeString);
             }
-            dismiss();
+            dismiss(); // Close the dialog
         });
 
-        btnCancel.setOnClickListener(v -> dismiss());
+        btnCancel.setOnClickListener(v -> dismiss()); // Close the dialog
     }
 }

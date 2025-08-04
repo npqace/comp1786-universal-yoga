@@ -1,3 +1,7 @@
+/**
+ * @file AppNavigator.tsx
+ * @description The main navigator for the application, handling authentication flow and the main tab/stack navigation.
+ */
 import React, { useState, useEffect } from 'react';
 import { StatusBar, StyleSheet, View, SafeAreaView } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
@@ -20,7 +24,7 @@ import ProfileScreen from '../screens/ProfileScreen';
 import MyBookingsScreen from '../screens/MyBookingsScreen';
 import DetailHeader from '../components/DetailHeader';
 
-// Define Param Lists
+// Define Param Lists for type safety with React Navigation
 type AuthStackParamList = {
   Login: undefined;
   SignUp: undefined;
@@ -37,11 +41,16 @@ type RootStackParamList = {
   ClassDetail: { classId: string; courseFirebaseKey?: string };
 };
 
+// Create navigators
 const Tab = createBottomTabNavigator<TabParamList>();
 const Stack = createStackNavigator<RootStackParamList>();
 const AuthStack = createStackNavigator<AuthStackParamList>();
 
-// Auth Navigator
+/**
+ * @navigator AuthNavigator
+ * @description Navigator for the authentication flow (Login, Sign Up).
+ * This is shown when the user is not logged in.
+ */
 function AuthNavigator() {
   return (
     <AuthStack.Navigator id={undefined}>
@@ -51,12 +60,17 @@ function AuthNavigator() {
   );
 }
 
-// Tab Navigator
+/**
+ * @navigator TabNavigator
+ * @description The main bottom tab navigator for the authenticated user.
+ * It includes screens for Classes, My Bookings, and Profile.
+ */
 function TabNavigator() {
   return (
     <Tab.Navigator
       id={undefined}
       screenOptions={({ route }) => ({
+        // Configure tab bar icons
         tabBarIcon: ({ focused, color, size }) => {
           let iconName: keyof typeof Ionicons.glyphMap = 'help-outline';
 
@@ -72,6 +86,7 @@ function TabNavigator() {
         },
         tabBarActiveTintColor: colors.primary,
         tabBarInactiveTintColor: 'gray',
+        // Use a custom header for all tab screens
         header: ({ options }) => <CustomHeader title={options.title} />,
       })}
     >
@@ -82,7 +97,12 @@ function TabNavigator() {
   );
 }
 
-// Main App Navigator
+/**
+ * @navigator MainStackNavigator
+ * @description The root stack navigator for the authenticated part of the app.
+ * It contains the TabNavigator and any other screens that should be presented
+ * on top of the tabs (e.g., ClassDetailScreen).
+ */
 function MainStackNavigator() {
   return (
     <Stack.Navigator id={undefined}>
@@ -91,6 +111,7 @@ function MainStackNavigator() {
         name="ClassDetail"
         component={ClassDetailScreen}
         options={() => ({
+          // Use a custom header for the detail screen
           header: () => <DetailHeader title="Class Details" />,
         })}
       />
@@ -98,21 +119,34 @@ function MainStackNavigator() {
   );
 }
 
+/**
+ * @component AppNavigator
+ * @description The main entry point for the app's navigation. It listens to the
+ * authentication state and renders either the AuthNavigator or the MainStackNavigator.
+ */
 export default function AppNavigator() {
   const [user, setUser] = useState<User | null>(null);
 
+  /**
+   * @effect
+   * @description Subscribes to Firebase authentication state changes to determine
+   * which navigator to show.
+   */
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (userState) => {
       if (userState) {
+        // User is signed in
         setUser({
           uid: userState.uid,
           email: userState.email,
           displayName: userState.displayName,
         });
       } else {
+        // User is signed out
         setUser(null);
       }
     });
+    // Unsubscribe from the listener on cleanup
     return unsubscribe;
   }, []);
 
@@ -121,6 +155,7 @@ export default function AppNavigator() {
       <StatusBar backgroundColor="transparent" barStyle="light-content" />
       <OfflineBanner />
       <NavigationContainer>
+        {/* Conditionally render the navigator based on user auth state */}
         {user ? <MainStackNavigator /> : <AuthNavigator />}
       </NavigationContainer>
     </SafeAreaView>

@@ -1,3 +1,8 @@
+/**
+ * @file index.ts
+ * @description Barrel file for exporting all components from the components directory.
+ * This allows for cleaner imports in other parts of the application.
+ */
 export { default as CustomDropdown } from './CustomDropdown';
 export { default as DetailItem } from './DetailItem';
 export { default as EmptyState } from './EmptyState';

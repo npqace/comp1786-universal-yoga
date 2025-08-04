@@ -1,14 +1,28 @@
+/**
+ * @file useYogaData.ts
+ * @description Custom hooks for fetching and managing yoga-related data from the YogaService.
+ */
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { YogaService } from '../services/yogaService';
 import { YogaClass, LoadingState, SearchFilters, Booking } from '../types';
 import { YogaCourse } from '../types/YogaCourse';
 
+/**
+ * @hook useFilteredYogaClasses
+ * @description A hook to fetch all yoga classes, apply filters, and manage loading/error states.
+ * It also subscribes to real-time updates for classes.
+ * @returns {{classes: YogaClass[], loading: LoadingState, refresh: () => void, setFilters: (filters: SearchFilters) => void}}
+ */
 export function useFilteredYogaClasses() {
   const [allClasses, setAllClasses] = useState<YogaClass[]>([]);
   const [loading, setLoading] = useState<LoadingState>({ isLoading: true });
   const [filters, setFilters] = useState<SearchFilters>({});
   const yogaService = YogaService.getInstance();
 
+  /**
+   * @callback fetchClasses
+   * @description Fetches all classes with their associated course data.
+   */
   const fetchClasses = useCallback(async () => {
     try {
       setLoading({ isLoading: true });
@@ -23,6 +37,10 @@ export function useFilteredYogaClasses() {
     }
   }, [yogaService]);
 
+  /**
+   * @effect
+   * @description Fetches initial data and subscribes to real-time class updates.
+   */
   useEffect(() => {
     // Initial fetch
     fetchClasses();
@@ -40,11 +58,17 @@ export function useFilteredYogaClasses() {
     return () => unsubscribe();
   }, [yogaService, fetchClasses]);
 
+  /**
+   * @memo filteredClasses
+   * @description Memoized calculation of filtered classes based on the current filters.
+   * This avoids re-calculating on every render unless classes or filters change.
+   */
   const filteredClasses = useMemo(() => {
     const { name, dayOfWeek, timeOfDay, courseFirebaseKey } = filters;
     
     let classesToFilter = [...allClasses];
 
+    // Apply filters if any are set
     if (name || dayOfWeek || timeOfDay || courseFirebaseKey) {
       classesToFilter = classesToFilter.filter(cls => {
         if (!cls.course) return false;
@@ -80,6 +104,7 @@ export function useFilteredYogaClasses() {
       });
     }
 
+    // Sort the classes by date
     return classesToFilter.sort((a, b) => {
       const dateA = new Date(a.date.split('/').reverse().join('-'));
       const dateB = new Date(b.date.split('/').reverse().join('-'));
@@ -87,6 +112,10 @@ export function useFilteredYogaClasses() {
     });
   }, [allClasses, filters]);
 
+  /**
+   * @callback refresh
+   * @description Manually triggers a refetch of the class data.
+   */
   const refresh = useCallback(() => {
     fetchClasses();
   }, [fetchClasses]);
@@ -99,6 +128,11 @@ export function useFilteredYogaClasses() {
   };
 }
 
+/**
+ * @hook useYogaCourses
+ * @description A hook to fetch all yoga courses and manage loading/error states.
+ * @returns {{courses: YogaCourse[], loading: LoadingState, refresh: () => void}}
+ */
 export function useYogaCourses() {
   const [courses, setCourses] = useState<YogaCourse[]>([]);
   const [loading, setLoading] = useState<LoadingState>({ isLoading: true });
@@ -129,6 +163,13 @@ export function useYogaCourses() {
   return { courses, loading, refresh };
 }
 
+/**
+ * @hook useClassDetail
+ * @description A hook to fetch the details of a specific yoga class by its ID.
+ * It also determines if the current user has booked the class.
+ * @param {string | undefined} classId - The ID of the class to fetch.
+ * @returns {{classDetail: YogaClass | null, isBooked: boolean, loading: LoadingState, refresh: () => void}}
+ */
 export function useClassDetail(classId: string | undefined) {
   const [classDetail, setClassDetail] = useState<YogaClass | null>(null);
   const [isBooked, setIsBooked] = useState(false);
@@ -162,16 +203,16 @@ export function useClassDetail(classId: string | undefined) {
     // Initial fetch
     fetchClassDetail();
 
-    // Subscribe to real-time updates for all classes
+    // Subscribe to real-time updates for all classes to catch changes to this specific class
     const unsubscribe = yogaService.subscribeToClassesUpdates(async (updatedClasses) => {
       try {
         const updatedClass = updatedClasses.find(cls => cls.firebaseKey === classId);
         if (updatedClass) {
+          // If the class is found in the update, re-fetch its course details and update the state
           const course = await yogaService.getCourseById(updatedClass.courseFirebaseKey);
           setClassDetail({ ...updatedClass, course });
         }
       } catch (error) {
-        // Handle potential errors during update
         console.error("Failed to process class updates:", error);
       }
     });
@@ -186,6 +227,12 @@ export function useClassDetail(classId: string | undefined) {
   return { classDetail, isBooked, loading, refresh };
 }
 
+/**
+ * @hook useUserBookings
+ * @description A hook to fetch the current user's bookings and listen for real-time updates.
+ * It enriches booking data with real-time class status.
+ * @returns {{bookings: Booking[], loading: LoadingState, refresh: () => Promise<void>}}
+ */
 export function useUserBookings() {
   // The final, combined data that will be sent to the UI
   const [enrichedBookings, setEnrichedBookings] = useState<Booking[]>([]);
@@ -197,7 +244,7 @@ export function useUserBookings() {
   const [error, setError] = useState<string | undefined>();
   const yogaService = YogaService.getInstance();
 
-  // Effect for setting up Firebase subscriptions
+  // Effect for setting up Firebase subscriptions for both classes and user bookings
   useEffect(() => {
     const unsubscribeClasses = yogaService.subscribeToClassesUpdates((updatedClasses) => {
       const newClassMap = new Map<string, YogaClass>();
@@ -236,6 +283,10 @@ export function useUserBookings() {
     }
   }, [rawBookings, classMap]);
 
+  /**
+   * @callback refresh
+   * @description Manually re-fetches all booking and class data.
+   */
   const refresh = useCallback(async () => {
     setRawBookings(null);
     setClassMap(null);
