@@ -75,7 +75,17 @@ public class YogaClassRepository {
     }
 
     public void insertFromSync(YogaClass yogaClass) {
-        AppDatabase.databaseWriteExecutor.execute(() -> yogaClassDao.insert(yogaClass));
+        AppDatabase.databaseWriteExecutor.execute(() -> {
+            // First, check if the course exists using the courseFirebaseKey from the yogaClass
+            if (yogaClass.getCourseFirebaseKey() != null) {
+                YogaCourse course = yogaCourseDao.getCourseByFirebaseKey(yogaClass.getCourseFirebaseKey());
+                if (course != null) {
+                    // If the course exists, set the local courseId on the yogaClass and insert it
+                    yogaClass.setCourseId(course.getId());
+                    yogaClassDao.insert(yogaClass);
+                }
+            }
+        });
     }
 
     public void updateFromSync(YogaClass yogaClass) {

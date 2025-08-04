@@ -12,7 +12,9 @@ import com.example.yogaAdmin.models.YogaCourse;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -96,8 +98,20 @@ public class YogaCourseRepository {
     public void delete(YogaCourse yogaCourse) {
         AppDatabase.databaseWriteExecutor.execute(() -> {
             List<YogaClass> classesToDelete = mYogaClassDao.getClassesForCourseSync(yogaCourse.getId());
+            Map<String, Object> childUpdates = new HashMap<>();
+
+            // Add the course to the update map
+            childUpdates.put("/courses/" + yogaCourse.getFirebaseKey(), null);
+
+            // Add all associated classes to the update map
             for (YogaClass yogaClass : classesToDelete) {
-                // Delete associated bookings from Firebase
+                if (yogaClass.getFirebaseKey() != null) {
+                    childUpdates.put("/classes/" + yogaClass.getFirebaseKey(), null);
+                }
+            }
+
+            // Also delete associated bookings from Firebase
+            for (YogaClass yogaClass : classesToDelete) {
                 if (yogaClass.getFirebaseKey() != null) {
                     DatabaseReference bookingsRef = firebaseDatabase.child("bookings");
                     Query bookingQuery = bookingsRef.orderByChild("classId").equalTo(yogaClass.getFirebaseKey());
@@ -114,17 +128,18 @@ public class YogaCourseRepository {
                             // Handle error
                         }
                     });
-
-                    // Delete the class from Firebase
-                    firebaseDatabase.child("classes").child(yogaClass.getFirebaseKey()).removeValue();
                 }
             }
 
-            // Delete the course from local and Firebase
-            mYogaCourseDao.delete(yogaCourse);
-            if (yogaCourse.getFirebaseKey() != null) {
-                firebaseDatabase.child("courses").child(yogaCourse.getFirebaseKey()).removeValue();
-            }
+            // Perform the atomic deletion from Firebase
+            firebaseDatabase.updateChildren(childUpdates).addOnCompleteListener(task -> {
+                if (task.isSuccessful()) {
+                    // Once the Firebase deletion is complete, delete from the local database
+                    AppDatabase.databaseWriteExecutor.execute(() -> {
+                        mYogaCourseDao.delete(yogaCourse);
+                    });
+                }
+            });
         });
     }
 
